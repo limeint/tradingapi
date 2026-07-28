@@ -1,0 +1,468 @@
+syntax = "proto3";
+
+package grpc.tradeapi.v1.corporateactions;
+
+import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
+import "grpc/gateway/protoc_gen_openapiv2/options/annotations.proto";
+import "google/type/decimal.proto";
+import "google/type/date.proto";
+
+option go_package = "github.com/limeint/tradingapi/go/grpc/tradeapi/v1/corporateactions";
+option java_multiple_files = true;
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  schemes: [
+    HTTP,
+    HTTPS
+  ]
+  info: {
+    title: "Limeint Trade API"
+    description: "Limeint API for trading operations"
+  }
+  security_definitions: {
+    security: {
+      key: "Authorization"
+      value: {
+        type: TYPE_API_KEY
+        in: IN_HEADER
+        name: "Authorization"
+        description: "JWT authorization token"
+      }
+    }
+  }
+  responses: [
+    {
+      key: "default"
+      value: {
+        schema: {
+          json_schema: {
+            ref: "googletypeStatus"
+          }
+        }
+      }
+    },
+    {
+      key: "500"
+      value: {
+        description: "Internal service error. Try again later."
+      }
+    },
+    {
+      key: "503"
+      value: {
+        description: "The service is currently unavailable. Try again later."
+      }
+    },
+    {
+      key: "429"
+      value: {
+        description: "Too many requests. The available limit is 200 requests per minute."
+      }
+    },
+    {
+      key: "401"
+      value: {
+        description: "The token has expired or is invalid."
+      }
+    },
+    {
+      key: "504"
+      value: {
+        description: "The deadline was exceeded before the operation completed."
+      }
+    }
+  ]
+};
+
+// Service for providing information on corporate actions (dividends, splits)
+service CorporateActionsService {
+  // Get upcoming split events by instrument
+  rpc GetFutureSplits(GetFutureSplitsRequest) returns (GetFutureSplitsResponse) {
+    option (google.api.http) = {
+      get: "/v1/splits/future"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: [
+        {
+          security_requirement: {
+            key: "Authorization"
+          }
+        }
+      ]
+    };
+  };
+
+  // Get the history of splits by instrument
+  rpc GetPastSplits(GetPastSplitsRequest) returns (GetPastSplitsResponse) {
+    option (google.api.http) = {
+      get: "/v1/splits/past"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: [
+        {
+          security_requirement: {
+            key: "Authorization"
+          }
+        }
+      ]
+    };
+  };
+
+  // Get a calendar of future bond events
+  rpc GetFutureBondsEvents(GetFutureBondsEventsRequest) returns (GetFutureBondsEventsResponse) {
+    option (google.api.http) = {
+      get: "/v1/bonds/future"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: [
+        {
+          security_requirement: {
+            key: "Authorization"
+          }
+        }
+      ]
+    };
+  };
+
+  // Get a calendar of historical bond events
+  rpc GetPastBondsEvents(GetPastBondsEventsRequest) returns (GetPastBondsEventsResponse) {
+    option (google.api.http) = {
+      get: "/v1/bonds/past"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: [
+        {
+          security_requirement: {
+            key: "Authorization"
+          }
+        }
+      ]
+    };
+  };
+
+  // Get a list of upcoming (future) dividend payments for an instrument.
+  rpc GetFutureDividends(GetFutureDividendsRequest) returns (GetFutureDividendsResponse) {
+    option (google.api.http) = {
+      get: "/v1/future-dividends"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: [
+        {
+          security_requirement: {
+            key: "Authorization"
+          }
+        }
+      ]
+      responses: {
+        key: "400"
+        value: {
+          description: "Invalid symbol. The symbol must use ticker@mic format, for example SBER@MISX."
+        }
+      }
+    };
+  };
+
+  // Get historical data on dividends paid for an instrument
+  rpc GetPastDividends(GetPastDividendsRequest) returns (GetPastDividendsResponse) {
+    option (google.api.http) = {
+      get: "/v1/past-dividends"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: [
+        {
+          security_requirement: {
+            key: "Authorization"
+          }
+        }
+      ]
+      responses: {
+        key: "400"
+        value: {
+          description: "Invalid symbol or interval. The symbol must use ticker@mic format, for example SBER@MISX."
+        }
+      }
+    };
+  };
+
+}
+
+// Request upcoming split events by instrument
+message GetFutureSplitsRequest {
+  // Instrument symbol
+  string symbol = 1;
+  // Sorting direction by date: asc - from old to new, desc - from new to old
+  SortDirection sort_direction = 2;
+  // Limit. Limits the number of splits returned in the list
+  int32 limit = 3;
+  // Offset. Specifies the number of splits to skip before starting to return the result
+  int32 offset = 4;
+}
+
+// Upcoming split events by instrument
+message GetFutureSplitsResponse {
+  // Instrument symbol
+  string symbol = 1;
+  // Pagination options
+  Pagination pagination = 2;
+  // Split information
+  repeated SplitInfo splits = 3;
+}
+
+// Request for split history by instrument
+message GetPastSplitsRequest {
+  // Instrument symbol
+  string symbol = 1;
+  // Start of time interval
+  google.type.Date date_from = 2;
+  // End of time interval
+  google.type.Date date_to = 3;
+  // Sorting direction by date: asc - from old to new, desc - from new to old
+  SortDirection sort_direction = 4;
+  // Limit. Limits the number of splits returned in the list
+  int32 limit = 5;
+  // Offset. Specifies the number of splits to skip before starting to return the result
+  int32 offset = 6;
+}
+
+// History of splits by instrument
+message GetPastSplitsResponse {
+  // Instrument symbol
+  string symbol = 1;
+  // Pagination options
+  Pagination pagination = 2;
+  // Split information
+  repeated SplitInfo splits = 3;
+}
+
+// Request a calendar of future bond events
+message GetFutureBondsEventsRequest {
+  // Instrument symbol
+  string symbol = 1;
+  // Start of time interval
+  google.type.Date date_from = 2;
+  // End of the time interval. By default, the response covers one year.
+  google.type.Date date_to = 3;
+  // Sorting direction by date: asc - from old to new, desc - from new to old
+  SortDirection sort_direction = 4;
+  // Limit. Limits the number of events returned for bonds in the list
+  int32 limit = 5;
+  // Offset. Specifies the number of bond events to skip before returning a result
+  int32 offset = 6;
+}
+
+// Calendar of future bond events
+message GetFutureBondsEventsResponse {
+  // Instrument symbol
+  string symbol = 1;
+  // Pagination options. The total parameter is ignored.
+  Pagination pagination = 2;
+  // Bond events
+  repeated BondEvent events = 3;
+}
+
+// Request a calendar of historical bond events
+message GetPastBondsEventsRequest {
+  // Instrument symbol
+  string symbol = 1;
+  // Start of time interval
+  google.type.Date date_from = 2;
+  // End of the time interval. By default, the response covers one year.
+  google.type.Date date_to = 3;
+  // Sorting direction by date: asc - from old to new, desc - from new to old
+  SortDirection sort_direction = 4;
+  // Limit. Limits the number of events returned for bonds in the list
+  int32 limit = 5;
+  // Offset. Specifies the number of bond events to skip before returning a result
+  int32 offset = 6;
+}
+
+// Calendar of historical events on bonds
+message GetPastBondsEventsResponse {
+  // Instrument symbol
+  string symbol = 1;
+  // Pagination options. The total parameter is ignored.
+  Pagination pagination = 2;
+  // Bond events
+  repeated BondEvent events = 3;
+}
+
+// Bond event
+message BondEvent {
+  // Event date
+  google.type.Date date = 1;
+  // Event type
+  BondEventType type = 2;
+  // Payment amount; may be omitted for offers where only the price is relevant
+  google.type.Decimal value = 3;
+  // Payout currency
+  google.protobuf.StringValue currency = 4;
+  // Event specific details
+  oneof event_details {
+    // Coupon payment details
+    CouponEventDetails coupon_details = 5;
+    // Details of amortization (partial repayment of bond par value)
+    AmortizationEventDetails amortization_details = 6;
+    // Offer details (early repurchase or repayment event)
+    OfferEventDetails offer_details = 7;
+  }
+}
+
+// Bond event type
+enum BondEventType {
+
+  UNSPECIFIED = 0;
+
+  COUPON = 1;
+
+  AMORTIZATION = 2;
+
+  OFFER = 3;
+}
+
+// Coupon payment details
+message CouponEventDetails {
+  // Record Date
+  google.type.Date record_date = 1;
+  // Coupon period start date
+  google.type.Date start_date = 2;
+  // Face value used to calculate the coupon
+  google.type.Decimal face_value = 3;
+  // Coupon rate as a percentage
+  google.type.Decimal value_percent = 4;
+}
+
+// Amortization details (partial repayment of bond face value)
+message AmortizationEventDetails {
+  // Remaining face value after amortization
+  google.type.Decimal new_face_value = 1;
+  // Original security face value
+  google.type.Decimal initial_face_value = 2;
+  // Amortized percentage of face value
+  google.type.Decimal amortization_percent = 3;
+}
+
+// Offer details (early repurchase or repayment event)
+message OfferEventDetails {
+  // PUT or CALL
+  google.protobuf.StringValue offer_type = 1;
+  // Offer price as a percentage of face value (or in currency)
+  google.type.Decimal price = 2;
+  // Start date of the offer submission period
+  google.type.Date start_date = 3;
+  // End date of the offer submission period
+  google.type.Date end_date = 4;
+  // Offer agent
+  google.protobuf.StringValue agent = 5;
+}
+
+// Corporate Action Information
+message SplitInfo {
+  // Effective date of the corporate action (execution date)
+  google.type.Date exec_date = 1;
+  // Number of securities before conversion (numerator of the coefficient)
+  google.type.Decimal old_ratio = 2;
+  // Number of securities after conversion (coefficient denominator)
+  google.type.Decimal new_ratio = 3;
+  // New instrument lot size after execution of a corporate action
+  google.protobuf.Int32Value new_lot = 4;
+  // Event type (split/consolidation, etc.)
+  ConvertationType convertation_type = 5;
+}
+
+// Possible event types
+enum ConvertationType {
+  // Unknown event/conversion type. Used by default
+  CONVTYPE_UNKNOWN = 0;
+  // Share buyback. Acquisition by the issuing company of its own shares
+  BUYBACK = 1;
+  // Execution of Call offer. Early redemption (revocation) of a security at the initiative of the issuer
+  CALL_OPTION_EXERCISED = 2;
+  // Partial face-value redemption (amortization) or scheduled redemption without a lottery
+  DRAWINGS = 3;
+  // Lottery redemption. Early repayment of part of a bond issue where securities are selected by lottery
+  DRAWINGS_BY_LOTTERY = 4;
+  // Early conversion. Exchange of one security for another before the scheduled date (for example, convertible bonds into shares)
+  EARLY_CONVERSION = 5;
+  // Redemption at maturity. Scheduled full redemption when the security reaches maturity
+  MATURITY = 6;
+  // Planned (regular) conversion. Standard corporate action: split, consolidation or planned exchange of securities
+  ORDINARY = 7;
+  // Execution of the Put offer. Early repurchase of a security by the issuer at the request of the investor (owner)
+  PUT_OPTION_EXERCISED = 8;
+  // Tender proposal. Public offer to shareholders to buy out their securities (often during mergers/acquisitions)
+  TENDER_OFFER = 9;
+}
+
+// Request to receive a list of upcoming dividend payments for an instrument
+message GetFutureDividendsRequest {
+  // Instrument symbol
+  string symbol = 1;
+  // Sorting direction by date: asc - from old to new, desc - from new to old.
+  SortDirection sort_direction = 2;
+  // Limit. Limits the number of elements returned
+  int32 limit = 3;
+  // Offset. Specifies how many items to skip before returning results.
+  int32 offset = 4;
+}
+
+// List of upcoming dividend payments for an instrument with pagination
+message GetFutureDividendsResponse {
+  // Pagination options
+  Pagination pagination = 1;
+  // List of dividends
+  repeated Dividend dividends = 2;
+}
+
+// Request to obtain historical data on dividends paid for an instrument
+message GetPastDividendsRequest {
+  // Instrument symbol
+  string symbol = 1;
+  // Sorting direction by date: asc - from old to new, desc - from new to old.
+  SortDirection sort_direction = 2;
+  // Start of time interval
+  google.type.Date date_from = 3;
+  // End of time interval
+  google.type.Date date_to = 4;
+  // Limit. Limits the number of elements returned
+  int32 limit = 5;
+  // Offset. Specifies how many items to skip before returning results.
+  int32 offset = 6;
+}
+
+// Historical data on dividends paid for an instrument with pagination
+message GetPastDividendsResponse {
+  // Pagination options
+  Pagination pagination = 1;
+  // List of dividends
+  repeated Dividend dividends = 2;
+}
+
+// Information about dividend payment
+message Dividend {
+  // Registry closing date
+  google.type.Date date = 1;
+  // Dividend per share
+  google.type.Decimal amount = 2;
+  // Dividend payment currency
+  string currency = 3;
+}
+
+// Pagination options
+message Pagination {
+  // Total number of elements
+  int32 total = 1;
+  // Limit. Limits the number of elements returned
+  int32 limit = 2;
+  // Offset. Specifies how many items to skip before returning results.
+  int32 offset = 3;
+  // Next page flag. Indicates whether the next page of data exists
+  bool has_next = 4;
+}
+
+// Sort direction
+enum SortDirection {
+  // Ascending
+  ASC = 0;
+  // Descending
+  DESC = 1;
+}

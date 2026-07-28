@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+package grpc.tradeapi.v1.metrics;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "grpc/gateway/protoc_gen_openapiv2/options/annotations.proto";
+
+option go_package = "github.com/limeint/tradingapi/go/grpc/tradeapi/v1/metrics";
+option java_multiple_files = true;
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  schemes: [
+    HTTP,
+    HTTPS
+  ]
+  info: {
+    title: "Limeint Trade API"
+    description: "Limeint API for trading operations"
+  }
+  security_definitions: {
+    security: {
+      key: "Authorization"
+      value: {
+        type: TYPE_API_KEY
+        in: IN_HEADER
+        name: "Authorization"
+        description: "JWT authorization token"
+      }
+    }
+  }
+  responses: [
+    {
+      key: "default"
+      value: {
+        schema: {
+          json_schema: {
+            ref: "googletypeStatus"
+          }
+        }
+      }
+    },
+    {
+      key: "500"
+      value: {
+        description: "Internal service error. Try again later."
+      }
+    },
+    {
+      key: "503"
+      value: {
+        description: "The service is currently unavailable. Try again later."
+      }
+    },
+    {
+      key: "429"
+      value: {
+        description: "Too many requests. The available limit is 200 requests per minute."
+      }
+    },
+    {
+      key: "401"
+      value: {
+        description: "The token has expired or is invalid."
+      }
+    },
+    {
+      key: "504"
+      value: {
+        description: "The deadline was exceeded before the operation completed."
+      }
+    }
+  ]
+};
+
+// Service that provides Trade API usage metrics.
+// Allows clients to track their activity, including information about current quotas and limits,
+// to avoid exceeding established limits.
+service UsageMetricsService {
+  // Get current usage metrics for a user
+  // Example HTTP request:
+  // GET /v1/usage
+  // Authorization: <token>
+  rpc GetUsageMetrics(GetUsageMetricsRequest) returns (GetUsageMetricsResponse) {
+    option (google.api.http) = {
+      get: "/v1/usage"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: [
+        {
+          security_requirement: {
+            key: "Authorization"
+          }
+        }
+      ]
+    };
+  };
+
+}
+
+// Request to get current usage metrics
+message GetUsageMetricsRequest {
+}
+
+// Information about current usage metrics
+message GetUsageMetricsResponse {
+  // Quota
+  message QuotaUsage {
+    // Method name
+    string name = 1;
+    // The total limit for this quota.
+    int64 limit = 2;
+    // How many available units are left in the current window.
+    int64 remaining = 3;
+    // The time when the quota counter will be reset (start of a new window).
+    google.protobuf.Timestamp reset_time = 4;
+  }
+  // List of current quotas and their use.
+  repeated QuotaUsage quotas = 1;
+}

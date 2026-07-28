@@ -1,0 +1,192 @@
+syntax = "proto3";
+
+package grpc.tradeapi.v1.auth;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "grpc/gateway/protoc_gen_openapiv2/options/annotations.proto";
+
+option go_package = "github.com/limeint/tradingapi/go/grpc/tradeapi/v1/auth";
+option java_multiple_files = true;
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  schemes: [
+    HTTP,
+    HTTPS
+  ]
+  info: {
+    title: "Limeint Trade API"
+    description: "Limeint API for trading operations"
+  }
+  responses: [
+    {
+      key: "default"
+      value: {
+        schema: {
+          json_schema: {
+            ref: "googletypeStatus"
+          }
+        }
+      }
+    },
+    {
+      key: "500"
+      value: {
+        description: "Internal service error. Try again later."
+      }
+    },
+    {
+      key: "503"
+      value: {
+        description: "The service is currently unavailable. Try again later."
+      }
+    },
+    {
+      key: "429"
+      value: {
+        description: "Too many requests. The available limit is 200 requests per minute."
+      }
+    },
+    {
+      key: "401"
+      value: {
+        description: "The token has expired or is invalid."
+      }
+    },
+    {
+      key: "504"
+      value: {
+        description: "The deadline was exceeded before the operation completed."
+      }
+    },
+    {
+      key: "400"
+      value: {
+        description: "The token has expired or is invalid."
+      }
+    }
+  ]
+};
+
+// Authentication service
+service AuthService {
+  // Exchange an API secret for a JWT
+  // Example HTTP request:
+  // POST /v1/sessions
+  // Content-Type: application/json
+  //
+  // {
+  //   "secret": "your-api-secret-key"
+  // }
+  //
+  // All fields are sent in the request body
+  rpc Auth(AuthRequest) returns (AuthResponse) {
+    option (google.api.http) = {
+      post: "/v1/sessions"
+      body: "*"
+    };
+  };
+
+  // Get session token information
+  // Example HTTP request:
+  // POST /v1/sessions/details
+  // Content-Type: application/json
+  //
+  // {
+  //   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  // }
+  //
+  // The token is sent in the request body for security
+  // The response also includes the accounts available to the token.
+  rpc TokenDetails(TokenDetailsRequest) returns (TokenDetailsResponse) {
+    option (google.api.http) = {
+      post: "/v1/sessions/details"
+      body: "*"
+    };
+  };
+
+  // Subscription to JWT token update. Stream method
+  rpc SubscribeJwtRenewal(SubscribeJwtRenewalRequest) returns (stream SubscribeJwtRenewalResponse);
+
+}
+
+// Authorization request
+message AuthRequest {
+  // API token (secret key)
+  string secret = 1;
+  // Request source application ID
+  string source_app_id = 2;
+}
+
+// Authorization information
+message AuthResponse {
+  // Received JWT token
+  string token = 1;
+}
+
+// Requesting information about a token
+message TokenDetailsRequest {
+  // JWT token
+  string token = 1;
+}
+
+// Token Information
+message TokenDetailsResponse {
+  // Creation date and time
+  google.protobuf.Timestamp created_at = 1;
+  // Expiration date and time
+  google.protobuf.Timestamp expires_at = 2;
+  // Information about accessing market data
+  repeated MDPermission md_permissions = 3;
+  // Account IDs
+  repeated string account_ids = 4;
+  // Session and trading accounts in the token will be marked readonly
+  bool readonly = 5;
+}
+
+// Information about accessing market data
+message MDPermission {
+  // Quote level
+  enum QuoteLevel {
+    // Unspecified value
+    QUOTE_LEVEL_UNSPECIFIED = 0;
+    // Last price
+    QUOTE_LEVEL_LAST_PRICE = 1;
+    // Bid ask
+    QUOTE_LEVEL_BEST_BID_OFFER = 2;
+    // Aggregated order book
+    QUOTE_LEVEL_DEPTH_OF_MARKET = 3;
+    // Full order book
+    QUOTE_LEVEL_DEPTH_OF_BOOK = 4;
+    // Access denied
+    QUOTE_LEVEL_ACCESS_FORBIDDEN = 5;
+  }
+  // Quote level
+  QuoteLevel quote_level = 1;
+  // Delay in minutes
+  int32 delay_minutes = 2;
+
+  oneof condition {
+    // Exchange ID mic
+    string mic = 3;
+    // Country
+    string country = 4;
+    // Continent
+    string continent = 5;
+    // The whole world
+    bool worldwide = 6;
+  }
+}
+
+// Subscription request for JWT token update
+message SubscribeJwtRenewalRequest {
+  // API token (secret key)
+  string secret = 1;
+  // Request source application ID
+  string source_app_id = 2;
+}
+
+// Updated token. Stream
+message SubscribeJwtRenewalResponse {
+  // Received JWT token
+  string token = 1;
+}
