@@ -1,0 +1,607 @@
+syntax = "proto3";
+
+package grpc.tradeapi.v1.orders;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/type/decimal.proto";
+import "grpc/tradeapi/v1/side.proto";
+import "grpc/tradeapi/v1/trade.proto";
+import "grpc/gateway/protoc_gen_openapiv2/options/annotations.proto";
+
+option go_package = "github.com/your-organization/trade-api/go/grpc/tradeapi/v1/orders";
+option java_multiple_files = true;
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  schemes: [
+    HTTP,
+    HTTPS
+  ]
+  info: {
+    title: "Trade API"
+    description: "API for trading operations"
+  }
+  security_definitions: {
+    security: {
+      key: "Authorization"
+      value: {
+        type: TYPE_API_KEY
+        in: IN_HEADER
+        name: "Authorization"
+        description: "JWT authorization token"
+      }
+    }
+  }
+  responses: [
+    {
+      key: "default"
+      value: {
+        schema: {
+          json_schema: {
+            ref: "googletypeStatus"
+          }
+        }
+      }
+    },
+    {
+      key: "500"
+      value: {
+        description: "Internal service error. Try again later."
+      }
+    },
+    {
+      key: "503"
+      value: {
+        description: "The service is currently unavailable. Try again later."
+      }
+    },
+    {
+      key: "429"
+      value: {
+        description: "Too many requests. The available limit is 200 requests per minute."
+      }
+    },
+    {
+      key: "401"
+      value: {
+        description: "The token has expired or is invalid."
+      }
+    },
+    {
+      key: "504"
+      value: {
+        description: "The deadline was exceeded before the operation completed."
+      }
+    }
+  ]
+};
+
+// Order service
+service OrdersService {
+  // Place an exchange order
+  // Example HTTP request:
+  // POST /v1/accounts/A12345/orders
+  // Content-Type: application/json
+  // Authorization: <token>
+  //
+  // {
+  //   "symbol": "SBER@MISX",
+  //   "quantity": {
+  // 		 "value": "10"
+  // 	 },
+  //   "side": "SIDE_BUY",
+  //   "type": "ORDER_TYPE_LIMIT",
+  //   "time_in_force": "TIME_IN_FORCE_DAY",
+  //   "limit_price": {
+  // 		 "value": "150.50"
+  // 	 }
+  // }
+  //
+  // The account_id field is taken from the URL path, the remaining fields are sent in the body of the request
+  rpc PlaceOrder(Order) returns (OrderState) {
+    option (google.api.http) = {
+      post: "/v1/accounts/{account_id}/orders"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: [
+        {
+          security_requirement: {
+            key: "Authorization"
+          }
+        }
+      ]
+      responses: [
+        {
+          key: "404"
+          value: {
+            description: "The account or instrument was not found"
+          }
+        },
+        {
+          key: "400"
+          value: {
+            description: "Invalid trading parameters"
+          }
+        }
+      ]
+    };
+  };
+
+  // Cancel an exchange order
+  // Example HTTP request:
+  // DELETE /v1/accounts/A12345/orders/ORD789012
+  // Authorization: <token>
+  rpc CancelOrder(CancelOrderRequest) returns (OrderState) {
+    option (google.api.http) = {
+      delete: "/v1/accounts/{account_id}/orders/{order_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: [
+        {
+          security_requirement: {
+            key: "Authorization"
+          }
+        }
+      ]
+      responses: [
+        {
+          key: "404"
+          value: {
+            description: "The account or order was not found"
+          }
+        },
+        {
+          key: "400"
+          value: {
+            description: "The order cannot be canceled since it has already been executed"
+          }
+        }
+      ]
+    };
+  };
+
+  // Get orders for an account
+  // Example HTTP request:
+  // GET /v1/accounts/A12345/orders
+  // Authorization: <token>
+  rpc GetOrders(OrdersRequest) returns (OrdersResponse) {
+    option (google.api.http) = {
+      get: "/v1/accounts/{account_id}/orders"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: [
+        {
+          security_requirement: {
+            key: "Authorization"
+          }
+        }
+      ]
+      responses: {
+        key: "404"
+        value: {
+          description: "Account was not found"
+        }
+      }
+    };
+  };
+
+  // Get a specific order
+  // Example HTTP request:
+  // GET /v1/accounts/A12345/orders/ORD789012
+  // Authorization: <token>
+  rpc GetOrder(GetOrderRequest) returns (OrderState) {
+    option (google.api.http) = {
+      get: "/v1/accounts/{account_id}/orders/{order_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: [
+        {
+          security_requirement: {
+            key: "Authorization"
+          }
+        }
+      ]
+      responses: {
+        key: "404"
+        value: {
+          description: "The account or order was not found"
+        }
+      }
+    };
+  };
+
+  // Subscribe to account orders and trades. Stream method
+  rpc SubscribeOrderTrade(stream OrderTradeRequest) returns (stream OrderTradeResponse) {
+    option deprecated = true;
+  };
+
+  // Subscribe to account orders. Stream method
+  rpc SubscribeOrders(SubscribeOrdersRequest) returns (stream SubscribeOrdersResponse);
+
+  // Subscribe to account trades. Stream method
+  rpc SubscribeTrades(SubscribeTradesRequest) returns (stream SubscribeTradesResponse);
+
+  // Place an SL/TP order
+  // Example HTTP request:
+  // POST /v1/accounts/A12345/sltp-orders
+  // Content-Type: application/json
+  // Authorization: <token>
+  //
+  // {
+  //   "symbol": "SBER@MISX",
+  //   "side": "SIDE_BUY",
+  //   "quantity_sl": {
+  //     "value": "10"
+  //   },
+  //   "sl_price": {
+  //     "value": "270.00"
+  //   },
+  //   "limit_price": {
+  //     "value": "269.50"
+  //   },
+  //   "quantity_tp": {
+  //     "value": "10"
+  //   },
+  //   "tp_price": {
+  //     "value": "295.50"
+  //   },
+  //   "tp_guard_spread": {
+  //     "value": "0.5"  },
+  //   "tp_spread_measure": "TP_SPREAD_MEASURE_VALUE",
+  //   "valid_before": "VALID_BEFORE_GOOD_TILL_DATE",
+  //   "valid_expiry_time": "2026-12-31T23:59:59Z",
+  //   "comment": "my SL/TP order"
+  //  }
+  //
+  // The account_id field is taken from the URL path, the remaining fields are sent in the body of the request
+  rpc PlaceSLTPOrder(SLTPOrder) returns (OrderState) {
+    option (google.api.http) = {
+      post: "/v1/accounts/{account_id}/sltp-orders"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: [
+        {
+          security_requirement: {
+            key: "Authorization"
+          }
+        }
+      ]
+      responses: [
+        {
+          key: "404"
+          value: {
+            description: "The account or instrument was not found"
+          }
+        },
+        {
+          key: "400"
+          value: {
+            description: "Invalid trading parameters"
+          }
+        }
+      ]
+    };
+  };
+
+}
+
+// Request an account order-and-trade subscription. Stream
+message OrderTradeRequest {
+  option deprecated = true;
+  // Available actions
+  enum Action {
+    // Subscribe
+    ACTION_SUBSCRIBE = 0;
+    // Unsubscribe
+    ACTION_UNSUBSCRIBE = 1;
+  }
+  // Subscription type
+  enum DataType {
+    // All orders and trades
+    DATA_TYPE_ALL = 0;
+    // Order
+    DATA_TYPE_ORDERS = 1;
+    // Trade
+    DATA_TYPE_TRADES = 2;
+  }
+  // Changing subscription status: subscribe/unsubscribe
+  Action action = 1;
+  // Select orders, trades, or both
+  DataType data_type = 2;
+  // Account ID
+  string account_id = 3;
+}
+
+// Account orders and trades
+message OrderTradeResponse {
+  option deprecated = true;
+  // Order
+  repeated OrderState orders = 1;
+  // Trade
+  repeated AccountTrade trades = 2;
+}
+
+// Request an account-order subscription. Stream
+message SubscribeOrdersRequest {
+  // Account ID
+  string account_id = 1;
+}
+
+// List of the account's orders
+message SubscribeOrdersResponse {
+  // Order
+  repeated OrderState orders = 1;
+}
+
+// Request an account-trade subscription. Stream
+message SubscribeTradesRequest {
+  // Account ID
+  string account_id = 1;
+}
+
+// List of own trades
+message SubscribeTradesResponse {
+  // Trade
+  repeated AccountTrade trades = 1;
+}
+
+// Request for a specific order
+message GetOrderRequest {
+  // Account ID
+  string account_id = 1;
+  // Order ID
+  string order_id = 2;
+}
+
+// Order type
+enum OrderType {
+  // Unspecified value
+  ORDER_TYPE_UNSPECIFIED = 0;
+  // Market
+  ORDER_TYPE_MARKET = 1;
+  // Limit
+  ORDER_TYPE_LIMIT = 2;
+  // Stop market order
+  ORDER_TYPE_STOP = 3;
+  // Stop limit order
+  ORDER_TYPE_STOP_LIMIT = 4;
+  // Multi leg order
+  ORDER_TYPE_MULTI_LEG = 5;
+}
+
+// Order validity period
+enum TimeInForce {
+  // Unspecified value
+  TIME_IN_FORCE_UNSPECIFIED = 0;
+  // Until the end of the day
+  TIME_IN_FORCE_DAY = 1;
+  // Valid until canceled
+  TIME_IN_FORCE_GOOD_TILL_CANCEL = 2;
+  // Valid until crossing
+  TIME_IN_FORCE_GOOD_TILL_CROSSING = 3;
+  // OTC trading
+  TIME_IN_FORCE_EXT = 4;
+  // At market open
+  TIME_IN_FORCE_ON_OPEN = 5;
+  // At market close
+  TIME_IN_FORCE_ON_CLOSE = 6;
+  // Execute immediately or cancel
+  TIME_IN_FORCE_IOC = 7;
+  // Execute in full or cancel
+  TIME_IN_FORCE_FOK = 8;
+}
+
+// Condition for triggering a stop order
+enum StopCondition {
+  // Unspecified value
+  STOP_CONDITION_UNSPECIFIED = 0;
+  // The trigger price is higher than the current price
+  STOP_CONDITION_LAST_UP = 1;
+  // The trigger price is less than the current price
+  STOP_CONDITION_LAST_DOWN = 2;
+}
+
+// Order information
+message Order {
+  // Account ID
+  string account_id = 1;
+  // Instrument symbol
+  string symbol = 2;
+  // Quantity in units
+  google.type.Decimal quantity = 3;
+  // Side (long or short)
+  Side side = 4;
+  // Order type
+  OrderType type = 5;
+  // Order validity period
+  TimeInForce time_in_force = 6;
+  // Required for limit and stop limit orders
+  google.type.Decimal limit_price = 7;
+  // Required for market stops and limit order stops
+  google.type.Decimal stop_price = 8;
+  // Required for market stops and limit order stops
+  StopCondition stop_condition = 9;
+  // Required for multi leg order
+  repeated Leg legs = 10;
+  // Unique identifier of the order. Automatically generated if not sent. (maximum 20 characters)
+  string client_order_id = 11;
+  // Conditional-order validity, populated for ORDER_TYPE_STOP and ORDER_TYPE_STOP_LIMIT
+  ValidBefore valid_before = 12;
+  // Order comment (maximum 128 characters)
+  string comment = 13;
+}
+
+// Multi-leg order leg
+message Leg {
+  // Instrument symbol
+  string symbol = 1;
+  // Quantity
+  google.type.Decimal quantity = 2;
+  // Side
+  Side side = 3;
+}
+
+// Order status
+enum OrderStatus {
+  // Undefined value
+  ORDER_STATUS_UNSPECIFIED = 0;
+  // New order
+  ORDER_STATUS_NEW = 1;
+  // Partially executed
+  ORDER_STATUS_PARTIALLY_FILLED = 2;
+  // Fulfilled
+  ORDER_STATUS_FILLED = 3;
+  // Done for the day
+  ORDER_STATUS_DONE_FOR_DAY = 4;
+  // Canceled
+  ORDER_STATUS_CANCELED = 5;
+  // Replaced with another
+  ORDER_STATUS_REPLACED = 6;
+  // Pending cancellation
+  ORDER_STATUS_PENDING_CANCEL = 7;
+  // Rejected
+  ORDER_STATUS_REJECTED = 9;
+  // Suspended
+  ORDER_STATUS_SUSPENDED = 10;
+  // Waiting for a new one
+  ORDER_STATUS_PENDING_NEW = 11;
+  // Expired
+  ORDER_STATUS_EXPIRED = 13;
+  // Error
+  ORDER_STATUS_FAILED = 16;
+  // Forwarding
+  ORDER_STATUS_FORWARDING = 17;
+  // Waiting
+  ORDER_STATUS_WAIT = 18;
+  // Rejected by broker
+  ORDER_STATUS_DENIED_BY_BROKER = 19;
+  // Rejected by the exchange
+  ORDER_STATUS_REJECTED_BY_EXCHANGE = 20;
+  // Watching
+  ORDER_STATUS_WATCHING = 21;
+  // Fulfilled
+  ORDER_STATUS_EXECUTED = 22;
+  // Disabled
+  ORDER_STATUS_DISABLED = 23;
+  // Waiting for link
+  ORDER_STATUS_LINK_WAIT = 24;
+  // Protective time SL
+  ORDER_STATUS_SL_GUARD_TIME = 27;
+  // Executed according to SL
+  ORDER_STATUS_SL_EXECUTED = 28;
+  // SL forwarding
+  ORDER_STATUS_SL_FORWARDING = 29;
+  // Protective time TP
+  ORDER_STATUS_TP_GUARD_TIME = 30;
+  // Executed according to TP
+  ORDER_STATUS_TP_EXECUTED = 31;
+  // TP correction
+  ORDER_STATUS_TP_CORRECTION = 32;
+  // TP forwarding
+  ORDER_STATUS_TP_FORWARDING = 33;
+  // TP correction during protective time
+  ORDER_STATUS_TP_CORR_GUARD_TIME = 34;
+}
+
+// Order status
+message OrderState {
+  // Order ID
+  string order_id = 1;
+  // Execution ID
+  string exec_id = 2;
+  // Order status
+  OrderStatus status = 3;
+  // Order
+  Order order = 4;
+  // Date and time of order
+  google.protobuf.Timestamp transact_at = 5;
+  // Date and time of order acceptance
+  google.protobuf.Timestamp accept_at = 6;
+  // Date and time of cancellation of the order
+  google.protobuf.Timestamp withdraw_at = 7;
+  // Initial quantity, populated only for exchange orders
+  google.type.Decimal initial_quantity = 8;
+  // Executed quantity, populated only for exchange orders
+  google.type.Decimal executed_quantity = 9;
+  // Remaining quantity, populated only for exchange orders
+  google.type.Decimal remaining_quantity = 10;
+  // Information about SL/TP order
+  SLTPOrder sltp_order = 11;
+  // Identifier of an exchange order generated as a result of a condition being triggered or a stop price being reached.
+  string triggered_order_id = 12;
+}
+
+// Request account orders
+message OrdersRequest {
+  // Account ID
+  string account_id = 1;
+}
+
+// Account orders
+message OrdersResponse {
+  // Order
+  repeated OrderState orders = 1;
+}
+
+// Request order cancellation
+message CancelOrderRequest {
+  // Account ID
+  string account_id = 1;
+  // Order ID
+  string order_id = 2;
+}
+
+// Validity period of the conditional order
+enum ValidBefore {
+  // Unspecified value
+  VALID_BEFORE_UNSPECIFIED = 0;
+  // Until the end of the trading day
+  VALID_BEFORE_END_OF_DAY = 1;
+  // Before cancellation
+  VALID_BEFORE_GOOD_TILL_CANCEL = 2;
+  // Before the specified date and time. This type is supported only when placing SL/TP orders
+  VALID_BEFORE_GOOD_TILL_DATE = 3;
+}
+
+// Information about SL/TP order
+message SLTPOrder {
+  // Account ID
+  string account_id = 1;
+  // Instrument symbol
+  string symbol = 2;
+  // Side for both orders
+  Side side = 3;
+  // Stop-loss quantity in units
+  google.type.Decimal quantity_sl = 4;
+  // Price condition parameter for SL part
+  google.type.Decimal sl_price = 5;
+  // If specified, after SL activation a limit order will be placed with this price
+  google.type.Decimal limit_price = 6;
+  // Take-profit quantity in units
+  google.type.Decimal quantity_tp = 10;
+  // Price condition parameter for TP part
+  google.type.Decimal tp_price = 11;
+  // If specified, after TP activation a limit order will be placed taking into account the protective spread
+  google.type.Decimal tp_guard_spread = 12;
+  // Unit for measuring the value of the protective spread
+  TPSpreadMeasure tp_spread_measure = 13;
+  // Unique identifier of the order. Automatically generated if not sent. (maximum 20 characters)
+  string client_order_id = 20;
+  // Conditional-order validity; defaults to VALID_BEFORE_GOOD_TILL_CANCEL when omitted
+  ValidBefore valid_before = 21;
+  // SL/TP request termination timestamp
+  google.protobuf.Timestamp valid_expiry_time = 22;
+  // Order comment (maximum 128 characters)
+  string comment = 23;
+}
+
+// Unit used to measure the take-profit protective spread
+enum TPSpreadMeasure {
+  // Unspecified value
+  TP_SPREAD_MEASURE_UNDEFINED = 0;
+  // Price units
+  TP_SPREAD_MEASURE_VALUE = 1;
+  // Percent, with precision to one hundredth of a percent
+  TP_SPREAD_MEASURE_PERCENT = 2;
+}

@@ -1,0 +1,96 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+# Distribution name on PyPI and its public Python import.
+# Install with ``pip install limeint-sdk`` and import with ``import trade_api``.
+name = "limeint-sdk"
+version = "2.18.0"
+description = "Limeint Python SDK for the Trade API (gRPC)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Limeint" }]
+keywords = ["limeint", "trading", "grpc", "trade-api", "brokerage"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Typing :: Typed",
+]
+dependencies = [
+    # Must be at least the versions used by the pinned code generators below.
+    "grpcio>=1.83.0",
+    "protobuf>=7.35.1",
+    "googleapis-common-protos>=1.62",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=4",
+    "mypy>=1.8",
+    "mypy-protobuf==5.1.0",
+    "ruff>=0.3",
+    # Required only to regenerate stubs from .proto via scripts/generate_proto.sh.
+    # CI generates them before building each release, so end users never need protoc.
+    "grpcio-tools==1.83.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/limeint/tradingapi"
+Documentation = "https://github.com/limeint/tradingapi/tree/main/sdk/python"
+Repository = "https://github.com/limeint/tradingapi"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["trade_api*", "trade_api.proto*"]
+
+[tool.setuptools.package-data]
+"trade_api" = ["py.typed"]
+# Ship generated type stubs (.pyi) alongside the runtime modules so downstream
+# type-checkers see the proto messages with their full field types.
+"trade_api.proto" = ["**/*.pyi"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+# Generated gRPC stubs (protoc output) carry lint noise we don't control —
+# E402, unused re-exports, long alias names. They're excluded from coverage
+# too (see [tool.coverage.run]); exclude them from linting for the same reason.
+extend-exclude = ["trade_api/proto"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+
+[tool.coverage.run]
+source = ["trade_api"]
+omit = [
+    "trade_api/proto/*",  # generated code
+]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]
+show_missing = true
+skip_covered = false

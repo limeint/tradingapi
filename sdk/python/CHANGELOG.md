@@ -1,0 +1,83 @@
+# Changelog
+
+All notable changes to the Limeint Trade API Python SDK are documented in this
+file. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+The PyPI distribution is `limeint-sdk`; the Python import name is
+`trade_api`.
+
+## [Unreleased]
+
+### Changed
+
+- The supported Python floor is 3.10 because release protobuf stubs use
+  protobuf 7 gencode.
+- Runtime minimums now match the pinned release generators:
+  `grpcio>=1.83.0` and `protobuf>=7.35.1`.
+
+## [2.18.0] — 2026-07-20
+
+### Added
+
+- `Constituents.weight` — weight of the instrument within the index.
+
+## [2.17.0] — 2026-06-25
+
+### Added
+
+- New `CorporateActionsService` proto with two RPCs: `GetFutureBondsEvents` and `GetPastBondsEvents` —
+  bond event calendars (coupons, amortisations, offers) with date-range filtering, sorting, and
+  pagination.
+- `OrderState.triggered_order_id` — ID of the exchange order generated when a stop condition or
+  stop-price is triggered.
+
+## [2.16.0] — 2026-06-05
+
+Version unified with the repository's other Trade API SDKs (JS, Kotlin) so a
+single release tag publishes every SDK at the same version. No API changes
+since `0.1.0`.
+
+## [0.1.0] — 2026-05-26
+
+Initial public release.
+
+### Added
+
+- `TradeAPIClient` — synchronous client with automatic JWT issuance, background
+  refresh via `AuthService.SubscribeJwtRenewal`, and exponential-backoff
+  retries on transient gRPC failures (`UNAVAILABLE`, `RESOURCE_EXHAUSTED`).
+- `AsyncTradeAPIClient` — asyncio counterpart, mirroring the sync surface 1:1
+  using `grpc.aio`. Streaming RPCs return async iterators.
+- Service stubs exposed as attributes: `auth`, `accounts`, `assets`,
+  `market_data`, `orders`, `reports`, `metrics`. The full proto surface is
+  available without a translation layer.
+- Per-service message re-export modules for short imports —
+  `trade_api.accounts`, `.assets`, `.market_data`, `.orders`,
+  `.reports`, `.metrics`, `.auth_messages`. `Side` is re-exported alongside
+  `Order` in `trade_api.orders`.
+- Typed exception hierarchy mapped from gRPC status codes
+  (`AuthError`, `PermissionDeniedError`, `InvalidArgumentError`,
+  `NotFoundError`, `RateLimitError`, `DeadlineExceededError`,
+  `InternalError`, `ServiceUnavailableError`), with `from_rpc_error()` to
+  convert raw `grpc.RpcError` to a typed `TradeAPIError`.
+- `RetryPolicy` — configurable exponential backoff with jitter for unary
+  RPCs. Streaming RPCs are not retried; callers handle reconnection at a
+  meaningful boundary.
+- Generated proto stubs ship pre-compiled in the wheel — end users never
+  need protoc. Type stubs (`.pyi`) generated via `mypy-protobuf` are
+  included, so RPC methods are visible to Pyright/Pylance/mypy.
+- `py.typed` marker — full static-typing support.
+- Examples for auth + accounts, placing/cancelling orders, and async quote
+  subscription.
+
+### Notes
+
+- Distribution name on PyPI is `limeint-sdk`. The import name remains
+  `trade_api`.
+
+[Unreleased]: https://github.com/limeint/tradingapi/compare/2.18.0...HEAD
+[2.18.0]: https://github.com/limeint/tradingapi/releases/tag/2.18.0
+[2.17.0]: https://github.com/limeint/tradingapi/releases/tag/2.17.0
+[2.16.0]: https://github.com/limeint/tradingapi/releases/tag/2.16.0
+[0.1.0]: https://github.com/limeint/tradingapi/releases/tag/v0.1.0

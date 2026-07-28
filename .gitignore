@@ -1,0 +1,23 @@
+.idea/
+build/
+out/
+*.iml
+/trade-api-go/.gradle/
+node_modules
+
+# Python build artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+
+# Tool caches
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Coverage
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
