@@ -1,10 +1,10 @@
 # Limeint Trade API
 
-This repository contains Limeint's Python SDK, protocol definitions, and
-example trading strategies for the gRPC Trade API:
+This repository contains Limeint's Python and Node.js SDKs, protocol
+definitions, and example trading strategies for the gRPC Trade API:
 
-- protobuf contracts used to generate the Python client;
-- the publishable `limeint-sdk` Python package;
+- protobuf contracts used to generate both clients;
+- the publishable Python and Node.js packages;
 - example trading strategies.
 
 The wire-level protobuf namespace remains `grpc.tradeapi.v1`. Keeping that
@@ -27,6 +27,11 @@ Do not commit production secrets or customer account IDs.
 ## Package coordinates
 
 - Python: `limeint-sdk`, imported as `trade_api`
+- Node.js: `@limeint/trade-api`
+
+Node package maintainers should follow
+[the npm release guide](sdk/node/RELEASING.md); Node releases use
+`node-vX.Y.Z` tags so they remain independent from Python package releases.
 
 The repository and issue tracker are at
 <https://github.com/limeint/tradingapi>.
@@ -50,7 +55,16 @@ source .venv/bin/activate
 python -m pip install ../../../sdk/python/dist/*.whl
 python -m pip install -r requirements-dev.txt
 python -m pytest
+
+cd ../../../sdk/node
+npm ci
+npm run generate
+npm run typecheck
+npm test
+npm run build
+npm pack --dry-run
 ```
 
-Python CI regenerates the protobuf client, tests the SDK, builds its wheel and
-source archive, and runs the strategy against the installed wheel.
+CI regenerates and verifies both protobuf clients. Python CI builds its wheel
+and source archive and runs the example strategy against the installed wheel;
+Node CI type-checks, tests, builds, and verifies the npm package contents.

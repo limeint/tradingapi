@@ -8,6 +8,10 @@ __pycache__/
 *.egg-info/
 .venv/
 
+# Node build artifacts
+node_modules/
+dist/
+
 # Tool caches
 .mypy_cache/
 .ruff_cache/

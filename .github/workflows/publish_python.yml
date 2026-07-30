@@ -17,6 +17,9 @@ on:
 
 jobs:
   build:
+    # Node releases use tags such as node-v0.1.0 and are handled by
+    # publish_node.yml. Do not interpret those as Python versions.
+    if: github.event_name == 'workflow_dispatch' || !startsWith(github.event.release.tag_name, 'node-v')
     runs-on: ubuntu-latest
     permissions:
       contents: read

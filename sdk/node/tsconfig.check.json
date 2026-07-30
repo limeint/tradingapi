@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@limeint/trade-api": [
+        "./src/index.ts"
+      ],
+      "@limeint/trade-api/*": [
+        "./src/*.ts"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    "examples/**/*.ts"
+  ],
+  "exclude": []
+}
