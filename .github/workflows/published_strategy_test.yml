@@ -4,11 +4,11 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - 'strategies/sma_crossover/**'
+      - 'examples/strategies/sma_crossover/**'
       - '.github/workflows/published_strategy_test.yml'
   pull_request:
     paths:
-      - 'strategies/sma_crossover/**'
+      - 'examples/strategies/sma_crossover/**'
       - '.github/workflows/published_strategy_test.yml'
   workflow_dispatch:
 
@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: strategies/sma_crossover/python
+        working-directory: examples/strategies/sma_crossover/python
 
     steps:
       - uses: actions/checkout@v4
@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: strategies/sma_crossover/node
+        working-directory: examples/strategies/sma_crossover/node
 
     steps:
       - uses: actions/checkout@v4
@@ -71,7 +71,7 @@ jobs:
         with:
           node-version: "20"
           cache: npm
-          cache-dependency-path: strategies/sma_crossover/node/package-lock.json
+          cache-dependency-path: examples/strategies/sma_crossover/node/package-lock.json
 
       - name: Install published SDK and test tools
         run: npm ci

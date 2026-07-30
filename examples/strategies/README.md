@@ -17,12 +17,13 @@ Each strategy owns a directory, and each language implementation lives inside
 it:
 
 ```text
-strategies/
-  <strategy>/
-    README.md          # the rule, candle handling, safety guards, configuration
-    .env.example       # settings shared by every implementation
-    python/            # self-contained implementation + its own README
-    node/              # self-contained implementation + its own README
+examples/
+  strategies/
+    <strategy>/
+      README.md          # the rule, candle handling, safety guards, configuration
+      .env.example       # settings shared by every implementation
+      python/            # self-contained implementation + its own README
+      node/              # self-contained implementation + its own README
 ```
 
 Implementations stay flat inside their language directory — source files at the

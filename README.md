@@ -5,7 +5,7 @@ definitions, and example trading strategies for the gRPC Trade API:
 
 - protobuf contracts used to generate both clients;
 - the publishable Python and Node.js packages;
-- example trading strategies.
+- [example trading strategies](examples/strategies/).
 
 The wire-level protobuf namespace remains `grpc.tradeapi.v1`. Keeping that
 namespace stable preserves compatibility with the existing API backend and RPC
