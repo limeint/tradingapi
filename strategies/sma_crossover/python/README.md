@@ -1,7 +1,8 @@
 # Limeint SMA 9/30 crossover — Python
 
 Python implementation of the [SMA 9/30 crossover strategy](../README.md), built
-on the Limeint SDK (`pip install limeint-sdk`, imported as `trade_api`).
+on the published Limeint SDK (`limeint-sdk==2.18.1rc1`, imported as
+`trade_api`).
 
 Read [`../README.md`](../README.md) first for the rule, candle handling, and
 safety guards. This page covers only how to install, run, and test the Python
@@ -21,10 +22,10 @@ modules:
 - `trade_api.orders`
 
 It does not import from `sdk/python`, generated modules under
-`trade_api.proto`, or the repository's raw `proto/` directory. CI builds the
-SDK wheel, installs it into the strategy environment, and verifies that
-`trade_api` resolves from the installed distribution rather than this
-repository's source tree.
+`trade_api.proto`, or the repository's raw `proto/` directory. The dependency
+file pins the published TestPyPI wheel and its SHA-256 digest. Consumer CI
+verifies that `trade_api` resolves from the installed distribution rather than
+this repository's source tree.
 
 ## Read the implementation in this order
 

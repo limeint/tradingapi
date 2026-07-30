@@ -1,0 +1,24 @@
+{
+  "name": "@limeint/example-sma-crossover",
+  "version": "0.0.0",
+  "private": true,
+  "description": "SMA 9/30 crossover example using the published Limeint Node SDK",
+  "type": "module",
+  "scripts": {
+    "start": "tsx main.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@limeint/trade-api": "2.18.1-rc.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.1.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

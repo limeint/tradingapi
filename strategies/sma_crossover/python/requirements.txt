@@ -1,12 +1,10 @@
-# This example deliberately depends on the published SDK rather than the source
-# tree in sdk/python, so the code here is exactly what a user of the package
-# would write — and so the directory stays copy-out runnable.
-# Install from this directory with: python -m pip install -r requirements.txt
+# This exact, hashed TestPyPI wheel makes the strategy a reproducible consumer
+# test for the published RC. It never resolves the repository's sdk/python tree.
 #
 # Requires Python 3.10+, matching the SDK's declared Python requirement. The
 # SDK wheel includes its generated proto stubs; this strategy never imports
 # those modules from the repository source tree.
-limeint-sdk>=2.18.0
+limeint-sdk @ https://test-files.pythonhosted.org/packages/2a/8a/6bd3032d3d9fad37890765d878e3c52f88a309ce120a65226e678d1dd2aa/limeint_sdk-2.18.1rc1-py3-none-any.whl#sha256=22214756066b8b02ae43ec22798f6cf923508c367a0ab24534d20592b57021d1
 
 # Imported directly by the example for Timestamp/Interval/Decimal messages.
 # Both arrive transitively via limeint-sdk; listed because this code uses them.

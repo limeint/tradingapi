@@ -63,8 +63,15 @@ npm run typecheck
 npm test
 npm run build
 npm pack --dry-run
+
+cd ../../strategies/sma_crossover/node
+npm ci
+npm run typecheck
+npm test
 ```
 
 CI regenerates and verifies both protobuf clients. Python CI builds its wheel
 and source archive and runs the example strategy against the installed wheel;
-Node CI type-checks, tests, builds, and verifies the npm package contents.
+Node CI type-checks, tests, builds, and verifies the npm package contents. The
+published-strategy workflow separately installs the exact public Python and
+Node.js releases and tests both language implementations as external consumers.

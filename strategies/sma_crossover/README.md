@@ -6,6 +6,7 @@ against the corresponding published Trade API SDK.
 | Language | Implementation | SDK |
 | --- | --- | --- |
 | Python | [`python/`](python/) | `limeint-sdk` |
+| Node.js | [`node/`](node/) | `@limeint/trade-api` |
 
 This page describes the strategy itself: the rule, how candles are handled, and
 the safety guards every implementation must honor. Each language directory has

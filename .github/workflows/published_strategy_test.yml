@@ -1,0 +1,97 @@
+name: Published SDK Strategy CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'strategies/sma_crossover/**'
+      - '.github/workflows/published_strategy_test.yml'
+  pull_request:
+    paths:
+      - 'strategies/sma_crossover/**'
+      - '.github/workflows/published_strategy_test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python strategy against TestPyPI SDK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: strategies/sma_crossover/python
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            strategies/sma_crossover/python/requirements.txt
+            strategies/sma_crossover/python/requirements-dev.txt
+
+      - name: Install published SDK and test tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Verify published SDK identity
+        env:
+          REPOSITORY_SDK_SOURCE: ${{ github.workspace }}/sdk/python
+        run: |
+          python -c "
+          import os
+          from importlib.metadata import version
+          from pathlib import Path
+          import trade_api
+
+          assert version('limeint-sdk') == '2.18.1rc1'
+          package_path = Path(trade_api.__file__).resolve()
+          source_path = Path(os.environ['REPOSITORY_SDK_SOURCE']).resolve()
+          assert not package_path.is_relative_to(source_path), package_path
+          print(f'Python strategy uses limeint-sdk {version(\"limeint-sdk\")} from {package_path}')
+          "
+
+      - name: Test and lint
+        run: |
+          python -m pytest
+          python -m ruff check .
+          python -m ruff format --check .
+          python -m mypy .
+
+  node:
+    name: Node strategy against npm SDK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: strategies/sma_crossover/node
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: strategies/sma_crossover/node/package-lock.json
+
+      - name: Install published SDK and test tools
+        run: npm ci
+
+      - name: Verify published SDK identity
+        run: |
+          npm ls @limeint/trade-api@2.18.1-rc.1 --depth=0
+          node --input-type=module -e '
+            const sdk = await import("@limeint/trade-api");
+            if (typeof sdk.withTradeApi !== "function") process.exit(1);
+            const sdkUrl = import.meta.resolve("@limeint/trade-api");
+            if (!sdkUrl.includes("/node_modules/")) process.exit(1);
+            console.log(`Node strategy imported the published SDK from ${sdkUrl}`);
+          '
+
+      - name: Type-check and test
+        run: |
+          npm run typecheck
+          npm test

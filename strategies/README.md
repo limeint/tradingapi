@@ -9,7 +9,7 @@ own applications.
 
 | Strategy | Rule | Languages |
 | --- | --- | --- |
-| [SMA 9/30 crossover](sma_crossover/README.md) | Enter when SMA 9 crosses above SMA 30; exit on the reverse crossover | [Python](sma_crossover/python/) |
+| [SMA 9/30 crossover](sma_crossover/README.md) | Enter when SMA 9 crosses above SMA 30; exit on the reverse crossover | [Python](sma_crossover/python/), [Node.js](sma_crossover/node/) |
 
 ## Layout
 
@@ -22,6 +22,7 @@ strategies/
     README.md          # the rule, candle handling, safety guards, configuration
     .env.example       # settings shared by every implementation
     python/            # self-contained implementation + its own README
+    node/              # self-contained implementation + its own README
 ```
 
 Implementations stay flat inside their language directory — source files at the
