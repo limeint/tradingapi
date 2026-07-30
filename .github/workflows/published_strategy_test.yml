@@ -29,8 +29,7 @@ jobs:
         with:
           python-version: "3.12"
           version: "0.11.32"
-          enable-cache: true
-          cache-dependency-glob: strategies/sma_crossover/python/uv.lock
+          enable-cache: false
 
       - name: Install published SDK and test tools
         run: uv sync --locked
