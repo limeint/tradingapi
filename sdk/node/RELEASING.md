@@ -1,9 +1,14 @@
-# Releasing the Node.js SDK
+# Releasing the SDKs
 
-The public npm package is `@limeint/trade-api`. Releases are built and
-published by `.github/workflows/publish_node.yml`.
+Python and Node.js share one version and one GitHub Release:
 
-## One-time setup
+- `limeint-sdk` publishes to PyPI;
+- `@limeint/trade-api` publishes to npm.
+
+The release starts both `.github/workflows/publish_python.yml` and
+`.github/workflows/publish_node.yml`.
+
+## One-time npm setup
 
 The workflow authenticates to npm with one GitHub Actions secret:
 `NPM_TOKEN`.
@@ -27,16 +32,23 @@ logs.
 
 ## Create a release
 
-1. Update the version in both `package.json` and `package-lock.json`:
+1. Choose one new version that has never been published to either registry.
+   Update the Python version in `sdk/python/pyproject.toml`, then update both
+   Node package files:
 
    ```sh
    cd sdk/node
-   npm version 0.1.1 --no-git-tag-version
+   npm version 2.18.1 --no-git-tag-version
    ```
 
-2. Regenerate and verify the package:
+2. Regenerate and verify both SDKs:
 
    ```sh
+   cd ../python
+   ./scripts/generate_proto.sh
+   python -m pytest
+
+   cd ../node
    npm ci
    npm run generate
    npm run typecheck
@@ -46,28 +58,21 @@ logs.
    ```
 
 3. Commit the version bump and generated changes.
-4. Create and push a tag whose version matches `package.json`:
+4. Create one GitHub Release targeting that commit with the bare version tag,
+   for example `2.18.1`. Publishing it starts both registry workflows.
 
-   ```sh
-   git tag node-v0.1.1
-   git push origin node-v0.1.1
-   ```
+Stable versions publish to PyPI and under npm's `latest` tag. Prereleases
+publish to TestPyPI and under npm's `next` tag.
 
-5. Create a GitHub Release from that tag. Publishing the release starts the
-   npm workflow.
-
-Stable versions publish under the npm `latest` tag. SemVer prereleases such as
-`node-v0.2.0-beta.1` publish under `next`.
-
-The workflow can also be started manually with an existing `node-vX.Y.Z` tag.
-The selected tag must point to the commit containing the matching package
-version.
+The Node workflow can also be started manually with an existing version tag.
+That tag must point to the commit containing the matching Python and Node
+versions.
 
 ## What the workflow verifies
 
 Before the protected publish job runs, CI:
 
-- checks the release tag against `package.json` and `package-lock.json`;
+- checks the release tag against the Python and Node package versions;
 - regenerates protobuf code and rejects drift;
 - type-checks the SDK, tests, and examples;
 - runs the in-process gRPC integration suite;

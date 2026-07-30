@@ -1,10 +1,10 @@
 name: Publish Python SDK to PyPI
 
-# Triggered when a GitHub Release is published. Tags are bare Python package
-# versions (a legacy v-prefix is also accepted). The marker in the tag
-# determines the target index:
-#   2.16.0          → real PyPI
-#   2.16.0a1, rc1, … → TestPyPI (any tag containing a/b/rc/dev marker)
+# Python and Node share one SDK version and GitHub Release. Tags are bare
+# package versions (a legacy v-prefix is also accepted). The marker in the
+# tag determines the target index:
+#   2.18.1          → real PyPI
+#   2.19.0-rc.1     → TestPyPI
 #
 # Authentication uses PyPI trusted publishing (OIDC) — no API tokens are
 # stored as repo secrets. Both PyPI and TestPyPI need a one-time trusted
@@ -14,12 +14,14 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing SDK version tag to publish (for example 2.18.1)
+        required: true
+        type: string
 
 jobs:
   build:
-    # Node releases use tags such as node-v0.1.0 and are handled by
-    # publish_node.yml. Do not interpret those as Python versions.
-    if: github.event_name == 'workflow_dispatch' || !startsWith(github.event.release.tag_name, 'node-v')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -32,8 +34,10 @@ jobs:
       is_prerelease: ${{ steps.classify.outputs.is_prerelease }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout release tag
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -43,29 +47,42 @@ jobs:
           cache-dependency-path: sdk/python/pyproject.toml
 
       - name: Verify tag matches pyproject version
-        # Catches the common mistake of cutting a v0.1.1 release without
+        # Catches the common mistake of cutting a 2.18.1 release without
         # bumping the version in pyproject.toml — PyPI would reject the
         # upload but only after the publish job ran, wasting minutes and
         # leaving the release in a half-cut state.
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
         run: |
-          git fetch --tags
-          TAG=$(git describe --tags --exact-match HEAD 2>/dev/null || echo "")
-          # Release tags are bare versions (e.g. 2.16.0). A legacy v-prefix is
-          # tolerated so v2.16.0 also resolves.
+          TAG="$RELEASE_TAG"
+          # Release tags are bare versions (e.g. 2.18.1). A legacy v-prefix is
+          # tolerated so v2.18.1 also resolves.
           TAG_VERSION="${TAG#v}"
           PYPROJECT_VERSION=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          NODE_VERSION=$(python -c "import json; print(json.load(open('../node/package.json'))['version'])")
+          NODE_LOCK_VERSION=$(python -c "import json; print(json.load(open('../node/package-lock.json'))['version'])")
           if [ "$TAG_VERSION" != "$PYPROJECT_VERSION" ]; then
             echo "::error::Tag $TAG (version $TAG_VERSION) does not match pyproject.toml version $PYPROJECT_VERSION"
             exit 1
           fi
-          echo "Tag and pyproject version agree: $PYPROJECT_VERSION"
+          if [ "$PYPROJECT_VERSION" != "$NODE_VERSION" ]; then
+            echo "::error::Python version $PYPROJECT_VERSION does not match Node version $NODE_VERSION"
+            exit 1
+          fi
+          if [ "$NODE_VERSION" != "$NODE_LOCK_VERSION" ]; then
+            echo "::error::Node package version $NODE_VERSION does not match lock version $NODE_LOCK_VERSION"
+            exit 1
+          fi
+          echo "Tag, Python, and Node versions agree: $PYPROJECT_VERSION"
 
       - name: Classify release (prerelease → TestPyPI, final → PyPI)
         id: classify
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
         run: |
-          TAG="${GITHUB_REF#refs/tags/}"
-          # PEP 440 prerelease markers: aN, bN, rcN, devN, .devN (case-insensitive).
-          if echo "$TAG" | grep -Eiq '(a|b|rc|dev)[0-9]+'; then
+          TAG="$RELEASE_TAG"
+          # Accept shared PEP 440/SemVer forms such as 2.19.0-rc.1.
+          if echo "$TAG" | grep -Eiq '(alpha|beta|a|b|rc|dev)[._-]?[0-9]+'; then
             echo "is_prerelease=true" >> "$GITHUB_OUTPUT"
             echo "Tag $TAG is a prerelease — will publish to TestPyPI"
           else

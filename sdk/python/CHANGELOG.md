@@ -9,12 +9,15 @@ The PyPI distribution is `limeint-sdk`; the Python import name is
 
 ## [Unreleased]
 
+## [2.18.1] — 2026-07-30
+
 ### Changed
 
 - The supported Python floor is 3.10 because release protobuf stubs use
   protobuf 7 gencode.
 - Runtime minimums now match the pinned release generators:
   `grpcio>=1.83.0` and `protobuf>=7.35.1`.
+- The Python and Node.js SDKs now share one version and GitHub Release.
 
 ## [2.18.0] — 2026-07-20
 
@@ -75,7 +78,8 @@ Initial public release.
 - Distribution name on PyPI is `limeint-sdk`. The import name remains
   `trade_api`.
 
-[Unreleased]: https://github.com/limeint/tradingapi/compare/2.18.0...HEAD
+[Unreleased]: https://github.com/limeint/tradingapi/compare/2.18.1...HEAD
+[2.18.1]: https://github.com/limeint/tradingapi/releases/tag/2.18.1
 [2.18.0]: https://github.com/limeint/tradingapi/releases/tag/2.18.0
 [2.17.0]: https://github.com/limeint/tradingapi/releases/tag/2.17.0
 [2.16.0]: https://github.com/limeint/tradingapi/releases/tag/2.16.0

@@ -1,7 +1,8 @@
-# Releasing the Python SDK
+# Releasing the SDKs
 
-This document is for maintainers cutting a release of `limeint-sdk` on PyPI.
-For SDK usage, see [README.md](README.md).
+The Python and Node.js packages share one version and GitHub Release. This
+document covers PyPI-specific setup; the combined release checklist is in
+[the SDK release guide](../node/RELEASING.md).
 
 ## One-time setup
 
@@ -50,13 +51,14 @@ without ceremony.
 
 ### Pre-release / dry-run (publishes to TestPyPI)
 
-1. Bump version in [pyproject.toml](pyproject.toml) to a PEP 440 prerelease,
-   e.g. `0.2.0rc1`.
+1. Bump both SDKs to the same prerelease version by following
+   [the shared checklist](../node/RELEASING.md), for example
+   `2.19.0-rc.1`.
 2. Update [CHANGELOG.md](CHANGELOG.md): move items from `[Unreleased]` to a
-   new `[0.2.0rc1] — YYYY-MM-DD` section. Update the link references at the
-   bottom.
+   new `[2.19.0-rc.1] — YYYY-MM-DD` section. Update the link references at
+   the bottom.
 3. Commit, push, merge to `main`.
-4. Create a GitHub Release with tag `2.16.0rc1` (bare version, no prefix),
+4. Create a GitHub Release with a matching bare version tag,
    target `main`. Mark it *Pre-release*.
 5. The `publish_python.yml` workflow detects the prerelease marker in the
    tag and pushes to TestPyPI.
@@ -65,7 +67,7 @@ without ceremony.
    python -m venv /tmp/limeint-verify && source /tmp/limeint-verify/bin/activate
    pip install -i https://test.pypi.org/simple/ \
      --extra-index-url https://pypi.org/simple/ \
-     limeint-sdk==2.16.0rc1
+     limeint-sdk==2.19.0rc1
    python -c "from trade_api import TradeAPIClient; print('ok')"
    ```
    The `--extra-index-url` is needed because TestPyPI doesn't mirror
@@ -73,44 +75,37 @@ without ceremony.
 
 ### Final release (publishes to real PyPI)
 
-1. Bump version in [pyproject.toml](pyproject.toml) to the final number,
-   e.g. `0.2.0`.
+1. Bump both SDKs to the same final version by following
+   [the shared checklist](../node/RELEASING.md).
 2. Update [CHANGELOG.md](CHANGELOG.md) similarly — final section, link
    references.
 3. Commit, push, merge to `main`.
-4. Create a GitHub Release with tag `2.16.0` (bare version, no prefix),
+4. Create a GitHub Release with the matching bare version tag,
    target `main`. **Do not** mark it pre-release.
 5. The workflow detects a final tag, requires environment approval (per
    the `pypi` environment config), and on approval pushes to PyPI.
 6. Verify:
    ```sh
    python -m venv /tmp/limeint-verify && source /tmp/limeint-verify/bin/activate
-   pip install limeint-sdk==2.16.0
+   pip install limeint-sdk==2.18.1
    python -c "from trade_api import TradeAPIClient; print('ok')"
    ```
 
 ## Version policy
 
-`limeint-sdk` follows [Semantic Versioning](https://semver.org/):
+Both packages follow the Trade API release line and
+[Semantic Versioning](https://semver.org/):
 
-- **Major (X.0.0)** — breaking changes to the Python public API
-  (`TradeAPIClient`, `AsyncTradeAPIClient`, the per-service shim modules, the
-  exception hierarchy). A breaking proto change upstream (the API removes
-  or renames an RPC) is also a major bump for this SDK.
-- **Minor (0.X.0)** — new RPCs, new shim re-exports, new optional
-  parameters. Should not break existing callers.
-- **Patch (0.0.X)** — bug fixes, internal refactors, regenerated stubs
-  with no surface change.
-
-Until `1.0.0`, minor versions may include small breaking changes if
-clearly noted in the changelog.
+- **Major (X.0.0)** — breaking public API or protocol changes.
+- **Minor (X.Y.0)** — backward-compatible RPCs or SDK features.
+- **Patch (X.Y.Z)** — fixes, refactors, and synchronized package releases.
 
 ## Troubleshooting
 
 ### "Tag does not match pyproject.toml version"
 
-The `build` job validates that the release tag (`2.16.0`) and the
-`pyproject.toml` version (`2.16.0`) agree. If you tagged before bumping
+The `build` job validates that the release tag (`2.18.1`) and both package
+versions agree. If you tagged before bumping
 the version: delete the release + tag, bump the version, push, and
 recreate the release.
 

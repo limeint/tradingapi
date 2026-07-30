@@ -1,9 +1,8 @@
 name: Publish Node SDK to npm
 
-# Node releases use a namespace so they can version independently from the
-# Python package:
-#   node-v0.1.0          -> npm dist-tag "latest"
-#   node-v0.2.0-beta.1   -> npm dist-tag "next"
+# Python and Node share one SDK version and GitHub Release:
+#   2.18.1          -> npm dist-tag "latest"
+#   2.19.0-rc.1     -> npm dist-tag "next"
 #
 # Publishing authenticates with the repository secret NPM_TOKEN.
 # See sdk/node/RELEASING.md.
@@ -14,7 +13,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing node-vX.Y.Z tag to publish
+        description: Existing SDK version tag to publish (for example 2.18.1)
         required: true
         type: string
 
@@ -24,7 +23,6 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'node-v')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -54,16 +52,11 @@ jobs:
         env:
           RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
         run: |
-          case "$RELEASE_TAG" in
-            node-v*) RELEASE_VERSION="${RELEASE_TAG#node-v}" ;;
-            *)
-              echo "::error::Node releases must use a node-vX.Y.Z tag"
-              exit 1
-              ;;
-          esac
+          RELEASE_VERSION="${RELEASE_TAG#v}"
 
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           LOCK_VERSION=$(node -p "require('./package-lock.json').version")
+          PYTHON_VERSION=$(python3 -c "import tomllib; print(tomllib.load(open('../python/pyproject.toml', 'rb'))['project']['version'])")
 
           if [ "$RELEASE_VERSION" != "$PACKAGE_VERSION" ]; then
             echo "::error::Tag version $RELEASE_VERSION does not match package.json version $PACKAGE_VERSION"
@@ -71,6 +64,10 @@ jobs:
           fi
           if [ "$PACKAGE_VERSION" != "$LOCK_VERSION" ]; then
             echo "::error::package.json version $PACKAGE_VERSION does not match package-lock.json version $LOCK_VERSION"
+            exit 1
+          fi
+          if [ "$PACKAGE_VERSION" != "$PYTHON_VERSION" ]; then
+            echo "::error::Node version $PACKAGE_VERSION does not match Python version $PYTHON_VERSION"
             exit 1
           fi
 
@@ -107,7 +104,7 @@ jobs:
       - name: Smoke-test packed package
         run: |
           mkdir -p "$RUNNER_TEMP/node-sdk-smoke"
-          npm install --prefix "$RUNNER_TEMP/node-sdk-smoke" package/*.tgz
+          npm install --prefix "$RUNNER_TEMP/node-sdk-smoke" "$PWD"/package/*.tgz
           cd "$RUNNER_TEMP/node-sdk-smoke"
           node --input-type=module -e '
             const sdk = await import("@limeint/trade-api");

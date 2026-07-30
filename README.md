@@ -29,9 +29,9 @@ Do not commit production secrets or customer account IDs.
 - Python: `limeint-sdk`, imported as `trade_api`
 - Node.js: `@limeint/trade-api`
 
-Node package maintainers should follow
-[the npm release guide](sdk/node/RELEASING.md); Node releases use
-`node-vX.Y.Z` tags so they remain independent from Python package releases.
+Both packages share a version. Publishing one GitHub Release with a bare
+version tag such as `2.18.1` publishes Python to PyPI and Node.js to npm.
+Maintainers should follow [the SDK release guide](sdk/node/RELEASING.md).
 
 The repository and issue tracker are at
 <https://github.com/limeint/tradingapi>.
