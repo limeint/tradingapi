@@ -1,3 +1,4 @@
+import logging
 import math
 from decimal import Decimal
 from types import SimpleNamespace
@@ -8,7 +9,8 @@ from trade_api.accounts import GetAccountResponse, Position
 from trade_api.market_data import Bar, BarsResponse
 from trade_api.orders import OrderState, Side
 
-from main import _ordered_bars, _place_order, run
+from config import Config
+from runner import ordered_bars, place_order, run
 from strategy import evaluate
 
 
@@ -19,24 +21,31 @@ def make_bar(seconds: int, close: str = "0") -> Bar:
     return bar
 
 
-def args(**overrides: Any) -> SimpleNamespace:
+def config(**overrides: Any) -> Config:
     values = {
+        "secret": "secret",
         "symbol": "SBER@MISX",
         "timeframe": "M5",
         "quantity": Decimal(2),
         "account_id": "A1",
         "execute": False,
         "check": False,
+        "log_level": "INFO",
     }
     values.update(overrides)
-    return SimpleNamespace(**values)
+    return Config(**values)
 
 
 class FakeClient:
-    def __init__(self, bars: list[Bar], position: str = "0") -> None:
+    def __init__(
+        self,
+        bars: list[Bar],
+        position: str = "0",
+        updates: list[BarsResponse] | None = None,
+    ) -> None:
         self.market_data = SimpleNamespace(
             Bars=lambda request: BarsResponse(symbol="SBER@MISX", bars=bars),
-            SubscribeBars=lambda request: (_ for _ in ()),
+            SubscribeBars=lambda request: iter(updates or []),
         )
         positions = [] if position == "0" else [Position(symbol="SBER@MISX")]
         if positions:
@@ -69,7 +78,7 @@ def test_evaluate_detects_one_entry_and_one_exit() -> None:
         value = base + math.sin(index * 0.7) * 0.65 + math.sin(index * 0.19) * 0.35
         closes.append(Decimal(str(value)))
 
-    signals = [evaluate(closes[: index + 1])[2] for index in range(29, len(closes))]
+    signals = [evaluate(closes[: index + 1]).signal for index in range(29, len(closes))]
     assert signals.count("entry") == 1
     assert signals.count("exit") == 1
 
@@ -80,35 +89,48 @@ def test_evaluate_requires_slow_window() -> None:
 
 
 def test_ordered_bars_sorts_and_keeps_latest_update() -> None:
-    bars = _ordered_bars([make_bar(2, "old"), make_bar(1), make_bar(2, "new")])
+    bars = ordered_bars([make_bar(2, "old"), make_bar(1), make_bar(2, "new")])
     assert [bar.timestamp.seconds for bar in bars] == [1, 2]
     assert bars[-1].close.value == "new"
 
 
 def test_history_check_is_read_only(capsys: pytest.CaptureFixture[str]) -> None:
     client = FakeClient([make_bar(index, str(index)) for index in range(1, 33)])
-    run(client, args(check=True))  # type: ignore[arg-type]
+    run(client, config(check=True))  # type: ignore[arg-type]
     assert "History check passed" in capsys.readouterr().out
+    assert client.account_calls == 0
+    assert client.placed == []
+
+
+def test_stream_confirms_the_pending_bar(caplog: pytest.LogCaptureFixture) -> None:
+    history = [make_bar(index, str(index)) for index in range(1, 33)]
+    update = BarsResponse(bars=[make_bar(32, "32.5"), make_bar(33, "33")])
+    client = FakeClient(history, updates=[update])
+
+    with caplog.at_level(logging.INFO, logger="runner"):
+        run(client, config())  # type: ignore[arg-type]
+
+    assert "Closed bar: close=32.5" in caplog.text
     assert client.account_calls == 0
     assert client.placed == []
 
 
 def test_dry_run_does_not_read_account_or_place_order() -> None:
     client = FakeClient([])
-    _place_order(client, args(), "entry", make_bar(1))  # type: ignore[arg-type]
+    place_order(client, config(), "entry", make_bar(1))  # type: ignore[arg-type]
     assert client.account_calls == 0
     assert client.placed == []
 
 
 def test_live_entry_buys_only_when_flat() -> None:
     client = FakeClient([])
-    _place_order(client, args(execute=True), "entry", make_bar(1))  # type: ignore[arg-type]
+    place_order(client, config(execute=True), "entry", make_bar(1))  # type: ignore[arg-type]
     assert client.placed[0].side == Side.SIDE_BUY
     assert client.placed[0].quantity.value == "2"
 
 
 def test_live_exit_cannot_create_a_short() -> None:
     client = FakeClient([], position="0.5")
-    _place_order(client, args(execute=True), "exit", make_bar(1))  # type: ignore[arg-type]
+    place_order(client, config(execute=True), "exit", make_bar(1))  # type: ignore[arg-type]
     assert client.placed[0].side == Side.SIDE_SELL
     assert client.placed[0].quantity.value == "0.5"

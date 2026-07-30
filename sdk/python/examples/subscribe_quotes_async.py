@@ -17,9 +17,7 @@ from trade_api.market_data import SubscribeQuoteRequest
 async def main(symbols: list[str]) -> None:
     secret = os.environ["TRADE_API_SECRET"]
     async with AsyncTradeAPIClient(secret=secret) as client:
-        async for tick in client.market_data.SubscribeQuote(
-            SubscribeQuoteRequest(symbols=symbols)
-        ):
+        async for tick in client.market_data.SubscribeQuote(SubscribeQuoteRequest(symbols=symbols)):
             # flush=True so the stream is visible under `timeout`, `tee`,
             # or any other pipeline that truncates buffered stdout on exit.
             print(tick, flush=True)

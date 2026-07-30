@@ -1,12 +1,18 @@
 """The SMA 9/30 rule, independent from APIs and order execution."""
 
 from collections.abc import Sequence
+from dataclasses import dataclass
 from decimal import Decimal
 from typing import Literal
 
-# A runtime alias, not a string annotation: `X | None` on a typing special form
-# needs Python 3.10, which is the floor for these examples anyway.
 Signal = Literal["entry", "exit"] | None
+
+
+@dataclass(frozen=True, slots=True)
+class Evaluation:
+    fast: Decimal
+    slow: Decimal
+    signal: Signal
 
 
 def _mean(values: Sequence[Decimal]) -> Decimal:
@@ -17,7 +23,7 @@ def evaluate(
     closes: Sequence[Decimal],
     fast_window: int = 9,
     slow_window: int = 30,
-) -> tuple[Decimal, Decimal, Signal]:
+) -> Evaluation:
     """Return current SMA values and an entry/exit crossover signal.
 
     At least ``slow_window`` closes calculate the averages. One additional
@@ -33,14 +39,14 @@ def evaluate(
     fast = _mean(closes[-fast_window:])
     slow = _mean(closes[-slow_window:])
     if len(closes) == slow_window:
-        return fast, slow, None
+        return Evaluation(fast, slow, None)
 
     previous = closes[:-1]
     previous_fast = _mean(previous[-fast_window:])
     previous_slow = _mean(previous[-slow_window:])
 
     if previous_fast <= previous_slow and fast > slow:
-        return fast, slow, "entry"
+        return Evaluation(fast, slow, "entry")
     if previous_fast >= previous_slow and fast < slow:
-        return fast, slow, "exit"
-    return fast, slow, None
+        return Evaluation(fast, slow, "exit")
+    return Evaluation(fast, slow, None)

@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import os
 
-from google.type.decimal_pb2 import Decimal  # type: ignore[import-not-found]
+from google.type.decimal_pb2 import Decimal  # type: ignore[import-untyped]
 
 from trade_api import TradeAPIClient
 from trade_api.orders import (

@@ -1,12 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 
-import {
-  orderedBars,
-  placeOrder,
-  run,
-  type Config,
-  type StrategyApi,
-} from "../main.js";
+import type { Config } from "../config.js";
+import type { StrategyApi } from "../runner.js";
+import { orderedBars, placeOrder, run } from "../runner.js";
 import { evaluate } from "../strategy.js";
 
 const bar = (seconds: number, close = "0") => ({
@@ -81,7 +77,9 @@ describe("SMA 9/30 strategy", () => {
       return base + Math.sin(index * 0.7) * 0.65 + Math.sin(index * 0.19) * 0.35;
     });
 
-    const signals = closes.slice(29).map((_, index) => evaluate(closes.slice(0, index + 30)).signal);
+    const signals = closes
+      .slice(29)
+      .map((_, index) => evaluate(closes.slice(0, index + 30)).signal);
     expect(signals.filter((signal) => signal === "entry")).toHaveLength(1);
     expect(signals.filter((signal) => signal === "exit")).toHaveLength(1);
   });

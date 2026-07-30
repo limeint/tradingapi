@@ -1,11 +1,12 @@
+export { Status as GrpcStatus } from "nice-grpc";
 export {
+  createTradeApi,
   DEFAULT_ENDPOINT,
   DEFAULT_RETRY_POLICY,
-  createTradeApi,
-  withTradeApi,
   type RetryPolicy,
   type TradeApi,
   type TradeApiOptions,
+  withTradeApi,
 } from "./client.js";
 export {
   AuthError,
@@ -19,4 +20,3 @@ export {
   TradeApiError,
   toTradeApiError,
 } from "./errors.js";
-export { Status as GrpcStatus } from "nice-grpc";

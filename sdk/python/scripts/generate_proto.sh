@@ -2,10 +2,10 @@
 # Generates Python gRPC stubs from the .proto files into trade_api/proto/.
 #
 # Usage:
-#   ./scripts/generate_proto.sh
+#   uv run ./scripts/generate_proto.sh
 #
 # Requirements:
-#   pip install grpcio-tools mypy-protobuf
+#   uv sync
 #
 # mypy-protobuf installs two protoc plugins on PATH:
 #   - protoc-gen-mypy       (typed stubs for proto messages, complements --pyi_out)
@@ -56,7 +56,7 @@ if ! PROTOC_GEN_MYPY_GRPC="$(command -v protoc-gen-mypy_grpc)"; then
     PROTOC_GEN_MYPY_GRPC=""
 fi
 if [ -z "$PROTOC_GEN_MYPY" ] || [ -z "$PROTOC_GEN_MYPY_GRPC" ]; then
-    echo "ERROR: mypy-protobuf is not installed. Run: pip install mypy-protobuf" >&2
+    echo "ERROR: mypy-protobuf is not installed. Run: uv sync" >&2
     exit 1
 fi
 

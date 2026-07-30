@@ -7,8 +7,6 @@ without inspecting raw status codes.
 
 from __future__ import annotations
 
-from typing import Optional
-
 import grpc
 
 
@@ -19,8 +17,8 @@ class TradeAPIError(Exception):
         self,
         message: str,
         *,
-        code: Optional[grpc.StatusCode] = None,
-        details: Optional[str] = None,
+        code: grpc.StatusCode | None = None,
+        details: str | None = None,
     ) -> None:
         super().__init__(message)
         self.code = code
@@ -86,14 +84,14 @@ def from_rpc_error(err: grpc.RpcError) -> TradeAPIError:
 
 
 __all__ = [
-    "TradeAPIError",
     "AuthError",
-    "PermissionDeniedError",
-    "RateLimitError",
-    "InvalidArgumentError",
-    "NotFoundError",
-    "ServiceUnavailableError",
     "DeadlineExceededError",
     "InternalError",
+    "InvalidArgumentError",
+    "NotFoundError",
+    "PermissionDeniedError",
+    "RateLimitError",
+    "ServiceUnavailableError",
+    "TradeAPIError",
     "from_rpc_error",
 ]

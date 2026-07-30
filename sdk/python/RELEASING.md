@@ -121,8 +121,9 @@ Run locally to see the exact issue:
 
 ```sh
 cd sdk/python
-python -m build
-twine check --strict dist/*
+uv sync --locked
+uv run python -m build
+uv run twine check --strict dist/*
 ```
 
 Most common: README contains a markdown construct PyPI can't render

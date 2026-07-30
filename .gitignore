@@ -12,6 +12,9 @@ __pycache__/
 node_modules/
 dist/
 
+# Generated language bindings
+sdk/node/src/generated/
+
 # Tool caches
 .mypy_cache/
 .ruff_cache/

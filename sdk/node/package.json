@@ -49,11 +49,14 @@
     }
   },
   "scripts": {
-    "build": "npm run clean && tsc -p tsconfig.json",
+    "build": "npm run generate && npm run clean && tsc -p tsconfig.json",
+    "check": "npm run generate && biome ci src tests examples && tsc -p tsconfig.check.json && vitest run",
     "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "format": "biome check --write src tests examples",
     "generate": "./scripts/generate_proto.sh",
-    "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.check.json",
+    "lint": "biome ci src tests examples",
+    "test": "npm run generate && vitest run",
+    "typecheck": "npm run generate && tsc -p tsconfig.check.json",
     "prepack": "npm run build"
   },
   "engines": {
@@ -88,6 +91,7 @@
     "nice-grpc-common": "^2.0.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.5",
     "@types/node": "^24.1.0",
     "grpc-tools": "^1.13.1",
     "ts-proto": "^2.12.0",

@@ -23,15 +23,17 @@ modules:
 
 It does not import from `sdk/python`, generated modules under
 `trade_api.proto`, or the repository's raw `proto/` directory. The dependency
-file pins the published TestPyPI wheel and its SHA-256 digest. Consumer CI
+lockfile pins the published TestPyPI wheel and its SHA-256 digest. Consumer CI
 verifies that `trade_api` resolves from the installed distribution rather than
 this repository's source tree.
 
 ## Read the implementation in this order
 
 1. [`strategy.py`](strategy.py) — the small, pure SMA calculation and crossover rule.
-2. [`main.py`](main.py) — history, completed live bars, dry-run, and guarded orders.
-3. [`tests/test_sma_crossover.py`](tests/test_sma_crossover.py) — executable examples of expected behavior.
+2. [`config.py`](config.py) — typed command-line and environment configuration.
+3. [`runner.py`](runner.py) — market data, completed bars, and guarded orders.
+4. [`main.py`](main.py) — the small executable entry point.
+5. [`tests/test_sma_crossover.py`](tests/test_sma_crossover.py) — executable behavior examples.
 
 The calculation is deliberately independent of the SDK. It can be tested or
 reused without credentials, networking, or protobuf messages.
@@ -43,9 +45,7 @@ gencode, and protobuf 7 dropped Python 3.9.
 
 ```sh
 cd strategies/sma_crossover/python
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
+uv sync --locked
 ```
 
 ## Run
@@ -81,18 +81,16 @@ python main.py --symbol SBER@MISX --quantity 1 --execute
 
 Full flag reference: `python main.py --help`.
 
-The example is deliberately flat — two modules and a test file, no package
-scaffolding — so it can be read top to bottom and dropped into an existing
-project without rewiring imports.
+The example stays flat and separates pure calculation, configuration,
+orchestration, and startup so each file can be read independently.
 
 ## Test
 
 No secret or network access is required:
 
 ```sh
-python -m pip install -r requirements-dev.txt
-python -m pytest
-python -m ruff check .
-python -m ruff format --check .
-python -m mypy .
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy .
+uv run pytest
 ```

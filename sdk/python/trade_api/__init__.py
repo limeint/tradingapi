@@ -15,39 +15,41 @@ Public surface:
 - :func:`from_rpc_error` — convert a raw ``grpc.RpcError`` into a typed :class:`TradeAPIError`.
 """
 
+from importlib.metadata import version
+
 from .aio import AsyncTradeAPIClient
 from .client import DEFAULT_ENDPOINT, TradeAPIClient
 from .exceptions import (
     AuthError,
     DeadlineExceededError,
-    TradeAPIError,
     InternalError,
     InvalidArgumentError,
     NotFoundError,
     PermissionDeniedError,
     RateLimitError,
     ServiceUnavailableError,
+    TradeAPIError,
     from_rpc_error,
 )
 from .retry import DEFAULT_POLICY, RetryPolicy
 
-__version__ = "2.18.0"
+__version__ = version("limeint-sdk")
 
 __all__ = [
-    "TradeAPIClient",
-    "AsyncTradeAPIClient",
     "DEFAULT_ENDPOINT",
-    "RetryPolicy",
     "DEFAULT_POLICY",
-    "TradeAPIError",
+    "AsyncTradeAPIClient",
     "AuthError",
-    "PermissionDeniedError",
-    "RateLimitError",
-    "InvalidArgumentError",
-    "NotFoundError",
-    "ServiceUnavailableError",
     "DeadlineExceededError",
     "InternalError",
-    "from_rpc_error",
+    "InvalidArgumentError",
+    "NotFoundError",
+    "PermissionDeniedError",
+    "RateLimitError",
+    "RetryPolicy",
+    "ServiceUnavailableError",
+    "TradeAPIClient",
+    "TradeAPIError",
     "__version__",
+    "from_rpc_error",
 ]
