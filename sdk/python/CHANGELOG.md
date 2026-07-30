@@ -9,7 +9,7 @@ The PyPI distribution is `limeint-sdk`; the Python import name is
 
 ## [Unreleased]
 
-## [2.18.1] — 2026-07-30
+## [2.18.1-rc.1] — 2026-07-30
 
 ### Changed
 
@@ -78,8 +78,8 @@ Initial public release.
 - Distribution name on PyPI is `limeint-sdk`. The import name remains
   `trade_api`.
 
-[Unreleased]: https://github.com/limeint/tradingapi/compare/2.18.1...HEAD
-[2.18.1]: https://github.com/limeint/tradingapi/releases/tag/2.18.1
+[Unreleased]: https://github.com/limeint/tradingapi/compare/2.18.1-rc.1...HEAD
+[2.18.1-rc.1]: https://github.com/limeint/tradingapi/releases/tag/2.18.1-rc.1
 [2.18.0]: https://github.com/limeint/tradingapi/releases/tag/2.18.0
 [2.17.0]: https://github.com/limeint/tradingapi/releases/tag/2.17.0
 [2.16.0]: https://github.com/limeint/tradingapi/releases/tag/2.16.0
