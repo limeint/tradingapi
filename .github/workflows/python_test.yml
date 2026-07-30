@@ -44,8 +44,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           version: "0.11.32"
-          enable-cache: true
-          cache-dependency-glob: sdk/python/uv.lock
+          enable-cache: false
 
       - name: Install dependencies
         run: uv sync --locked
@@ -118,8 +117,7 @@ jobs:
         with:
           python-version: "3.12"
           version: "0.11.32"
-          enable-cache: true
-          cache-dependency-glob: sdk/python/uv.lock
+          enable-cache: false
 
       - name: Install dependencies
         run: uv sync --locked
@@ -168,6 +166,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           version: "0.11.32"
+          enable-cache: false
 
       - name: Download distribution artifacts
         uses: actions/download-artifact@v4
@@ -199,8 +198,7 @@ jobs:
         with:
           python-version: "3.12"
           version: "0.11.32"
-          enable-cache: true
-          cache-dependency-glob: strategies/sma_crossover/python/uv.lock
+          enable-cache: false
 
       - name: Download SDK distribution
         uses: actions/download-artifact@v4
