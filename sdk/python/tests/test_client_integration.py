@@ -13,10 +13,10 @@ import pytest
 from trade_api import (
     AsyncTradeAPIClient,
     AuthError,
-    TradeAPIClient,
     InvalidArgumentError,
     RateLimitError,
     RetryPolicy,
+    TradeAPIClient,
     from_rpc_error,
 )
 from trade_api.proto.grpc.tradeapi.v1.accounts.accounts_service_pb2 import (
@@ -131,9 +131,7 @@ def test_streaming_subscription_yields_events_and_carries_auth() -> None:
     market_data = FakeMarketDataService(events=4, require_auth=True)
     with fake_server(auth=auth, market_data=market_data) as (endpoint, _):
         with TradeAPIClient.for_testing(secret="s", endpoint=endpoint) as client:
-            events = list(
-                client.market_data.SubscribeQuote(SubscribeQuoteRequest(symbols=["X"]))
-            )
+            events = list(client.market_data.SubscribeQuote(SubscribeQuoteRequest(symbols=["X"])))
             assert len(events) == 4
             md = dict(market_data.last_metadata)
             assert md.get("authorization") == "stream-jwt"
@@ -165,27 +163,27 @@ def test_get_token_returns_current_jwt() -> None:
 
 def test_get_token_returns_none_before_construction_completes() -> None:
     """When construction fails midway, get_token() should not crash."""
+
     class BadAuth(FakeAuthService):
         def Auth(self, request, context):  # type: ignore[override]
             context.abort(grpc.StatusCode.UNAUTHENTICATED, "nope")
 
-    with fake_server(auth=BadAuth()) as (endpoint, _):
-        with pytest.raises(AuthError):
-            TradeAPIClient.for_testing(secret="bad", endpoint=endpoint)
+    with fake_server(auth=BadAuth()) as (endpoint, _), pytest.raises(AuthError):
+        TradeAPIClient.for_testing(secret="bad", endpoint=endpoint)
 
 
 def test_insecure_auth_interceptor_covers_all_call_types() -> None:
-    """The ``_InsecureAuthInterceptor`` implements four methods (unary-unary,
+    """The sync interceptor implements four methods (unary-unary,
     unary-stream, stream-unary, stream-stream). We have integration coverage
     for the first two via real RPCs; this unit test exercises the other two
     directly so the wrapping logic is verified."""
     from unittest.mock import MagicMock
 
-    from trade_api.client import _InsecureAuthInterceptor
+    from trade_api._insecure_auth import InsecureAuthInterceptor
 
     token_mgr = MagicMock()
     token_mgr.get_token.return_value = "jwt-xyz"
-    interceptor = _InsecureAuthInterceptor(token_mgr)
+    interceptor = InsecureAuthInterceptor(token_mgr)
 
     sentinel_details = MagicMock()
     sentinel_details.metadata = (("existing", "value"),)
@@ -208,14 +206,14 @@ def test_client_rejects_call_when_auth_fails_upfront() -> None:
         def Auth(self, request, context):  # type: ignore[override]
             context.abort(grpc.StatusCode.UNAUTHENTICATED, "no")
 
-    with fake_server(auth=BadAuth()) as (endpoint, _):
-        with pytest.raises(AuthError):
-            TradeAPIClient.for_testing(secret="bad", endpoint=endpoint)
+    with fake_server(auth=BadAuth()) as (endpoint, _), pytest.raises(AuthError):
+        TradeAPIClient.for_testing(secret="bad", endpoint=endpoint)
 
 
 def test_failed_construction_does_not_leak_channels() -> None:
     """When construction raises, the auth channel + daemon thread should be
     cleaned up rather than leaked."""
+
     class BadAuth(FakeAuthService):
         def Auth(self, request, context):  # type: ignore[override]
             context.abort(grpc.StatusCode.UNAUTHENTICATED, "nope")
@@ -250,9 +248,7 @@ async def test_async_unary_call_carries_authorization() -> None:
     auth = FakeAuthService(initial_token="async-jwt")
     accounts = FakeAccountsService()
     with fake_server(auth=auth, accounts=accounts) as (endpoint, _):
-        async with AsyncTradeAPIClient.for_testing(
-            secret="s", endpoint=endpoint
-        ) as client:
+        async with AsyncTradeAPIClient.for_testing(secret="s", endpoint=endpoint) as client:
             resp = await client.accounts.GetAccount(GetAccountRequest(account_id="A99"))
             assert resp.account_id == "A99"
             md = dict(accounts.last_metadata)
@@ -265,9 +261,7 @@ async def test_async_streaming_subscription_yields_events_and_carries_auth() -> 
     auth = FakeAuthService(initial_token="async-stream-jwt")
     market_data = FakeMarketDataService(events=3, require_auth=True)
     with fake_server(auth=auth, market_data=market_data) as (endpoint, _):
-        async with AsyncTradeAPIClient.for_testing(
-            secret="s", endpoint=endpoint
-        ) as client:
+        async with AsyncTradeAPIClient.for_testing(secret="s", endpoint=endpoint) as client:
             received = []
             async for event in client.market_data.SubscribeQuote(
                 SubscribeQuoteRequest(symbols=["X"])
@@ -311,6 +305,7 @@ async def test_async_get_token_returns_none_before_start() -> None:
 async def test_async_failed_start_cleans_up() -> None:
     """When start() raises (e.g. initial Auth fails), the partial channels
     and the token-manager thread/task must be torn down."""
+
     class BadAuth(FakeAuthService):
         async def _aborted(self, context):  # type: ignore[no-untyped-def]
             context.abort(grpc.StatusCode.UNAUTHENTICATED, "nope")
@@ -341,8 +336,6 @@ async def test_async_unary_retry_does_not_leak_call_objects() -> None:
         async with AsyncTradeAPIClient.for_testing(
             secret="s", endpoint=endpoint, retry_policy=_fast_retry()
         ) as client:
-            state = await client.orders.PlaceOrder(
-                Order(account_id="A1", symbol="SBER@MISX")
-            )
+            state = await client.orders.PlaceOrder(Order(account_id="A1", symbol="SBER@MISX"))
             assert state.order_id == "ord-1"
         auth.close_stream()

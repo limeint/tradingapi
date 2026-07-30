@@ -13,12 +13,17 @@ from __future__ import annotations
 
 import logging
 from types import TracebackType
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import grpc
 import grpc.aio
 
+from ._insecure_auth import (
+    InsecureAsyncAuthStreamInterceptor,
+    InsecureAsyncAuthUnaryInterceptor,
+)
 from ._metadata import async_call_credentials
+from ._services import service_stubs
 from .auth import AsyncTokenManager
 from .client import DEFAULT_ENDPOINT
 from .retry import DEFAULT_POLICY, RetryPolicy, build_async_interceptors
@@ -53,65 +58,6 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-async def _details_with_token_async(token_manager: AsyncTokenManager, details):  # type: ignore[no-untyped-def]
-    token = await token_manager.get_token()
-    existing = tuple(details.metadata or ())
-    return details._replace(metadata=existing + (("authorization", token),))
-
-
-# grpc.aio.Channel registers each interceptor into exactly one bucket based on
-# the first matching isinstance() check (see grpc.aio._channel.Channel.__init__).
-# That means an interceptor inheriting from multiple ClientInterceptor subtypes
-# is silently ignored for all but the first matching type. To get Authorization
-# headers on both unary and server-streaming calls, we register two separate
-# objects — one per interface. The retry interceptors (in retry.py) are split
-# the same way for the same reason.
-
-
-class _InsecureAsyncAuthUnaryInterceptor(grpc.aio.UnaryUnaryClientInterceptor):
-    """Insecure-mode auth header injector for unary-unary calls."""
-
-    def __init__(self, token_manager: AsyncTokenManager) -> None:
-        self._token_manager = token_manager
-
-    async def intercept_unary_unary(self, continuation, client_call_details, request):  # type: ignore[no-untyped-def]
-        details = await _details_with_token_async(self._token_manager, client_call_details)
-        return await continuation(details, request)
-
-
-class _InsecureAsyncAuthStreamInterceptor(grpc.aio.UnaryStreamClientInterceptor):
-    """Insecure-mode auth header injector for server-streaming calls."""
-
-    def __init__(self, token_manager: AsyncTokenManager) -> None:
-        self._token_manager = token_manager
-
-    async def intercept_unary_stream(self, continuation, client_call_details, request):  # type: ignore[no-untyped-def]
-        details = await _details_with_token_async(self._token_manager, client_call_details)
-        return await continuation(details, request)
-
-
-def _async_service_stubs():  # noqa: ANN202
-    from .proto.grpc.tradeapi.v1.accounts import accounts_service_pb2_grpc  # type: ignore[import-not-found]
-    from .proto.grpc.tradeapi.v1.assets import assets_service_pb2_grpc  # type: ignore[import-not-found]
-    from .proto.grpc.tradeapi.v1.auth import auth_service_pb2_grpc  # type: ignore[import-not-found]
-    from .proto.grpc.tradeapi.v1.marketdata import marketdata_service_pb2_grpc  # type: ignore[import-not-found]
-    from .proto.grpc.tradeapi.v1.metrics import usage_metrics_service_pb2_grpc  # type: ignore[import-not-found]
-    from .proto.grpc.tradeapi.v1.orders import orders_service_pb2_grpc  # type: ignore[import-not-found]
-    from .proto.grpc.tradeapi.v1.reports import reports_service_pb2_grpc  # type: ignore[import-not-found]
-
-    # The grpc-python generated stubs are channel-agnostic — the same stub
-    # classes work for grpc.aio.Channel.
-    return {
-        "auth": auth_service_pb2_grpc.AuthServiceStub,
-        "accounts": accounts_service_pb2_grpc.AccountsServiceStub,
-        "assets": assets_service_pb2_grpc.AssetsServiceStub,
-        "market_data": marketdata_service_pb2_grpc.MarketDataServiceStub,
-        "orders": orders_service_pb2_grpc.OrdersServiceStub,
-        "reports": reports_service_pb2_grpc.ReportsServiceStub,
-        "metrics": usage_metrics_service_pb2_grpc.UsageMetricsServiceStub,
-    }
-
-
 class AsyncTradeAPIClient:
     """Asyncio client for the Limeint Trade API.
 
@@ -128,7 +74,7 @@ class AsyncTradeAPIClient:
         *,
         endpoint: str = DEFAULT_ENDPOINT,
         retry_policy: RetryPolicy = DEFAULT_POLICY,
-        channel_options: Optional[list[tuple[str, object]]] = None,
+        channel_options: list[tuple[str, object]] | None = None,
         _insecure: bool = False,
     ) -> None:
         self._endpoint = endpoint
@@ -137,9 +83,9 @@ class AsyncTradeAPIClient:
         self._channel_options = channel_options
         self._insecure = _insecure
 
-        self._auth_channel: Optional[grpc.aio.Channel] = None
-        self._channel: Optional[grpc.aio.Channel] = None
-        self._token_manager: Optional[AsyncTokenManager] = None
+        self._auth_channel: grpc.aio.Channel | None = None
+        self._channel: grpc.aio.Channel | None = None
+        self._token_manager: AsyncTokenManager | None = None
         self._started = False
 
     @classmethod
@@ -149,8 +95,8 @@ class AsyncTradeAPIClient:
         *,
         endpoint: str,
         retry_policy: RetryPolicy = DEFAULT_POLICY,
-        channel_options: Optional[list[tuple[str, object]]] = None,
-    ) -> "AsyncTradeAPIClient":
+        channel_options: list[tuple[str, object]] | None = None,
+    ) -> AsyncTradeAPIClient:
         """Construct an insecure (no-TLS) client for testing against an in-process
         fake server. Never use against ``api.finam.ru`` or any production endpoint."""
         return cls(
@@ -180,7 +126,7 @@ class AsyncTradeAPIClient:
             # returns the AsyncStub variant when given a grpc.aio.Channel, so
             # these annotations match runtime behavior — RPC methods are typed
             # as returning awaitables / async iterators.
-            stubs = _async_service_stubs()
+            stubs = service_stubs()
             self.auth: AuthServiceAsyncStub = stubs["auth"](self._channel)
             self.accounts: AccountsServiceAsyncStub = stubs["accounts"](self._channel)
             self.assets: AssetsServiceAsyncStub = stubs["assets"](self._channel)
@@ -206,8 +152,8 @@ class AsyncTradeAPIClient:
             self._endpoint,
             options=self._channel_options,
             interceptors=[
-                _InsecureAsyncAuthUnaryInterceptor(self._token_manager),
-                _InsecureAsyncAuthStreamInterceptor(self._token_manager),
+                InsecureAsyncAuthUnaryInterceptor(self._token_manager),
+                InsecureAsyncAuthStreamInterceptor(self._token_manager),
                 retry_unary,
                 retry_stream,
             ],
@@ -250,7 +196,7 @@ class AsyncTradeAPIClient:
             except Exception:  # pragma: no cover - defensive log on teardown
                 logger.exception("Error closing auth channel during teardown")
 
-    def get_token(self) -> Optional[str]:
+    def get_token(self) -> str | None:
         """Return the current JWT, or ``None`` if ``start()`` has not completed.
 
         Sync read (no ``await``) — exposes the cached token snapshot. The token
@@ -259,20 +205,20 @@ class AsyncTradeAPIClient:
         """
         if self._token_manager is None:
             return None
-        return self._token_manager._token  # noqa: SLF001 — intentional snapshot read
+        return self._token_manager._token
 
     async def close(self) -> None:
         await self._safe_teardown()
 
-    async def __aenter__(self) -> "AsyncTradeAPIClient":
+    async def __aenter__(self) -> AsyncTradeAPIClient:
         await self.start()
         return self
 
     async def __aexit__(
         self,
-        exc_type: Optional[type[BaseException]],
-        exc: Optional[BaseException],
-        tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
     ) -> None:
         await self.close()
 

@@ -8,13 +8,13 @@ import pytest
 from trade_api.exceptions import (
     AuthError,
     DeadlineExceededError,
-    TradeAPIError,
     InternalError,
     InvalidArgumentError,
     NotFoundError,
     PermissionDeniedError,
     RateLimitError,
     ServiceUnavailableError,
+    TradeAPIError,
     from_rpc_error,
 )
 

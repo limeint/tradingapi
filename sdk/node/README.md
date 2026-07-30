@@ -159,15 +159,15 @@ For state-changing RPCs, use a stable idempotency identifier such as
 From `sdk/node`:
 
 ```sh
-npm install
-npm run generate
-npm run typecheck
-npm test
+npm ci
+npm run format
+npm run check
 npm run build
 npm pack --dry-run
 ```
 
 Run `npm run generate` whenever files under `../../proto` change. Generated
-files are committed so SDK consumers never need `protoc`.
+files are build artifacts and are not committed. Package consumers still never
+need `protoc` because releases contain the compiled output.
 
 Release maintainers should follow [RELEASING.md](./RELEASING.md).

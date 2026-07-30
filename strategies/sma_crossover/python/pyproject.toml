@@ -1,6 +1,20 @@
-# Tool configuration only. This example is not packaged or published — it is a
-# self-contained directory meant to be copied out and run against the SDK
-# installed from PyPI (see requirements.txt).
+[project]
+name = "limeint-sma-crossover-example"
+version = "0.0.0"
+description = "SMA 9/30 crossover example for the Limeint Trade API"
+requires-python = ">=3.10"
+dependencies = [
+    "limeint-sdk @ https://test-files.pythonhosted.org/packages/2a/8a/6bd3032d3d9fad37890765d878e3c52f88a309ce120a65226e678d1dd2aa/limeint_sdk-2.18.1rc1-py3-none-any.whl#sha256=22214756066b8b02ae43ec22798f6cf923508c367a0ab24534d20592b57021d1",
+    "protobuf>=7.35",
+    "googleapis-common-protos>=1.62",
+]
+
+[dependency-groups]
+dev = [
+    "mypy==2.3.0",
+    "pytest>=9",
+    "ruff==0.16.1",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -10,6 +24,15 @@ addopts = "-ra --strict-markers"
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "B", "SIM", "C901", "PLR0915", "RUF"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-statements = 40
 
 [tool.mypy]
 python_version = "3.10"

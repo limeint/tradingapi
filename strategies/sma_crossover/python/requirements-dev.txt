@@ -1,7 +1,0 @@
-# Install requirements.txt first when developing the strategy outside CI.
-pytest>=7
-
-# Upper bound is deliberate: ruff is pre-1.0, so minor releases expand the
-# default rule set. Bump this consciously together with any required fixes.
-ruff>=0.3,<0.17
-mypy>=1.8

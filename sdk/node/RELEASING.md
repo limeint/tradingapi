@@ -44,20 +44,15 @@ logs.
 2. Regenerate and verify both SDKs:
 
    ```sh
-   cd ../python
-   ./scripts/generate_proto.sh
-   python -m pytest
+   cd ../..
+   just bootstrap
+   just check
 
-   cd ../node
-   npm ci
-   npm run generate
-   npm run typecheck
-   npm test
-   npm run build
-   npm pack --dry-run
+   npm --prefix sdk/node run build
+   npm --prefix sdk/node pack --dry-run
    ```
 
-3. Commit the version bump and generated changes.
+3. Commit the version bump. Generated bindings are recreated during CI builds.
 4. Create one GitHub Release targeting that commit with the bare version tag,
    for example `2.18.1`. Publishing it starts both registry workflows.
 
@@ -73,7 +68,7 @@ versions.
 Before the protected publish job runs, CI:
 
 - checks the release tag against the Python and Node package versions;
-- regenerates protobuf code and rejects drift;
+- regenerates protobuf code from the tagged source contracts;
 - type-checks the SDK, tests, and examples;
 - runs the in-process gRPC integration suite;
 - builds and packs the package;

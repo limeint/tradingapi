@@ -39,12 +39,13 @@ jobs:
         with:
           ref: ${{ github.event.release.tag_name || inputs.tag }}
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Setup uv and Python
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
           python-version: "3.12"
-          cache: 'pip'
-          cache-dependency-path: sdk/python/pyproject.toml
+          version: "0.11.32"
+          enable-cache: true
+          cache-dependency-glob: sdk/python/uv.lock
 
       - name: Verify tag matches pyproject version
         # Catches the common mistake of cutting a 2.18.1 release without
@@ -90,28 +91,23 @@ jobs:
             echo "Tag $TAG is a final release — will publish to real PyPI"
           fi
 
-      - name: Install build tooling
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install build twine
-
-      - name: Install proto generation tooling
-        run: python -m pip install -e ".[dev]"
+      - name: Install dependencies
+        run: uv sync --locked
 
       - name: Regenerate proto stubs
-        run: ./scripts/generate_proto.sh
+        run: uv run ./scripts/generate_proto.sh
 
       - name: Run SDK tests
-        run: python -m pytest tests/
+        run: uv run pytest tests/
 
       - name: Build sdist + wheel
-        run: python -m build
+        run: uv run python -m build
 
       - name: Validate distribution metadata
-        run: twine check --strict dist/*
+        run: uv run twine check --strict dist/*
 
       - name: Verify distribution contents
-        run: python scripts/verify_distribution.py dist
+        run: uv run python scripts/verify_distribution.py dist
 
       - name: Smoke-test the built wheel
         run: |
@@ -125,10 +121,9 @@ jobs:
         env:
           REPOSITORY_SDK_SOURCE: ${{ github.workspace }}/sdk/python
         run: |
-          python -m venv "$RUNNER_TEMP/limeint-strategy-test"
-          "$RUNNER_TEMP/limeint-strategy-test/bin/python" -m pip install ../../../sdk/python/dist/*.whl
-          "$RUNNER_TEMP/limeint-strategy-test/bin/python" -m pip install -r requirements-dev.txt
-          "$RUNNER_TEMP/limeint-strategy-test/bin/python" -c "
+          uv sync --locked --no-install-package limeint-sdk
+          uv pip install --python .venv/bin/python ../../../sdk/python/dist/*.whl
+          .venv/bin/python -c "
           import os
           from pathlib import Path
           import trade_api
@@ -139,7 +134,7 @@ jobs:
               raise SystemExit(f'strategy imported repository SDK source: {package_path}')
           print(f'strategy uses installed SDK: {package_path}')
           "
-          "$RUNNER_TEMP/limeint-strategy-test/bin/python" -m pytest
+          .venv/bin/python -m pytest
 
       - name: Upload distribution artifacts
         uses: actions/upload-artifact@v4

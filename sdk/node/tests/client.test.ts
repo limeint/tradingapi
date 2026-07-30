@@ -1,25 +1,11 @@
-import {
-  ServerError,
-  Status,
-  createServer,
-  type CallContext,
-} from "nice-grpc";
+import type { CallContext } from "nice-grpc";
+import { createServer, ServerError, Status } from "nice-grpc";
 import { describe, expect, it } from "vitest";
-
-import {
-  AuthError,
-  ServiceUnavailableError,
-  createTradeApi,
-  withTradeApi,
-} from "../src/index.js";
-import {
-  AccountsServiceDefinition,
-  type AccountsServiceImplementation,
-} from "../src/generated/grpc/tradeapi/v1/accounts/accounts_service.js";
-import {
-  AuthServiceDefinition,
-  type AuthServiceImplementation,
-} from "../src/generated/grpc/tradeapi/v1/auth/auth_service.js";
+import type { AccountsServiceImplementation } from "../src/generated/grpc/tradeapi/v1/accounts/accounts_service.js";
+import { AccountsServiceDefinition } from "../src/generated/grpc/tradeapi/v1/accounts/accounts_service.js";
+import type { AuthServiceImplementation } from "../src/generated/grpc/tradeapi/v1/auth/auth_service.js";
+import { AuthServiceDefinition } from "../src/generated/grpc/tradeapi/v1/auth/auth_service.js";
+import { AuthError, createTradeApi, ServiceUnavailableError, withTradeApi } from "../src/index.js";
 
 type FakeOptions = {
   initialToken?: string;
@@ -27,10 +13,7 @@ type FakeOptions = {
   unavailableCalls?: number;
 };
 
-const waitUntil = async (
-  predicate: () => boolean,
-  timeoutMs = 2_000,
-): Promise<void> => {
+const waitUntil = async (predicate: () => boolean, timeoutMs = 2_000): Promise<void> => {
   const deadline = Date.now() + timeoutMs;
   while (!predicate()) {
     if (Date.now() >= deadline) throw new Error("Timed out waiting for condition");
@@ -60,10 +43,7 @@ const fakeServer = async (options: FakeOptions = {}) => {
     async tokenDetails() {
       return { accountIds: ["A1"], readonly: false };
     },
-    async *subscribeJwtRenewal(
-      _request: unknown,
-      context: CallContext,
-    ) {
+    async *subscribeJwtRenewal(_request: unknown, context: CallContext) {
       renewalStarted = true;
       await Promise.race([
         renewalReady,
@@ -201,9 +181,9 @@ describe("createTradeApi", () => {
     });
 
     try {
-      await expect(
-        client.accounts.getAccount({ accountId: "A1" }),
-      ).rejects.toBeInstanceOf(ServiceUnavailableError);
+      await expect(client.accounts.getAccount({ accountId: "A1" })).rejects.toBeInstanceOf(
+        ServiceUnavailableError,
+      );
     } finally {
       await client.close();
       await fake.close();

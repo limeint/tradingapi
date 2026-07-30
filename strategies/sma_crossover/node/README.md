@@ -12,8 +12,8 @@ Node.js 20 or newer is required.
 cd strategies/sma_crossover/node
 npm ci
 npm ls @limeint/trade-api
-npm run typecheck
-npm test
+npm run format
+npm run check
 ```
 
 The SDK dependency is pinned exactly so this directory is also a reproducible

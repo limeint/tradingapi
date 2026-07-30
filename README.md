@@ -36,42 +36,21 @@ Maintainers should follow [the SDK release guide](sdk/node/RELEASING.md).
 The repository and issue tracker are at
 <https://github.com/limeint/tradingapi>.
 
-## Generate and verify
+## Development
 
 From the repository root:
 
 ```sh
-cd sdk/python
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -e ".[dev]" build
-./scripts/generate_proto.sh
-python -m pytest
-python -m build
-
-cd ../../strategies/sma_crossover/python
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install ../../../sdk/python/dist/*.whl
-python -m pip install -r requirements-dev.txt
-python -m pytest
-
-cd ../../../sdk/node
-npm ci
-npm run generate
-npm run typecheck
-npm test
-npm run build
-npm pack --dry-run
-
-cd ../../strategies/sma_crossover/node
-npm ci
-npm run typecheck
-npm test
+just bootstrap
+just format
+just check
 ```
 
-CI regenerates and verifies both protobuf clients. Python CI builds its wheel
-and source archive and runs the example strategy against the installed wheel;
-Node CI type-checks, tests, builds, and verifies the npm package contents. The
-published-strategy workflow separately installs the exact public Python and
-Node.js releases and tests both language implementations as external consumers.
+`just` is the single command surface. Biome formats and lints TypeScript; Ruff
+does the same for Python; TypeScript and mypy enforce types; pre-commit runs the
+fast checks before every commit. Python dependencies are locked by `uv`, and npm
+lockfiles cover Node.js.
+
+Generated protobuf bindings are build artifacts. `just generate` recreates
+them from `proto/`; they are excluded from review so changes stay focused on
+the source contracts and handwritten SDK code.

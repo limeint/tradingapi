@@ -25,24 +25,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
           python-version: "3.12"
-          cache: pip
-          cache-dependency-path: |
-            strategies/sma_crossover/python/requirements.txt
-            strategies/sma_crossover/python/requirements-dev.txt
+          version: "0.11.32"
+          enable-cache: true
+          cache-dependency-glob: strategies/sma_crossover/python/uv.lock
 
       - name: Install published SDK and test tools
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt -r requirements-dev.txt
+        run: uv sync --locked
 
       - name: Verify published SDK identity
         env:
           REPOSITORY_SDK_SOURCE: ${{ github.workspace }}/sdk/python
         run: |
-          python -c "
+          uv run python -c "
           import os
           from importlib.metadata import version
           from pathlib import Path
@@ -55,12 +52,12 @@ jobs:
           print(f'Python strategy uses limeint-sdk {version(\"limeint-sdk\")} from {package_path}')
           "
 
-      - name: Test and lint
+      - name: Lint, type-check, and test
         run: |
-          python -m pytest
-          python -m ruff check .
-          python -m ruff format --check .
-          python -m mypy .
+          uv run ruff check .
+          uv run ruff format --check .
+          uv run mypy .
+          uv run pytest
 
   node:
     name: Node strategy against npm SDK
@@ -91,7 +88,5 @@ jobs:
             console.log(`Node strategy imported the published SDK from ${sdkUrl}`);
           '
 
-      - name: Type-check and test
-        run: |
-          npm run typecheck
-          npm test
+      - name: Lint, type-check, and test
+        run: npm run check

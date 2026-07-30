@@ -223,8 +223,11 @@ From the repository root:
 
 ```sh
 cd sdk/python
-pip install -e ".[dev]"
-./scripts/generate_proto.sh
+uv sync --locked
+uv run ./scripts/generate_proto.sh
+uv run ruff check trade_api examples tests
+uv run mypy trade_api examples
+uv run pytest
 ```
 
 `scripts/generate_proto.sh` compiles the `.proto` files in `../../proto/` into
@@ -235,6 +238,7 @@ pip install -e ".[dev]"
 ```
 sdk/python/
 ├── pyproject.toml
+├── uv.lock
 ├── README.md
 ├── LICENSE
 ├── scripts/
@@ -247,7 +251,9 @@ sdk/python/
     ├── auth.py                 # JWT lifecycle
     ├── retry.py                # retry policy + interceptors
     ├── exceptions.py           # typed errors
+    ├── _insecure_auth.py       # plaintext test-channel authentication
     ├── _metadata.py            # Authorization header plumbing
+    ├── _services.py            # lazy generated-service registry
     ├── accounts.py             # message re-exports (per-service)
     ├── assets.py
     ├── auth_messages.py
