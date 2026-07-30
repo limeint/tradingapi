@@ -6,13 +6,13 @@ on:
     paths:
       - 'sdk/python/**'
       - 'proto/**'
-      - 'strategies/sma_crossover/python/**'
+      - 'examples/strategies/sma_crossover/python/**'
       - '.github/workflows/python_test.yml'
   pull_request:
     paths:
       - 'sdk/python/**'
       - 'proto/**'
-      - 'strategies/sma_crossover/python/**'
+      - 'examples/strategies/sma_crossover/python/**'
       - '.github/workflows/python_test.yml'
   workflow_dispatch:
 
@@ -187,7 +187,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: strategies/sma_crossover/python
+        working-directory: examples/strategies/sma_crossover/python
 
     steps:
       - name: Checkout repository

@@ -44,7 +44,7 @@ Python 3.10 or newer is required — the published SDK wheel carries protobuf 7
 gencode, and protobuf 7 dropped Python 3.9.
 
 ```sh
-cd strategies/sma_crossover/python
+cd examples/strategies/sma_crossover/python
 uv sync --locked
 ```
 

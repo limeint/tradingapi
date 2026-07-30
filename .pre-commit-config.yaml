@@ -13,10 +13,10 @@ repos:
     hooks:
       - id: ruff-check
         args: [--fix]
-        files: ^(sdk/python|strategies/sma_crossover/python)/
+        files: ^(sdk/python|examples/strategies/sma_crossover/python)/
         exclude: ^sdk/python/trade_api/proto/
       - id: ruff-format
-        files: ^(sdk/python|strategies/sma_crossover/python)/
+        files: ^(sdk/python|examples/strategies/sma_crossover/python)/
         exclude: ^sdk/python/trade_api/proto/
 
   - repo: local
@@ -27,5 +27,5 @@ repos:
         language: node
         additional_dependencies:
           - "@biomejs/biome@2.5.5"
-        files: ^(sdk/node|strategies/sma_crossover/node)/.*\.(c?js|mjs|ts|json)$
+        files: ^(sdk/node|examples/strategies/sma_crossover/node)/.*\.(c?js|mjs|ts|json)$
         exclude: ^sdk/node/src/generated/

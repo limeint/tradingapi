@@ -9,7 +9,7 @@ there are no imports from this repository's SDK source or protobuf directory.
 Node.js 20 or newer is required.
 
 ```sh
-cd strategies/sma_crossover/node
+cd examples/strategies/sma_crossover/node
 npm ci
 npm ls @limeint/trade-api
 npm run format
