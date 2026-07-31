@@ -98,7 +98,7 @@ class AsyncTradeAPIClient:
         channel_options: list[tuple[str, object]] | None = None,
     ) -> AsyncTradeAPIClient:
         """Construct an insecure (no-TLS) client for testing against an in-process
-        fake server. Never use against ``api.finam.ru`` or any production endpoint."""
+        fake server. Never use against ``api.limeint.eu`` or any production endpoint."""
         return cls(
             secret,
             endpoint=endpoint,

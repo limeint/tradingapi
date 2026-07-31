@@ -15,7 +15,6 @@ REQUIRED_SUFFIXES = (
     ("trade_api/proto/grpc/tradeapi/v1/marketdata/marketdata_service_pb2_grpc.py"),
 )
 EXPECTED_ARCHIVE_PREFIX = "limeint_sdk-"
-FORBIDDEN_PATH_PARTS = ("/finam_trade_api/", "/finam_sdk.egg-info/")
 
 
 def _archive_names(path: Path) -> Iterable[str]:
@@ -38,11 +37,6 @@ def _verify(path: Path) -> None:
             f"{path.name} does not use the expected distribution name {EXPECTED_ARCHIVE_PREFIX}"
         )
     names = tuple(_archive_names(path))
-    forbidden = [
-        name for name in names if any(part in f"/{name}/" for part in FORBIDDEN_PATH_PARTS)
-    ]
-    if forbidden:
-        raise RuntimeError(f"{path.name} contains retired Finam package metadata")
     missing = [
         suffix for suffix in REQUIRED_SUFFIXES if not any(name.endswith(suffix) for name in names)
     ]

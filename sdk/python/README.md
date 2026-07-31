@@ -62,15 +62,15 @@ asyncio.run(main())
 
 The client exposes the full Trade API surface via sub-clients:
 
-| Attribute            | gRPC service           | What it does                                  |
-| -------------------- | ---------------------- | --------------------------------------------- |
-| `client.auth`        | `AuthService`          | Token issuance + details (usually automatic). |
-| `client.accounts`    | `AccountsService`      | Accounts, positions, trades, transactions.    |
-| `client.assets`      | `AssetsService`        | Instruments, exchanges, schedules, options.   |
-| `client.market_data` | `MarketDataService`    | Bars, quotes, order book, trade streams.      |
-| `client.orders`      | `OrdersService`        | Place / cancel orders, order + trade streams. |
-| `client.reports`     | `ReportsService`       | Account reports.                              |
-| `client.metrics`     | `UsageMetricsService`  | API usage / quota metrics.                    |
+| Attribute            | gRPC service          | What it does                                  |
+| -------------------- | --------------------- | --------------------------------------------- |
+| `client.auth`        | `AuthService`         | Token issuance + details (usually automatic). |
+| `client.accounts`    | `AccountsService`     | Accounts, positions, trades, transactions.    |
+| `client.assets`      | `AssetsService`       | Instruments, exchanges, schedules, options.   |
+| `client.market_data` | `MarketDataService`   | Bars, quotes, order book, trade streams.      |
+| `client.orders`      | `OrdersService`       | Place / cancel orders, order + trade streams. |
+| `client.reports`     | `ReportsService`      | Account reports.                              |
+| `client.metrics`     | `UsageMetricsService` | API usage / quota metrics.                    |
 
 ## API reference
 
@@ -78,14 +78,14 @@ Every RPC defined in the `.proto` files is exposed directly on the sub-client.
 Request and response message types are re-exported from short, per-service
 modules:
 
-| Module | Use with |
-| --- | --- |
-| `trade_api.accounts` | `client.accounts.*` |
-| `trade_api.assets` | `client.assets.*` |
-| `trade_api.market_data` | `client.market_data.*` |
-| `trade_api.orders` | `client.orders.*` (includes `Side`) |
-| `trade_api.reports` | `client.reports.*` |
-| `trade_api.metrics` | `client.metrics.*` |
+| Module                    | Use with                                                    |
+| ------------------------- | ----------------------------------------------------------- |
+| `trade_api.accounts`      | `client.accounts.*`                                         |
+| `trade_api.assets`        | `client.assets.*`                                           |
+| `trade_api.market_data`   | `client.market_data.*`                                      |
+| `trade_api.orders`        | `client.orders.*` (includes `Side`)                         |
+| `trade_api.reports`       | `client.reports.*`                                          |
+| `trade_api.metrics`       | `client.metrics.*`                                          |
 | `trade_api.auth_messages` | `client.auth.*` (rarely needed — JWT handled automatically) |
 
 The original deeply-nested paths
@@ -96,87 +96,87 @@ Legend: ▶ unary · ⇉ server-stream · ⇄ bidi-stream
 
 ### `client.auth` — `AuthService`
 
-| Method | Kind | Purpose |
-| --- | :---: | --- |
-| `Auth(AuthRequest)` | ▶ | Exchange API secret for a JWT. *Called for you on construction.* |
-| `TokenDetails(TokenDetailsRequest)` | ▶ | Inspect a JWT — expiry, market-data permissions, visible account IDs. |
-| `SubscribeJwtRenewal(SubscribeJwtRenewalRequest)` | ⇉ | Stream of refreshed JWTs. *Consumed for you in the background.* |
+| Method                                            | Kind | Purpose                                                               |
+| ------------------------------------------------- | :--: | --------------------------------------------------------------------- |
+| `Auth(AuthRequest)`                               |  ▶   | Exchange API secret for a JWT. _Called for you on construction._      |
+| `TokenDetails(TokenDetailsRequest)`               |  ▶   | Inspect a JWT — expiry, market-data permissions, visible account IDs. |
+| `SubscribeJwtRenewal(SubscribeJwtRenewalRequest)` |  ⇉   | Stream of refreshed JWTs. _Consumed for you in the background._       |
 
 ### `client.accounts` — `AccountsService`
 
-| Method | Kind | Purpose |
-| --- | :---: | --- |
-| `GetAccount(GetAccountRequest)` | ▶ | Account info: equity, cash, positions, margin. |
-| `Trades(TradesRequest)` | ▶ | Historical trades for an account. |
-| `Transactions(TransactionsRequest)` | ▶ | Cash movements and other non-trade transactions. |
-| `SubscribeAccount(GetAccountRequest)` | ⇉ | Streaming account updates. |
+| Method                                | Kind | Purpose                                          |
+| ------------------------------------- | :--: | ------------------------------------------------ |
+| `GetAccount(GetAccountRequest)`       |  ▶   | Account info: equity, cash, positions, margin.   |
+| `Trades(TradesRequest)`               |  ▶   | Historical trades for an account.                |
+| `Transactions(TransactionsRequest)`   |  ▶   | Cash movements and other non-trade transactions. |
+| `SubscribeAccount(GetAccountRequest)` |  ⇉   | Streaming account updates.                       |
 
 ### `client.assets` — `AssetsService`
 
-| Method | Kind | Purpose |
-| --- | :---: | --- |
-| `Exchanges(ExchangesRequest)` | ▶ | List of supported exchanges. |
-| `Assets(AssetsRequest)` | ▶ | Tradable instruments (filtered). |
-| `AllAssets(AllAssetsRequest)` | ▶ | Full instrument catalog. |
-| `GetAsset(GetAssetRequest)` | ▶ | Single instrument by symbol. |
-| `GetAssetParams(GetAssetParamsRequest)` | ▶ | Trading parameters for an instrument. |
-| `OptionsChain(OptionsChainRequest)` | ▶ | Options chain for an underlying. |
-| `Schedule(ScheduleRequest)` | ▶ | Trading session schedule. |
-| `Clock(ClockRequest)` | ▶ | Server clock (use for time-aligned operations). |
-| `GetConstituents(GetConstituentsRequest)` | ▶ | Index constituents. |
+| Method                                    | Kind | Purpose                                         |
+| ----------------------------------------- | :--: | ----------------------------------------------- |
+| `Exchanges(ExchangesRequest)`             |  ▶   | List of supported exchanges.                    |
+| `Assets(AssetsRequest)`                   |  ▶   | Tradable instruments (filtered).                |
+| `AllAssets(AllAssetsRequest)`             |  ▶   | Full instrument catalog.                        |
+| `GetAsset(GetAssetRequest)`               |  ▶   | Single instrument by symbol.                    |
+| `GetAssetParams(GetAssetParamsRequest)`   |  ▶   | Trading parameters for an instrument.           |
+| `OptionsChain(OptionsChainRequest)`       |  ▶   | Options chain for an underlying.                |
+| `Schedule(ScheduleRequest)`               |  ▶   | Trading session schedule.                       |
+| `Clock(ClockRequest)`                     |  ▶   | Server clock (use for time-aligned operations). |
+| `GetConstituents(GetConstituentsRequest)` |  ▶   | Index constituents.                             |
 
 ### `client.market_data` — `MarketDataService`
 
-| Method | Kind | Purpose |
-| --- | :---: | --- |
-| `Bars(BarsRequest)` | ▶ | OHLC candles (any timeframe via `TimeFrame` enum). |
-| `LastQuote(QuoteRequest)` | ▶ | Most recent quote snapshot. |
-| `OrderBook(OrderBookRequest)` | ▶ | Order book snapshot. |
-| `LatestTrades(LatestTradesRequest)` | ▶ | Most recent trades for a symbol. |
-| `SubscribeQuote(SubscribeQuoteRequest)` | ⇉ | Live quote stream. |
-| `SubscribeOrderBook(SubscribeOrderBookRequest)` | ⇉ | Live order-book updates. |
-| `SubscribeLatestTrades(SubscribeLatestTradesRequest)` | ⇉ | Live trades stream. |
-| `SubscribeBars(SubscribeBarsRequest)` | ⇉ | Live candle stream. |
+| Method                                                | Kind | Purpose                                            |
+| ----------------------------------------------------- | :--: | -------------------------------------------------- |
+| `Bars(BarsRequest)`                                   |  ▶   | OHLC candles (any timeframe via `TimeFrame` enum). |
+| `LastQuote(QuoteRequest)`                             |  ▶   | Most recent quote snapshot.                        |
+| `OrderBook(OrderBookRequest)`                         |  ▶   | Order book snapshot.                               |
+| `LatestTrades(LatestTradesRequest)`                   |  ▶   | Most recent trades for a symbol.                   |
+| `SubscribeQuote(SubscribeQuoteRequest)`               |  ⇉   | Live quote stream.                                 |
+| `SubscribeOrderBook(SubscribeOrderBookRequest)`       |  ⇉   | Live order-book updates.                           |
+| `SubscribeLatestTrades(SubscribeLatestTradesRequest)` |  ⇉   | Live trades stream.                                |
+| `SubscribeBars(SubscribeBarsRequest)`                 |  ⇉   | Live candle stream.                                |
 
 ### `client.orders` — `OrdersService`
 
-| Method | Kind | Purpose |
-| --- | :---: | --- |
-| `PlaceOrder(Order)` | ▶ | Place market / limit / stop / stop-limit / multi-leg order. |
-| `PlaceSLTPOrder(SLTPOrder)` | ▶ | Place an SL/TP (stop-loss + take-profit) order. |
-| `CancelOrder(CancelOrderRequest)` | ▶ | Cancel an active order. |
-| `GetOrders(OrdersRequest)` | ▶ | List active orders for an account. |
-| `GetOrder(GetOrderRequest)` | ▶ | Single order by ID. |
-| `SubscribeOrders(SubscribeOrdersRequest)` | ⇉ | Live order-state updates. |
-| `SubscribeTrades(SubscribeTradesRequest)` | ⇉ | Live execution / fill stream. |
-| `SubscribeOrderTrade(stream OrderTradeRequest)` | ⇄ | Bidi stream — order + trade events, request-driven. |
+| Method                                          | Kind | Purpose                                                     |
+| ----------------------------------------------- | :--: | ----------------------------------------------------------- |
+| `PlaceOrder(Order)`                             |  ▶   | Place market / limit / stop / stop-limit / multi-leg order. |
+| `PlaceSLTPOrder(SLTPOrder)`                     |  ▶   | Place an SL/TP (stop-loss + take-profit) order.             |
+| `CancelOrder(CancelOrderRequest)`               |  ▶   | Cancel an active order.                                     |
+| `GetOrders(OrdersRequest)`                      |  ▶   | List active orders for an account.                          |
+| `GetOrder(GetOrderRequest)`                     |  ▶   | Single order by ID.                                         |
+| `SubscribeOrders(SubscribeOrdersRequest)`       |  ⇉   | Live order-state updates.                                   |
+| `SubscribeTrades(SubscribeTradesRequest)`       |  ⇉   | Live execution / fill stream.                               |
+| `SubscribeOrderTrade(stream OrderTradeRequest)` |  ⇄   | Bidi stream — order + trade events, request-driven.         |
 
 ### `client.reports` — `ReportsService`
 
-| Method | Kind | Purpose |
-| --- | :---: | --- |
-| `CreateAccountReport(CreateAccountReportRequest)` | ▶ | Generate an account report (async — returns a job handle). |
-| `GetAccountReportInfo(GetAccountReportInfoRequest)` | ▶ | Poll report status. |
-| `SubscribeAccountReportInfo(SubscribeAccountReportInfoRequest)` | ⇉ | Stream report status updates instead of polling. |
+| Method                                                          | Kind | Purpose                                                    |
+| --------------------------------------------------------------- | :--: | ---------------------------------------------------------- |
+| `CreateAccountReport(CreateAccountReportRequest)`               |  ▶   | Generate an account report (async — returns a job handle). |
+| `GetAccountReportInfo(GetAccountReportInfoRequest)`             |  ▶   | Poll report status.                                        |
+| `SubscribeAccountReportInfo(SubscribeAccountReportInfoRequest)` |  ⇉   | Stream report status updates instead of polling.           |
 
 ### `client.metrics` — `UsageMetricsService`
 
-| Method | Kind | Purpose |
-| --- | :---: | --- |
-| `GetUsageMetrics(GetUsageMetricsRequest)` | ▶ | API usage / quota stats for the current token. |
+| Method                                    | Kind | Purpose                                        |
+| ----------------------------------------- | :--: | ---------------------------------------------- |
+| `GetUsageMetrics(GetUsageMetricsRequest)` |  ▶   | API usage / quota stats for the current token. |
 
 ### Client lifecycle
 
-| Operation | Sync | Async |
-| --- | --- | --- |
-| Construct | `TradeAPIClient(secret, *, endpoint=DEFAULT_ENDPOINT, retry_policy=DEFAULT_POLICY, channel_options=None)` | `AsyncTradeAPIClient(secret, ...)` — same args |
-| Start | *immediate, blocks for initial JWT* | `await client.start()` — or use `async with` |
-| Current JWT | `client.get_token()` → `str \| None` | `client.get_token()` → `str \| None` (sync read of cached snapshot) |
-| Close | `client.close()` | `await client.close()` |
-| Context manager | `with TradeAPIClient(...) as client:` | `async with AsyncTradeAPIClient(...) as client:` |
-| Testing (no TLS) | `TradeAPIClient.for_testing(secret, endpoint="localhost:50051")` | `AsyncTradeAPIClient.for_testing(secret, endpoint="localhost:50051")` |
+| Operation        | Sync                                                                                                      | Async                                                                 |
+| ---------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Construct        | `TradeAPIClient(secret, *, endpoint=DEFAULT_ENDPOINT, retry_policy=DEFAULT_POLICY, channel_options=None)` | `AsyncTradeAPIClient(secret, ...)` — same args                        |
+| Start            | _immediate, blocks for initial JWT_                                                                       | `await client.start()` — or use `async with`                          |
+| Current JWT      | `client.get_token()` → `str \| None`                                                                      | `client.get_token()` → `str \| None` (sync read of cached snapshot)   |
+| Close            | `client.close()`                                                                                          | `await client.close()`                                                |
+| Context manager  | `with TradeAPIClient(...) as client:`                                                                     | `async with AsyncTradeAPIClient(...) as client:`                      |
+| Testing (no TLS) | `TradeAPIClient.for_testing(secret, endpoint="localhost:50051")`                                          | `AsyncTradeAPIClient.for_testing(secret, endpoint="localhost:50051")` |
 
-> `for_testing(...)` opens an insecure (plaintext) channel against an in-process fake server. **Never use against `api.finam.ru`** — it sends your JWT in clear.
+> `for_testing(...)` opens an insecure (plaintext) channel against an in-process fake server. **Never use against `api.limeint.eu`** — it sends your JWT in clear.
 
 ## Error handling
 
@@ -204,7 +204,7 @@ All inherit from `TradeAPIError`.
 ## Retries
 
 Unary RPCs are retried automatically on `UNAVAILABLE` and `RESOURCE_EXHAUSTED`
-with exponential backoff + jitter. Streaming RPCs are *not* retried — the
+with exponential backoff + jitter. Streaming RPCs are _not_ retried — the
 caller is expected to handle reconnection at a meaningful boundary
 (e.g. resuming from the last received bar).
 

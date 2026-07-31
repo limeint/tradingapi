@@ -10,7 +10,7 @@ import { DEFAULT_RETRY_POLICY, resolveRetry } from "./internal/retry.js";
 import type { ServiceClients } from "./internal/services.js";
 import { createServiceClients } from "./internal/services.js";
 
-export const DEFAULT_ENDPOINT = "api.finam.ru:443";
+export const DEFAULT_ENDPOINT = "api.limeint.eu:443";
 export type { RetryPolicy };
 export { DEFAULT_RETRY_POLICY };
 

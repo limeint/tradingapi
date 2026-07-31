@@ -51,7 +51,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_ENDPOINT = "api.finam.ru:443"
+DEFAULT_ENDPOINT = "api.limeint.eu:443"
 
 
 class TradeAPIClient:
@@ -59,7 +59,7 @@ class TradeAPIClient:
 
     Args:
         secret: API secret (long-lived token) issued by the Trade API provider.
-        endpoint: gRPC endpoint, e.g. ``api.finam.ru:443``.
+        endpoint: gRPC endpoint, e.g. ``api.limeint.eu:443``.
         retry_policy: Optional retry policy override.
         channel_options: Extra gRPC channel options forwarded to ``grpc.secure_channel``.
 
@@ -142,7 +142,7 @@ class TradeAPIClient:
         channel_options: list[tuple[str, object]] | None = None,
     ) -> TradeAPIClient:
         """Construct an insecure (no-TLS) client for testing against an in-process
-        fake server. Never use against ``api.finam.ru`` or any production endpoint."""
+        fake server. Never use against ``api.limeint.eu`` or any production endpoint."""
         return cls(
             secret,
             endpoint=endpoint,
