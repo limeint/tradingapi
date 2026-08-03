@@ -5,12 +5,13 @@ package grpc.tradeapi.v1;
 option go_package = "github.com/limeint/tradingapi/go/grpc/tradeapi/v1";
 option java_multiple_files = true;
 
-// Trade side
+// Transaction side
 enum Side {
-  // Trade side is unspecified
+  // Transaction side is not specified
   SIDE_UNSPECIFIED = 0;
   // Buy
   SIDE_BUY = 1;
   // Sell
   SIDE_SELL = 2;
 }
+
