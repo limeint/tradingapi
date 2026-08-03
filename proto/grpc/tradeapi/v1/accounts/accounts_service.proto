@@ -19,8 +19,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     HTTPS
   ]
   info: {
-    title: "Limeint Trade API"
-    description: "Limeint API for trading operations"
+    title: "REST"
+    description: "Trading API"
   }
   security_definitions: {
     security: {
@@ -47,13 +47,13 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     {
       key: "500"
       value: {
-        description: "Internal service error. Try again later."
+        description: "Internal service error. Please try again later."
       }
     },
     {
       key: "503"
       value: {
-        description: "The service is currently unavailable. Try again later."
+        description: "The service is currently unavailable. Please try again later."
       }
     },
     {
@@ -65,28 +65,28 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     {
       key: "401"
       value: {
-        description: "The token has expired or is invalid."
+        description: "Token has expired or the token is invalid"
       }
     },
     {
       key: "504"
       value: {
-        description: "The deadline was exceeded before the operation completed."
+        description: "The deadline expired before the operation could be completed"
       }
     },
     {
       key: "404"
       value: {
-        description: "Account was not found in token"
+        description: "Account not found in token"
       }
     }
   ]
 };
 
-// Account service
+// Accounts Service
 service AccountsService {
-  // Get information about a specific account
-  // Example HTTP request:
+  // Get information on a specific account
+  // HTTP request example:
   // GET /v1/accounts/A12345
   // Authorization: <token>
   rpc GetAccount(GetAccountRequest) returns (GetAccountResponse) {
@@ -104,14 +104,14 @@ service AccountsService {
     };
   };
 
-  // Get account trade history
-  // Example HTTP request:
+  // Getting account trade history
+  // HTTP request example:
   // GET /v1/accounts/A12345/trades?limit=50&interval.start_time=2023-01-01T00:00:00Z&interval.end_time=2023-01-31T23:59:59Z
   // Authorization: <token>
   //
   // Parameters:
-  // - account_id is passed in the URL path
-  // - limit and interval are passed as query parameters
+  // - account_id - passed in the URL path
+  // - limit and interval - passed as query parameters
   rpc Trades(TradesRequest) returns (TradesResponse) {
     option (google.api.http) = {
       get: "/v1/accounts/{account_id}/trades"
@@ -127,20 +127,20 @@ service AccountsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid interval"
+          description: "Invalid interval passed"
         }
       }
     };
   };
 
-  // Get account transactions
-  // Example HTTP request:
+  // Getting a list of account transactions
+  // HTTP request example:
   // GET /v1/accounts/A12345/transactions?limit=50&interval.start_time=2023-01-01T00:00:00Z&interval.end_time=2023-01-31T23:59:59Z
   // Authorization: <token>
   //
   // Parameters:
-  // - account_id is passed in the URL path
-  // - limit and interval are passed as query parameters
+  // - account_id - passed in the URL path
+  // - limit and interval - passed as query parameters
   rpc Transactions(TransactionsRequest) returns (TransactionsResponse) {
     option (google.api.http) = {
       get: "/v1/accounts/{account_id}/transactions"
@@ -156,7 +156,7 @@ service AccountsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid interval"
+          description: "Invalid interval passed"
         }
       }
     };
@@ -167,7 +167,7 @@ service AccountsService {
 
 }
 
-// Request information for a specific account
+// Request to obtain information about a specific account
 message GetAccountRequest {
   // Account ID
   string account_id = 1;
@@ -179,83 +179,68 @@ message GetAccountResponse {
   string account_id = 1;
   // Account type
   string type = 2;
-  // Account status
+  // Account Status
   string status = 3;
-  // Available funds plus cost of open positions
+  // Available funds plus the value of open positions
   google.type.Decimal equity = 4;
   // Unrealized profit
   google.type.Decimal unrealized_profit = 5;
-  // Open positions plus theoretical positions from unfilled active orders
+  // Positions. Open plus theoretical (for unfilled active orders)
   repeated Position positions = 6;
-  // The amount of own funds in the account available for trading. Does not include margin funds.
+  // The amount of equity in the account available for trading. Does not include margin funds.
   repeated google.type.Money cash = 7;
 
   oneof portfolio {
-    // General type for Moscow Exchange accounts. Includes both single and mono accounts.
-    MC portfolio_mc = 8;
-    // Portfolio type for US markets accounts.
+    // Portfolio type for accounts in US markets.
     MCT portfolio_mct = 9;
-    // Portfolio type for trading on the derivatives market of the Moscow Exchange.
+    // Portfolio type for trading on the Moscow Exchange derivatives market.
     FORTS portfolio_forts = 10;
   }
   // Account opening date
   google.protobuf.Timestamp open_account_date = 11;
-  // Date of first trade transaction
+  // Date of the first trade transaction
   google.protobuf.Timestamp first_trade_date = 12;
-  // Date of first non-trading transaction
+  // Date of the first non-trade transaction
   google.protobuf.Timestamp first_non_trade_date = 13;
 }
 
-// General type for Moscow Exchange accounts. Includes both single and specialized (mono) accounts for different sections of the exchange.
-// Unified Trading Account (UTA): supports several markets (equities, FX, derivatives, SPB, foreign securities, and foreign futures) with a single cash position.
-// MOEX equities mono account: isolated account for trading stocks, bonds, and fund units.
-// MOEX FX mono account: isolated account for currency-pair transactions (for example, CNYRUB_TOM).
-message MC {
-  // The amount of own funds in the account available for trading. Includes margin funds.
-  google.type.Decimal available_cash = 1;
-  // Initial Margin
-  google.type.Decimal initial_margin = 2;
-  // Minimum Margin
-  google.type.Decimal maintenance_margin = 3;
-}
-
-// Portfolio type for US markets accounts.
-// Provides access to US exchanges: NYSE, NASDAQ, CBOE, CME, trade with US stocks, futures and options.
+// Portfolio type for accounts on US markets.
+// Provides access to US exchanges: NYSE NASDAQ CBOE CME, trades in US stocks, futures, and options.
 message MCT {
 }
 
-// Portfolio type for trading on the derivatives market of the Moscow Exchange.
-// Designed to work with derivative financial instruments: futures and options.
+// Portfolio type for trading on the Moscow Exchange derivatives market.
+// Designed for working with derivative financial instruments: futures and options.
 message FORTS {
-  // The amount of own funds in the account available for trading. Includes margin funds.
+  // The amount of equity in the account available for trading. Includes margin funds.
   google.type.Decimal available_cash = 1;
-  // Minimum margin (required amount of collateral for open positions)
+  // Minimum margin (required collateral amount for open positions)
   google.type.Decimal money_reserved = 2;
 }
 
-// Request for trade history
+// Request to receive trade history
 message TradesRequest {
   // Account ID
   string account_id = 1;
-  // Maximum number of trades
+  // Trade limit
   int32 limit = 2;
-  // Start and end of the requested period, Unix epoch time
+  // Start and end of the requested Unix epoch time period
   google.type.Interval interval = 3;
 }
 
-// Trade history
+// Trade History
 message TradesResponse {
-  // Account trades
+  // Account Transactions
   repeated AccountTrade trades = 1;
 }
 
-// Request for a list of transactions
+// Request to get a list of transactions
 message TransactionsRequest {
   // Account ID
   string account_id = 1;
   // Transaction limit
   int32 limit = 2;
-  // Start and end of the requested period, Unix epoch time
+  // Start and end of the requested Unix epoch time period
   google.type.Interval interval = 3;
 }
 
@@ -265,42 +250,42 @@ message TransactionsResponse {
   repeated Transaction transactions = 1;
 }
 
-// Position information
+// Position Information
 message Position {
-  // Instrument symbol
+  // Symbol
   string symbol = 1;
-  // Quantity in units, signed value (long-short)
+  // Quantity in units. Signed value defining (long-short)
   google.type.Decimal quantity = 2;
-  // Average price, not populated for FORTS positions
+  // Average price. Not populated for FORTS positions.
   google.type.Decimal average_price = 3;
   // Current price
   google.type.Decimal current_price = 4;
-  // Maintenance margin, populated only for FORTS positions
+  // Maintenance margin. Only completed for FORTS positions.
   google.type.Decimal maintenance_margin = 5;
-  // Profit or loss for the current day (PnL), not populated for FORTS positions
+  // Profit or loss for the current day (PnL). Not populated for FORTS positions.
   google.type.Decimal daily_pnl = 6;
   // Total unrealized profit or loss (PnL) of the current position
   google.type.Decimal unrealized_pnl = 7;
 }
 
-// Transaction information
+// Transaction Information
 message Transaction {
-  // Populated for trade-related transaction types
+  // Object populated for trade transaction types
   message Trade {
-    // Quantity in units
+    // Quantity in pcs.
     google.type.Decimal size = 1;
-    // Trade price per unit. For options, this is the execution price or premium reported by the trade.
+    // Trade price per unit. Strike price/Option premium. This is the execution price; the value is taken from the trade.
     google.type.Decimal price = 2;
-    // Accrued interest, populated when the trade includes accrued interest
+    // NKD. Completed if the transaction includes NKD.
     google.type.Decimal accrued_interest = 3;
   }
   // Transaction categories.
   enum TransactionCategory {
     // Other
     OTHERS = 0;
-    // Cash deposit
+    // Money deposit
     DEPOSIT = 1;
-    // Cash withdrawal
+    // Money withdraw
     WITHDRAW = 2;
     // Income
     INCOME = 5;
@@ -310,9 +295,9 @@ message Transaction {
     TAX = 8;
     // Inheritance
     INHERITANCE = 9;
-    // Cash transfer
+    // Money transfer
     TRANSFER = 11;
-    // Termination of the contract
+    // Contract Termination
     CONTRACT_TERMINATION = 12;
     // Expenses
     OUTCOMES = 13;
@@ -327,16 +312,17 @@ message Transaction {
   string category = 2 [deprecated = true];
   // Timestamp
   google.protobuf.Timestamp timestamp = 4;
-  // Instrument symbol
+  // Symbol
   string symbol = 5;
   // Change in money
   google.type.Money change = 6;
-  // Trade information
+  // Transaction Information
   Trade trade = 7;
   // Transaction category from TransactionCategory.
   TransactionCategory transaction_category = 8;
   // Transaction name
   string transaction_name = 9;
-  // Quantity change, populated only for securities transfers (TransactionCategory = TRANSFER)
+  // Change in qty only for securities transfers (for TransactionCategory = TRANSFER)
   google.type.Decimal change_qty = 10;
 }
+

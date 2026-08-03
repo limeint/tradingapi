@@ -9,17 +9,17 @@ import "grpc/tradeapi/v1/side.proto";
 option go_package = "github.com/limeint/tradingapi/go/grpc/tradeapi/v1";
 option java_multiple_files = true;
 
-// Trade information
+// Trade Information
 message AccountTrade {
   // Trade ID
   string trade_id = 1;
-  // Instrument symbol
+  // Asset symbol
   string symbol = 2;
-  // Execution price
+  // Trade Price
   google.type.Decimal price = 3;
-  // Size in units
+  // Size in pcs.
   google.type.Decimal size = 4;
-  // Trade side (long or short)
+  // Trading side (long or short)
   Side side = 5;
   // Timestamp
   google.protobuf.Timestamp timestamp = 6;
@@ -27,12 +27,13 @@ message AccountTrade {
   string order_id = 7;
   // Account ID
   string account_id = 8;
-  // Order comment (maximum 128 characters)
+  // Order Label (maximum 128 characters)
   string comment = 9;
-  // Accrued interest (populated on the day after the trade date)
+  // Accrued interest (filled the next day after the trade date)
   google.type.Decimal accrued_interest = 10;
-  // Price currency (for example, RUB, USD, EUR)
-  // Populated only by the Trades method.
-  // SubscribeTrades may leave this field empty because its data source differs. Consumers should handle an empty value.
+  // Price currency (for example, USD, EUR)
+  // Note: The field is filled in only when using the Trades method
+  // For SubscribeTrades, this field may be empty due to differences in data sources. When processing trades from a subscription, it is recommended to consider the possibility of an empty value.
   string currency = 11;
 }
+

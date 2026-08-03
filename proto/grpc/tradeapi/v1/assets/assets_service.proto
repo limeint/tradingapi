@@ -19,8 +19,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     HTTPS
   ]
   info: {
-    title: "Limeint Trade API"
-    description: "Limeint API for trading operations"
+    title: "REST"
+    description: "Trading API"
   }
   security_definitions: {
     security: {
@@ -53,7 +53,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     {
       key: "503"
       value: {
-        description: "The service is currently unavailable. Try again later."
+        description: "The service is currently unavailable. Please try again later."
       }
     },
     {
@@ -65,28 +65,28 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     {
       key: "401"
       value: {
-        description: "The token has expired or is invalid."
+        description: "Token has expired or the token is invalid"
       }
     },
     {
       key: "504"
       value: {
-        description: "The deadline was exceeded before the operation completed."
+        description: "The deadline expired before the operation could be completed"
       }
     },
     {
       key: "404"
       value: {
-        description: "Instrument not found"
+        description: "Asset not found"
       }
     }
   ]
 };
 
-// Instrument service
+// Assets Service
 service AssetsService {
-  // Get available exchanges, names, and MIC codes
-  // Example HTTP request:
+  // Getting a list of available exchange names and MIC codes
+  // HTTP request example:
   // GET /v1/exchanges
   // Authorization: <token>
   rpc Exchanges(ExchangesRequest) returns (ExchangesResponse) {
@@ -104,8 +104,8 @@ service AssetsService {
     };
   };
 
-  // Get instruments available for trading and their descriptions
-  // Example HTTP request:
+  // Get the list of instruments available for trading, along with their descriptions
+  // HTTP request example:
   // GET /v1/assets
   // Authorization: <token>
   rpc Assets(AssetsRequest) returns (AssetsResponse) {
@@ -124,7 +124,7 @@ service AssetsService {
     };
   };
 
-  // Get all instruments, including indicative and archived instruments, and their descriptions
+  // Get the list of all instruments, including indicative and archived ones, along with their descriptions
   // Example HTTP request:
   // GET /v1/assets/all?cursor=56658&only_disabled=true
   // Authorization: <token>
@@ -143,14 +143,14 @@ service AssetsService {
     };
   };
 
-  // Get information about a specific instrument
-  // Example HTTP request:
+  // Getting information on a specific asset
+  // HTTP request example:
   // GET /v1/assets/SBER@MISX?account_id=1440399
   // Authorization: <token>
   //
   // Parameters:
-  // - symbol is passed in the URL path
-  // - account_id is passed as a query parameter
+  // - symbol - passed in the URL path
+  // - account_id - passed as a query parameter
   rpc GetAsset(GetAssetRequest) returns (GetAssetResponse) {
     option (google.api.http) = {
       get: "/v1/assets/{symbol}"
@@ -166,20 +166,20 @@ service AssetsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol or account. The symbol must use ticker@mic format, for example SBER@MISX."
+          description: "Invalid symbol or account passed. The symbol must be in the form ticker@mic. Where ticker is, for example, SBER. And mic is, for example, MISX."
         }
       }
     };
   };
 
-  // Get trading parameters for an instrument
-  // Example HTTP request:
+  // Getting trading parameters for an asset
+  // HTTP request example:
   // GET /v1/assets/SBER@MISX/params?account_id=1440399
   // Authorization: <token>
   //
   // Parameters:
-  // - symbol is passed in the URL path
-  // - account_id is passed as a query parameter
+  // - symbol - passed in the URL path
+  // - account_id - passed as a query parameter
   rpc GetAssetParams(GetAssetParamsRequest) returns (GetAssetParamsResponse) {
     option (google.api.http) = {
       get: "/v1/assets/{symbol}/params"
@@ -195,14 +195,14 @@ service AssetsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol or account. The symbol must use ticker@mic format, for example SBER@MISX."
+          description: "Invalid symbol or account passed. The symbol must be in the form ticker@mic. Where ticker is, for example, SBER. And mic is, for example, MISX."
         }
       }
     };
   };
 
-  // Retrieving an options chain for the underlying asset
-  // Example HTTP request:
+  // Getting the options chain for the underlying asset
+  // HTTP request example:
   // GET /v1/assets/SBER@MISX/options
   // Authorization: <token>
   rpc OptionsChain(OptionsChainRequest) returns (OptionsChainResponse) {
@@ -220,14 +220,14 @@ service AssetsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol. The symbol must use ticker@mic format, for example SBER@MISX."
+          description: "Invalid symbol passed. The symbol must be in the form ticker@mic. Where ticker is, for example, SBER. And mic is, for example, MISX."
         }
       }
     };
   };
 
-  // Get an instrument's trading schedule
-  // Example HTTP request:
+  // Getting a trading schedule for an asset
+  // HTTP request example:
   // GET /v1/assets/SBER@MISX/schedule
   // Authorization: <token>
   rpc Schedule(ScheduleRequest) returns (ScheduleResponse) {
@@ -245,14 +245,14 @@ service AssetsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol. The symbol must use ticker@mic format, for example SBER@MISX."
+          description: "Invalid symbol passed. The symbol must be in the form ticker@mic. Where ticker is, for example, SBER. And mic is, for example, MISX."
         }
       }
     };
   };
 
-  // Get the server time
-  // Example HTTP request:
+  // Getting the time on the server
+  // HTTP request example:
   // GET /v1/assets/clock
   // Authorization: <token>
   rpc Clock(ClockRequest) returns (ClockResponse) {
@@ -270,7 +270,7 @@ service AssetsService {
     };
   };
 
-  // Get the composition of a stock index by its symbol
+  // Get the composition of a stock market index by its symbol.
   rpc GetConstituents(GetConstituentsRequest) returns (GetConstituentsResponse) {
     option (google.api.http) = {
       get: "/v1/assets/{symbol}/constituents"
@@ -288,186 +288,187 @@ service AssetsService {
 
 }
 
-// Request for a list of available exchanges
+// Request to obtain a list of available exchanges
 message ExchangesRequest {
 }
 
 // List of available exchanges
 message ExchangesResponse {
-  // Information about the exchange
+  // Exchange Information
   repeated Exchange exchanges = 1;
 }
 
-// Request a list of available instruments
+// Request to get a list of available assets
 message AssetsRequest {
 }
 
-// List of available instruments
+// List of available assets
 message AssetsResponse {
-  // Instrument information
+  // Asset information
   repeated Asset assets = 1;
 }
 
-// Request a list of available instruments
+// Request to get a list of available assets
 message AllAssetsRequest {
-  // Cursor for pagination. Specifies the sec_id of the instrument the list should start with.
-  // For the first request, leave the field blank (value 0).
-  // For subsequent requests, use next_cursor from the previous response.
+  // Cursor for pagination. Specifies the sec_id of the asset with which the list should begin.
+  // For the first request, leave this field blank (value 0).
+  // For subsequent requests, use the next_cursor value from the previous response.
   int64 cursor = 1;
-  // Filtering by instrument status: only active (non-archived) instruments are selected
+  // Filtering by asset status: only active (non-archived) assets are selected
   // Default: false.
   bool only_active = 2;
-  // Filtering by instrument status: only inactive (archived) instruments are selected
+  // Filtering by asset status: only inactive (archived) assets are selected
   // Default: false.
   bool only_disabled = 3;
 }
 
-// Response containing one page of available instruments
+// Response containing some of the available assets.
 message AllAssetsResponse {
-  // Page of instruments
+  // Part of the list of assets
   repeated Asset assets = 1;
-  // Cursor to get the next page. Contains the sec_id of the last instrument in the current list.
-  // Pass this value in the next request's cursor field to retrieve the next page.
+  // Cursor for retrieving the next page. Contains the sec_id of the last asset in the current list.
+  // Pass this value into the cursor field of the next request to retrieve the next piece of data.
   // If the value is 0 or missing, this is the last page.
   int64 next_cursor = 2;
 }
 
-// Request information on a specific instrument
+// Request for information on a specific asset
 message GetAssetRequest {
-  // Instrument symbol
+  // Symbol
   string symbol = 1;
-  // ID of the account for which information on the instrument will be selected
+  // The account ID for which the asset information will be retrieved.
   string account_id = 2;
 }
 
-// Information about a specific instrument
+// List of information about a specific asset
 message GetAssetResponse {
-  // Specific parameters for an instrument of the "Futures" type
+  // Specific parameters for instrument type "Futures"
   message FutureDetails {
-    // Date and time of expiration (execution) of the futures contract.
+    // Futures contract expiration date and time.
     google.protobuf.Timestamp expiration_date = 1;
-    // Contract size (multiplier) is the number of units of the underlying asset in one contract.
+    // Contract size (multiplier) — the number of units of the underlying asset in one contract.
     google.type.Decimal contract_size = 2;
   }
-  // Specific parameters for an instrument of the "Option" type
+  // Specific parameters for instrument type "Option"
   message OptionDetails {
-    // Date and time of expiration (execution) of the option contract.
+    // Option contract expiration date and time.
     google.protobuf.Timestamp expiration_date = 1;
-    // Contract size (multiplier) is the number of units of the underlying asset in one contract.
+    // Contract size (multiplier) — the number of units of the underlying asset in one contract.
     google.type.Decimal contract_size = 2;
-    // The exercise price (strike) of the option.
+    // Option strike price.
     google.type.Decimal strike = 3;
   }
-  // Specific parameters for the instrument type "Bond"
+  // Specific parameters for instrument type "Bond"
   message BondDetails {
-    // The current face value of one bond.
+    // Current face value of one bond.
     google.type.Decimal bond_face_value = 1;
-    // Symbolic code of the currency of the bond's par value (for example, RUB, USD).
+    // Symbolic currency code of the bond denomination (e.g., RUB, USD).
     string currency = 2;
   }
   // Trading mode code
   string board = 1;
-  // Instrument ID
+  // Asset ID
   string id = 2;
-  // Instrument ticker
+  // Asset ticker
   string ticker = 3;
   // mic exchange ID
   string mic = 4;
-  // Isin instrument identifier
+  // Isin asset identifier
   string isin = 5;
-  // Instrument type
+  // Asset type
   string type = 6;
-  // Instrument name
+  // Asset name
   string name = 7;
-  // Number of decimal places in price
+  // Number of decimal places in the price
   int32 decimals = 10;
-  // Minimum price increment. Calculate the effective increment as min_step/(10^decimals).
+  // Minimum price step. To calculate the final price step: min_step/(10 decimals)
   int64 min_step = 11;
-  // Number of units per lot
+  // Number of pieces per lot
   google.type.Decimal lot_size = 9;
   // Futures expiration date
   google.type.Date expiration_date = 12 [deprecated = true];
-  // Quote currency may not coincide with the currency of the instrument trading mode
+  // The quote currency may not match the asset's trading mode currency.
   string quote_currency = 13;
 
   oneof asset_details {
-    // Specific parameters for an instrument of the "Futures" type
+    // Specific parameters for instrument type "Futures"
     FutureDetails future_details = 14;
-    // Specific parameters for an instrument of the "Option" type
+    // Specific parameters for instrument type "Option"
     OptionDetails option_details = 15;
-    // Specific parameters for the instrument type "Bond"
+    // Specific parameters for instrument type "Bond"
     BondDetails bond_details = 16;
   }
 }
 
-// Request for trading parameters of an instrument
+// Request for asset trading parameters
 message GetAssetParamsRequest {
-  // Instrument symbol
+  // Symbol
   string symbol = 1;
-  // Account ID for which trading parameters will be selected
+  // ID of the account for which trading parameters will be selected
   string account_id = 2;
 }
 
-// Trading parameters of the instrument
+// Asset trading parameters
 message GetAssetParamsResponse {
-  // Instrument symbol
+  // Symbol
   string symbol = 1;
   // Account ID for which trading parameters are selected
   string account_id = 2;
-  // Is trading available?
-  // Old field, marked as obsolete.
-  // Clients should switch to is_tradeable.
+  // Are trading operations available?
+  // The old field is marked as deprecated.
+  // Clients should migrate to is_tradeable.
   bool tradeable = 3 [deprecated = true];
-  // Whether long operations are available
+  // Are operations available in Long?
   Longable longable = 4;
-  // Whether short operations are available
+  // Are short operations available?
   Shortable shortable = 5;
-  // Risk rate for a long operation
+  // Risk rate for the Long operation
   google.type.Decimal long_risk_rate = 6;
-  // Collateral required to maintain a long position
+  // Amount of collateral to maintain a Long position
   google.type.Money long_collateral = 7 [deprecated = true];
-  // Risk rate for a short operation
+  // Risk rate for a short transaction
   google.type.Decimal short_risk_rate = 8;
-  // Collateral required to maintain a short position
+  // Collateral amount to maintain a Short position
   google.type.Money short_collateral = 9 [deprecated = true];
-  // Initial margin required to open a long position; for FORTS accounts this equals the exchange margin requirement
+  // Initial requirements for how much free cash must be in the account to open a long position for FORTS accounts is equal to the exchange GO
   google.type.Money long_initial_margin = 10;
-  // Initial margin required to open a short position; for FORTS accounts this equals the exchange margin requirement
+  // Initial requirements for how much free cash in the account must be available to open a short position for FORTS accounts equal to the exchange GO
   google.type.Money short_initial_margin = 11;
-  // Is trading available?
-  // Replaces the legacy field and distinguishes false from an unset value.
+  // Are trading operations available? New field. Allows you to distinguish between false and "not set".
   google.protobuf.BoolValue is_tradable = 12;
-  // Acceptable price. Helps determine whether it is possible to place orders with a negative price for a financial instrument
+  // Acceptable price. Helps determine whether orders with a negative price can be placed for a financial asset.
   PriceType price_type = 13;
+  // Lot size of the instrument for trading operations. If the field is 0, the value is absent.
+  int64 trade_lot_size = 14;
 }
 
-// Request to receive an option chain
+// Options chain request
 message OptionsChainRequest {
-  // Symbol of the underlying asset of the option
+  // The symbol of the option's underlying asset
   string underlying_symbol = 1;
-  // Optional parameter. Relevant for options on futures, by type (weekly, monthly).
-  // If the parameter is not specified, options with the closest expiration date will be returned.
+  // Optional parameter. Relevant for options on futures by type (weekly, monthly).
+  // If this parameter is not specified, options with the closest expiration date will be returned.
   string root = 2;
   // Optional filter by option expiration date.
-  // If the parameter is not specified, options with the closest expiration date will be returned.
+  // If this parameter is not specified, options with the closest expiration date will be returned.
   google.type.Date expiration_date = 3;
 }
 
-// Option Chain Information
+// Options Chain Information
 message OptionsChainResponse {
-  // Symbol of the underlying asset of the option
+  // The symbol of the option's underlying asset
   string symbol = 1;
-  // Option Information
+  // Option information
   repeated Option options = 2;
 }
 
-// Request an instrument schedule
+// Request to receive the asset schedule
 message ScheduleRequest {
-  // Instrument symbol
+  // Symbol
   string symbol = 1;
 }
 
-// Instrument schedule
+// Asset Schedule
 message ScheduleResponse {
   // Sessions
   message Sessions {
@@ -476,74 +477,74 @@ message ScheduleResponse {
     // Session interval
     google.type.Interval interval = 2;
   }
-  // Instrument symbol
+  // Symbol
   string symbol = 1;
-  // Instrument sessions
+  // Asset Sessions
   repeated Sessions sessions = 2;
 }
 
-// Request to get the time on the server
+// Request to obtain the server time
 message ClockRequest {
 }
 
-// Server time
+// Server Time
 message ClockResponse {
   // Timestamp
   google.protobuf.Timestamp timestamp = 1;
 }
 
-// Information about the exchange
+// Exchange Information
 message Exchange {
-  // Exchange ID mic
+  // MIC Exchange ID
   string mic = 1;
-  // Exchange name
+  // Exchange Name
   string name = 2;
 }
 
-// Instrument information
+// Asset Information
 message Asset {
-  // Instrument symbol ticker@mic
+  // Ticker@mic symbol
   string symbol = 1;
-  // Instrument ID
+  // Asset ID
   string id = 2;
-  // Instrument ticker
+  // Asset ticker
   string ticker = 3;
   // mic exchange ID
   string mic = 4;
-  // Isin instrument identifier
+  // Isin asset identifier
   string isin = 5;
-  // Instrument type
+  // Asset type
   string type = 6;
-  // Instrument name
+  // Asset name
   string name = 7;
-  // Archive instrument or not
+  // Is the asset archived or not?
   bool is_archived = 8;
 }
 
-// Option information
+// Option Information
 message Option {
-  // Option type
+  // Option Type
   enum Type {
-    // Undefined value
+    // Unspecified value
     TYPE_UNSPECIFIED = 0;
     // Call
     TYPE_CALL = 1;
     // Put
     TYPE_PUT = 2;
   }
-  // Instrument symbol
+  // Symbol
   string symbol = 1;
-  // Instrument type
+  // Asset type
   Type type = 2;
-  // Lot, the amount of the underlying asset in the instrument
+  // Lot quantity of the underlying asset
   google.type.Decimal contract_size = 4;
   // Trading start date
   google.type.Date trade_first_day = 5;
-  // Trade end date
+  // Trading end date
   google.type.Date trade_last_day = 6;
-  // Option exercise price
+  // Option strike price
   google.type.Decimal strike = 7;
-  // Option Multiplier
+  // Option multiplier
   google.type.Decimal multiplier = 9;
   // Expiration start date
   google.type.Date expiration_first_day = 10;
@@ -551,7 +552,7 @@ message Option {
   google.type.Date expiration_last_day = 11;
 }
 
-// Long-operation availability
+// Are operations available in Long?
 message Longable {
   // Status
   enum Status {
@@ -559,16 +560,16 @@ message Longable {
     NOT_AVAILABLE = 0;
     // Available
     AVAILABLE = 1;
-    // Prohibited at account level
+    // Forbidden at the account level
     ACCOUNT_NOT_APPROVED = 2;
   }
-  // Instrument status
+  // Asset status
   Status value = 1;
-  // Number of days remaining in a long-operation restriction, if any
+  // How many days is the ban on Long transactions valid (if any)?
   int32 halted_days = 2;
 }
 
-// Short-operation availability
+// Are short operations available?
 message Shortable {
   // Status
   enum Status {
@@ -576,20 +577,20 @@ message Shortable {
     NOT_AVAILABLE = 0;
     // Available
     AVAILABLE = 1;
-    // Indicates that the security is hard to borrow
+    // Indication that the paper is Hard To Borrow (if any)
     HTB = 2;
-    // Prohibited at account level
+    // Forbidden at the account level
     ACCOUNT_NOT_APPROVED = 3;
-    // Allowed as part of a strategy
+    // Allowed in strategy
     AVAILABLE_STRATEGY = 4;
   }
-  // Instrument status
+  // Asset status
   Status value = 1;
-  // Number of days remaining in a short-operation restriction, if any
+  // How many days is the ban on short transactions valid (if any)?
   int32 halted_days = 2;
 }
 
-// Acceptable price
+// Available price
 enum PriceType {
   // Unknown
   UNKNOWN = 0;
@@ -601,40 +602,41 @@ enum PriceType {
   ANY = 3;
 }
 
-// Request for index composition
+// Request to get the index composition.
 message GetConstituentsRequest {
-  // Index symbol (for example, "SPX@_SP" or "NDX@_SCI")
+  // Symbol code of the index (e.g.,"SPX@_SP", "NDX@_SCI")
   string symbol = 1;
-  // Cursor for pagination. Specifies the sec_id of the instrument the list should start with.
-  // For the first request, leave the field blank (value 0).
-  // For subsequent requests, use next_cursor from the previous response.
+  // Cursor for pagination. Specifies the sec_id of the asset with which the list should begin.
+  // For the first request, leave this field blank (value 0).
+  // For subsequent requests, use the next_cursor value from the previous response.
   int64 cursor = 2;
 }
 
-// Index composition query result
+// Result of the index composition request.
 message GetConstituentsResponse {
-  // List of components (securities) included in the calculation base of the requested index
+  // List of constituents (securities) included in the calculation base of the requested index.
   repeated Constituents constituents = 1;
-  // Cursor to get the next page. Contains the sec_id of the last instrument in the current list.
-  // Pass this value in the next request's cursor field to retrieve the next page.
+  // Cursor for retrieving the next page. Contains the sec_id of the last asset in the current list.
+  // Pass this value into the cursor field of the next request to retrieve the next piece of data.
   // If the value is 0 or missing, this is the last page
   int64 next_cursor = 2;
 }
 
-// Information about the component (security) included in the index
+// Information about a constituent (security) included in the index
 message Constituents {
-  // Instrument symbol code
+  // Symbol code of the instrument
   string symbol = 1;
   // Full name of the issuing company
   string name = 2;
-  // Global economic sector to which the company belongs (for example, "Technology", "Healthcare")
+  // Global economic sector the company belongs to (e.g., "Technology", "Healthcare")
   string sector = 3;
-  // Industry (sub-industry) of the company's activity (for example, "Software - Application")
+  // Industry (sub-sector) of the company's activity (e.g., "Software - Application")
   string sub_sector = 4;
   // Unique company identifier in the US SEC database (Central Index Key)
   string cik = 5;
-  // Date the security was added to the index
+  // Index inclusion date
   google.type.Date index_inclusion_date = 6;
-  // Instrument weight in index
+  // Weight of the instrument in the index
   google.type.Decimal weight = 7;
 }
+

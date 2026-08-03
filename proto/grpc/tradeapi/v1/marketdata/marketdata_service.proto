@@ -17,8 +17,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     HTTPS
   ]
   info: {
-    title: "Limeint Trade API"
-    description: "Limeint API for trading operations"
+    title: "REST"
+    description: "Trading API"
   }
   security_definitions: {
     security: {
@@ -51,7 +51,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     {
       key: "503"
       value: {
-        description: "The service is currently unavailable. Try again later."
+        description: "The service is currently unavailable. Please try again later."
       }
     },
     {
@@ -63,40 +63,40 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     {
       key: "401"
       value: {
-        description: "The token has expired or is invalid."
+        description: "Token has expired or the token is invalid"
       }
     },
     {
       key: "504"
       value: {
-        description: "The deadline was exceeded before the operation completed."
+        description: "The deadline expired before the operation could be completed"
       }
     },
     {
       key: "404"
       value: {
-        description: "Instrument not found"
+        description: "Asset not found"
       }
     },
     {
       key: "400"
       value: {
-        description: "Invalid symbol. The symbol must use ticker@mic format, for example SBER@MISX."
+        description: "Invalid symbol passed. The symbol must be in the form ticker@mic. Where ticker is, for example, SBER. And mic is, for example, MISX."
       }
     }
   ]
 };
 
-// Market data service
+// Market Data Service
 service MarketDataService {
-  // Get historical bars for an instrument
-  // Example HTTP request:
-  // GET /v1/instruments/SBER@MISX/bars?timeframe=TIME_FRAME_D&interval.start_time=2023-01-01T00:00:00Z&interval.end_time=2023-01-31T23:59:59Z
+  // Getting historical data on an asset (aggregated candlesticks)
+  // HTTP request example:
+  // GET /v1/assets/SBER@MISX/bars?timeframe=TIME_FRAME_D&interval.start_time=2023-01-01T00:00:00Z&interval.end_time=2023-01-31T23:59:59Z
   // Authorization: <token>
   //
   // Parameters:
-  // - symbol is passed in the URL path
-  // - timeframe and interval are passed as query parameters
+  // - symbol - passed in the URL path
+  // - timeframe and interval - passed as query parameters
   rpc Bars(BarsRequest) returns (BarsResponse) {
     option (google.api.http) = {
       get: "/v1/instruments/{symbol}/bars"
@@ -112,16 +112,13 @@ service MarketDataService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol or interval. The symbol must use ticker@mic format, for example SBER@MISX."
+          description: "Invalid character or interval passed. The character must be in the form ticker@mic. Where ticker is, for example, SBER. And mic is, for example, MISX."
         }
       }
     };
   };
 
-  // Get the latest quote for an instrument
-  // Example HTTP request:
-  // GET /v1/instruments/SBER@MISX/quotes/latest
-  // Authorization: <token>
+  // Get the latest quote for an asset. HTTP request example: GET /v1/assets/SBER@MISX/quotes/latest. Authorization: <token>
   rpc LastQuote(QuoteRequest) returns (QuoteResponse) {
     option (google.api.http) = {
       get: "/v1/instruments/{symbol}/quotes/latest"
@@ -137,9 +134,9 @@ service MarketDataService {
     };
   };
 
-  // Get the current order book for an instrument
-  // Example HTTP request:
-  // GET /v1/instruments/SBER@MISX/orderbook
+  // Getting the current order book for an asset
+  // HTTP request example:
+  // GET /v1/assets/SBER@MISX/orderbook
   // Authorization: <token>
   rpc OrderBook(OrderBookRequest) returns (OrderBookResponse) {
     option (google.api.http) = {
@@ -156,9 +153,9 @@ service MarketDataService {
     };
   };
 
-  // Get recent trades for an instrument
-  // Example HTTP request:
-  // GET /v1/instruments/SBER@MISX/trades/latest
+  // Getting a list of the latest trades for an asset
+  // HTTP request example:
+  // GET /v1/assets/SBER@MISX/trades/latest
   // Authorization: <token>
   rpc LatestTrades(LatestTradesRequest) returns (LatestTradesResponse) {
     option (google.api.http) = {
@@ -175,41 +172,41 @@ service MarketDataService {
     };
   };
 
-  // Subscribe to quotes for an instrument. Stream method
+  // Subscribe to quotes for an asset. Stream method
   rpc SubscribeQuote(SubscribeQuoteRequest) returns (stream SubscribeQuoteResponse);
 
-  // Subscribe to an instrument's order book. Stream method
+  // Subscribe to order book by asset. Stream method
   rpc SubscribeOrderBook(SubscribeOrderBookRequest) returns (stream SubscribeOrderBookResponse);
 
-  // Subscribe to trades for an instrument. Stream method
+  // Subscribe to trades on an asset. Stream method
   rpc SubscribeLatestTrades(SubscribeLatestTradesRequest) returns (stream SubscribeLatestTradesResponse);
 
-  // Subscribe to aggregated bars. Stream method
+  // Subscribe to aggregated candlesticks. Stream method
   rpc SubscribeBars(SubscribeBarsRequest) returns (stream SubscribeBarsResponse);
 
 }
 
-// Available bar timeframes
+// Available timeframes for candlesticks
 enum TimeFrame {
   // Timeframe not specified
   TIME_FRAME_UNSPECIFIED = 0;
-  // 1 minute. Data depth 7 days.
+  // 1 minute. Data depth: 7 days.
   TIME_FRAME_M1 = 1;
-  // 5 minutes. Data depth 30 days.
+  // 5 minutes. Data depth: 30 days.
   TIME_FRAME_M5 = 5;
-  // 15 minutes. Data depth 30 days.
+  // 15 minutes. Data depth: 30 days.
   TIME_FRAME_M15 = 9;
-  // 30 minutes. Data depth 30 days.
+  // 30 minutes. Data depth is 30 days.
   TIME_FRAME_M30 = 11;
-  // 1 hour. Data depth 30 days.
+  // 1 hour. Data depth: 30 days.
   TIME_FRAME_H1 = 12;
-  // 2 hours. Data depth 30 days.
+  // 2 hours. Data depth: 30 days.
   TIME_FRAME_H2 = 13;
-  // 4 hours. Data depth 30 days.
+  // 4 hours. Data depth: 30 days.
   TIME_FRAME_H4 = 15;
-  // 8 hours. Data depth 30 days.
+  // 8 hours. Data depth: 30 days.
   TIME_FRAME_H8 = 17;
-  // Day. Data depth 365 days.
+  // Day. Data depth is 365 days.
   TIME_FRAME_D = 19;
   // Week. Data depth 365*5 days.
   TIME_FRAME_W = 20;
@@ -219,9 +216,9 @@ enum TimeFrame {
   TIME_FRAME_QR = 22;
 }
 
-// Request historical bars for an instrument
+// Request to receive historical data for an asset (aggregated candlesticks)
 message BarsRequest {
-  // Instrument symbol
+  // Asset symbol
   string symbol = 1;
   // Required timeframe
   TimeFrame timeframe = 2;
@@ -229,63 +226,63 @@ message BarsRequest {
   google.type.Interval interval = 3;
 }
 
-// List of aggregated bars
+// List of aggregated candles
 message BarsResponse {
-  // Instrument symbol
+  // Asset symbol
   string symbol = 1;
-  // Aggregated bars
+  // Aggregated Candle
   repeated Bar bars = 2;
 }
 
-// Request to receive the latest quote for an instrument
+// Request to get the latest quote for an asset
 message QuoteRequest {
-  // Instrument symbol
+  // Asset symbol
   string symbol = 1;
 }
 
-// Latest quote for the instrument
+// Last quote for the asset
 message QuoteResponse {
-  // Instrument symbol
+  // Asset symbol
   string symbol = 1;
   // Last trade price
   Quote quote = 2;
 }
 
-// Request the current order book for an instrument
+// Request to obtain the current order book for an asset
 message OrderBookRequest {
-  // Instrument symbol
+  // Asset Symbol
   string symbol = 1;
 }
 
-// Current order book by instrument
+// Current order book by asset
 message OrderBookResponse {
-  // Instrument symbol
+  // Asset Symbol
   string symbol = 1;
-  // Order book
+  // Orderbook
   OrderBook orderbook = 2;
 }
 
-// Request recent trades for an instrument
+// Request for a list of recent trades for an asset
 message LatestTradesRequest {
-  // Instrument symbol
+  // Asset symbol
   string symbol = 1;
 }
 
-// Recent trades for an instrument
+// List of latest trades for an asset
 message LatestTradesResponse {
-  // Instrument symbol
+  // Asset symbol
   string symbol = 1;
-  // Recent trades
+  // List of latest trades
   repeated Trade trades = 2;
 }
 
-// Request to subscribe to quotes for an instrument. Stream
+// Request to subscribe to quotes for an asset. Stream
 message SubscribeQuoteRequest {
-  // List of instrument symbols
+  // List of asset symbols
   repeated string symbols = 1;
 }
 
-// Quotes by instrument. Stream
+// Asset Quotes. Stream
 message SubscribeQuoteResponse {
   // List of quotes
   repeated Quote quote = 1;
@@ -293,59 +290,61 @@ message SubscribeQuoteResponse {
   StreamError error = 2;
 }
 
-// Request for subscription to order book by instrument. Stream
+// Subscription request for an order book by asset. Stream
 message SubscribeOrderBookRequest {
-  // Instrument symbol
+  // Asset Symbol
   string symbol = 1;
 }
 
-// Instrument order book stream
+// Order Book by Asset. Stream
 message SubscribeOrderBookResponse {
-  // List of order book streams
+  // List of orderbook streams
   repeated StreamOrderBook order_book = 1;
 }
 
-// Request an aggregated-bar subscription. Stream
+// Subscribe request for aggregated candles. Stream
 message SubscribeBarsRequest {
-  // Instrument symbol
+  // Asset symbol
   string symbol = 1;
   // Required timeframe
   TimeFrame timeframe = 2;
 }
 
-// Aggregated bars. Stream
+// List of aggregated candles. Stream
 message SubscribeBarsResponse {
-  // Instrument symbol
+  // Asset Symbol
   string symbol = 1;
-  // Aggregated bars
+  // Aggregated Candle
   repeated Bar bars = 2;
 }
 
-// Aggregated bar information
+// Aggregated Candle Information
 message Bar {
   // Timestamp
   google.protobuf.Timestamp timestamp = 1;
-  // Opening price
+  // Candlestick opening price
   google.type.Decimal open = 2;
-  // High price
+  // Maximum candle price
   google.type.Decimal high = 3;
-  // Low price
+  // Minimum candle price
   google.type.Decimal low = 4;
-  // Closing price
+  // Candlestick closing price
   google.type.Decimal close = 5;
-  // Trading volume for the bar, in units
+  // Trading volume per candle in units.
   google.type.Decimal volume = 6;
+  // Indicates whether the data is a snapshot
+  bool is_data_snapshot = 7;
 }
 
-// Quote information
+// Quote Information
 message Quote {
-  // Option Information
+  // Option information
   message Option {
     // Open Interest
     google.type.Decimal open_interest = 1;
-    // Implied volatility
+    // Implied Volatility
     google.type.Decimal implied_volatility = 2;
-    // Theoretical price
+    // Theoretical Price
     google.type.Decimal theoretical_price = 3;
     // Delta
     google.type.Decimal delta = 4;
@@ -358,7 +357,7 @@ message Quote {
     // Rho
     google.type.Decimal rho = 8;
   }
-  // Instrument symbol
+  // Asset symbol
   string symbol = 1;
   // Timestamp
   google.protobuf.Timestamp timestamp = 2;
@@ -376,20 +375,22 @@ message Quote {
   google.type.Decimal last_size = 8;
   // Daily trade volume
   google.type.Decimal volume = 9;
-  // Daily trade turnover
+  // Daily turnover
   google.type.Decimal turnover = 10;
-  // Opening price. Daytime
+  // Opening price. Daily
   google.type.Decimal open = 11;
-  // Maximum price. Daytime
+  // Maximum price. Daily
   google.type.Decimal high = 12;
-  // Minimum price. Daytime
+  // Minimum price. Daily
   google.type.Decimal low = 13;
-  // Closing price. Daytime
+  // Closing price. Daily
   google.type.Decimal close = 14;
   // Price change (last minus close)
   google.type.Decimal change = 15;
-  // Open interest. The total number of open (active) derivative contracts.
+  // Open Interest. The total number of outstanding (active) derivative contracts.
   google.type.Decimal open_interest = 16;
+  // Indicates whether the data is a snapshot
+  bool is_data_snapshot = 17;
 
   oneof additions {
     // Option Information
@@ -397,13 +398,13 @@ message Quote {
   }
 }
 
-// Order book information
+// Order Book Information
 message OrderBook {
-  // Information about the level in the order book (line)
+  // Information about the order book level (row)
   message Row {
-    // Action
+    // Command
     enum Action {
-      // Action not specified
+      // Action unspecified
       ACTION_UNSPECIFIED = 0;
       // Delete
       ACTION_REMOVE = 1;
@@ -421,18 +422,18 @@ message OrderBook {
       // Buy size
       google.type.Decimal buy_size = 3;
     }
-    // Action
+    // Command
     Action action = 4;
     // Market Participant ID
     string mpid = 5;
     // Timestamp
     google.protobuf.Timestamp timestamp = 6;
   }
-  // Order book levels
+  // Orderbook Levels
   repeated Row rows = 1;
 }
 
-// Trade information
+// Trade Information
 message Trade {
   // Trade ID sent by the exchange
   string trade_id = 1;
@@ -440,29 +441,31 @@ message Trade {
   string mpid = 2;
   // Timestamp
   google.protobuf.Timestamp timestamp = 3;
-  // Trade price
+  // Trade Price
   google.type.Decimal price = 4;
   // Trade size
   google.type.Decimal size = 5;
   // Trade side (buy or sell)
   Side side = 6;
-  // Open interest at the time of the trade.
+  // Open interest at the time of the transaction.
   google.type.Decimal open_interest = 7;
+  // Indicates whether the data is a snapshot
+  bool is_data_snapshot = 8;
 }
 
 // Stream service error
 message StreamError {
   // Error code
   int32 code = 1;
-  // Description of the error
+  // Error Description
   string description = 2;
 }
 
-// Instrument order book stream
+// Orderbook by asset. Stream
 message StreamOrderBook {
-  // Information about the level in the order book (line)
+  // Information about the order book level (row)
   message Row {
-    // Action
+    // Command
     enum Action {
       // Action not specified
       ACTION_UNSPECIFIED = 0;
@@ -482,29 +485,32 @@ message StreamOrderBook {
       // Buy size
       google.type.Decimal buy_size = 3;
     }
-    // Action
+    // Command
     Action action = 4;
     // Market Participant ID
     string mpid = 5;
     // Timestamp
     google.protobuf.Timestamp timestamp = 6;
   }
-  // Instrument symbol
+  // Asset symbol
   string symbol = 1;
-  // Order book levels
+  // Orderbook Levels
   repeated Row rows = 2;
+  // Indicates whether the data is a snapshot
+  bool is_data_snapshot = 3;
 }
 
-// Request recent trades for an instrument. Stream
+// Request for a list of recent trades for an asset. Stream
 message SubscribeLatestTradesRequest {
-  // Instrument symbol
+  // Asset symbol
   string symbol = 1;
 }
 
-// Recent trades for an instrument. Stream
+// List of latest trades for this asset. Stream
 message SubscribeLatestTradesResponse {
-  // Instrument symbol
+  // Asset symbol
   string symbol = 1;
-  // List of trades
+  // List of Trades
   repeated Trade trades = 2;
 }
+

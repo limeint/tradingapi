@@ -14,8 +14,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     HTTPS
   ]
   info: {
-    title: "Limeint Trade API"
-    description: "Limeint API for trading operations"
+    title: "REST"
+    description: "Trading API"
   }
   security_definitions: {
     security: {
@@ -42,13 +42,13 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     {
       key: "500"
       value: {
-        description: "Internal service error. Try again later."
+        description: "Internal service error. Please try again later."
       }
     },
     {
       key: "503"
       value: {
-        description: "The service is currently unavailable. Try again later."
+        description: "The service is currently unavailable. Please try again later."
       }
     },
     {
@@ -60,26 +60,23 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     {
       key: "401"
       value: {
-        description: "The token has expired or is invalid."
+        description: "Token has expired or the token is invalid"
       }
     },
     {
       key: "504"
       value: {
-        description: "The deadline was exceeded before the operation completed."
+        description: "The deadline expired before the operation could be completed"
       }
     }
   ]
 };
 
-// Service that provides Trade API usage metrics.
-// Allows clients to track their activity, including information about current quotas and limits,
+// A service for obtaining TradeAPI usage metrics.
+// Allows clients to track their activity, including information about current quotas and limits
 // to avoid exceeding established limits.
 service UsageMetricsService {
-  // Get current usage metrics for a user
-  // Example HTTP request:
-  // GET /v1/usage
-  // Authorization: <token>
+  // Get current usage metrics for a user. HTTP request example: GET /v1/usage Authorization: <token>
   rpc GetUsageMetrics(GetUsageMetricsRequest) returns (GetUsageMetricsResponse) {
     option (google.api.http) = {
       get: "/v1/usage"
@@ -107,13 +104,14 @@ message GetUsageMetricsResponse {
   message QuotaUsage {
     // Method name
     string name = 1;
-    // The total limit for this quota.
+    // Total limit for this quota.
     int64 limit = 2;
-    // How many available units are left in the current window.
+    // How many units remain available in the current window.
     int64 remaining = 3;
     // The time when the quota counter will be reset (start of a new window).
     google.protobuf.Timestamp reset_time = 4;
   }
-  // List of current quotas and their use.
+  // List of current quotas and their usage.
   repeated QuotaUsage quotas = 1;
 }
+
