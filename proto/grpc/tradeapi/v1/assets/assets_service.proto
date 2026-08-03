@@ -11,7 +11,7 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "grpc/gateway/protoc_gen_openapiv2/options/annotations.proto";
 
-option go_package = "github.com/limeint/tradingapi/go/grpc/tradeapi/v1/assets";
+option go_package = "github.com/FinamWeb/finam-trade-api/go/grpc/tradeapi/v1/assets";
 option java_multiple_files = true;
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   schemes: [
@@ -19,8 +19,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     HTTPS
   ]
   info: {
-    title: "Limeint Trade API"
-    description: "Limeint API for trading operations"
+    title: "Finam Trade-API"
+    description: "API для торговых операций"
   }
   security_definitions: {
     security: {
@@ -29,7 +29,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         type: TYPE_API_KEY
         in: IN_HEADER
         name: "Authorization"
-        description: "JWT authorization token"
+        description: "JWT токен авторизации"
       }
     }
   }
@@ -47,46 +47,46 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     {
       key: "500"
       value: {
-        description: "Internal service error. Try again later."
+        description: "Внутренняя ошибка сервиса. Попробуйте позже"
       }
     },
     {
       key: "503"
       value: {
-        description: "The service is currently unavailable. Try again later."
+        description: "Сервис на данный момент не доступен. Попробуйте позже"
       }
     },
     {
       key: "429"
       value: {
-        description: "Too many requests. The available limit is 200 requests per minute."
+        description: "Слишком много запросов. Доступный лимит - 200 запросов в минуту"
       }
     },
     {
       key: "401"
       value: {
-        description: "The token has expired or is invalid."
+        description: "Срок действия токена истек или токен недействителен"
       }
     },
     {
       key: "504"
       value: {
-        description: "The deadline was exceeded before the operation completed."
+        description: "Крайний срок истек до завершения операции"
       }
     },
     {
       key: "404"
       value: {
-        description: "Instrument not found"
+        description: "Инструмент не найден"
       }
     }
   ]
 };
 
-// Instrument service
+// Сервис инструментов
 service AssetsService {
-  // Get available exchanges, names, and MIC codes
-  // Example HTTP request:
+  // Получение списка доступных бирж, названия и mic коды
+  // Пример HTTP запроса:
   // GET /v1/exchanges
   // Authorization: <token>
   rpc Exchanges(ExchangesRequest) returns (ExchangesResponse) {
@@ -104,8 +104,8 @@ service AssetsService {
     };
   };
 
-  // Get instruments available for trading and their descriptions
-  // Example HTTP request:
+  // Получение списка доступных для торговли инструментов, их описание
+  // Пример HTTP запроса:
   // GET /v1/assets
   // Authorization: <token>
   rpc Assets(AssetsRequest) returns (AssetsResponse) {
@@ -124,8 +124,8 @@ service AssetsService {
     };
   };
 
-  // Get all instruments, including indicative and archived instruments, and their descriptions
-  // Example HTTP request:
+  // Получение списка всех инструментов, в том числе индикативных и архивных, их описание
+  // Пример HTTP запроса:
   // GET /v1/assets/all?cursor=56658&only_disabled=true
   // Authorization: <token>
   rpc AllAssets(AllAssetsRequest) returns (AllAssetsResponse) {
@@ -143,14 +143,14 @@ service AssetsService {
     };
   };
 
-  // Get information about a specific instrument
-  // Example HTTP request:
+  // Получение информации по конкретному инструменту
+  // Пример HTTP запроса:
   // GET /v1/assets/SBER@MISX?account_id=1440399
   // Authorization: <token>
   //
-  // Parameters:
-  // - symbol is passed in the URL path
-  // - account_id is passed as a query parameter
+  // Параметры:
+  // - symbol - передается в URL пути
+  // - account_id - передаётся как query-параметр
   rpc GetAsset(GetAssetRequest) returns (GetAssetResponse) {
     option (google.api.http) = {
       get: "/v1/assets/{symbol}"
@@ -166,20 +166,20 @@ service AssetsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol or account. The symbol must use ticker@mic format, for example SBER@MISX."
+          description: "Неверно передан символ или счет. Символ должен быть в виде ticker@mic. Где ticker - это, например, SBER. А mic, например, MISX"
         }
       }
     };
   };
 
-  // Get trading parameters for an instrument
-  // Example HTTP request:
+  // Получение торговых параметров по инструменту
+  // Пример HTTP запроса:
   // GET /v1/assets/SBER@MISX/params?account_id=1440399
   // Authorization: <token>
   //
-  // Parameters:
-  // - symbol is passed in the URL path
-  // - account_id is passed as a query parameter
+  // Параметры:
+  // - symbol - передается в URL пути
+  // - account_id - передаётся как query-параметр
   rpc GetAssetParams(GetAssetParamsRequest) returns (GetAssetParamsResponse) {
     option (google.api.http) = {
       get: "/v1/assets/{symbol}/params"
@@ -195,14 +195,14 @@ service AssetsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol or account. The symbol must use ticker@mic format, for example SBER@MISX."
+          description: "Неверно передан символ или счет. Символ должен быть в виде ticker@mic. Где ticker - это, например, SBER. А mic, например, MISX"
         }
       }
     };
   };
 
-  // Retrieving an options chain for the underlying asset
-  // Example HTTP request:
+  // Получение цепочки опционов для базового актива
+  // Пример HTTP запроса:
   // GET /v1/assets/SBER@MISX/options
   // Authorization: <token>
   rpc OptionsChain(OptionsChainRequest) returns (OptionsChainResponse) {
@@ -220,14 +220,14 @@ service AssetsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol. The symbol must use ticker@mic format, for example SBER@MISX."
+          description: "Неверно передан символ. Символ должен быть в виде ticker@mic. Где ticker - это, например, SBER. А mic, например, MISX"
         }
       }
     };
   };
 
-  // Get an instrument's trading schedule
-  // Example HTTP request:
+  // Получение расписания торгов для инструмента
+  // Пример HTTP запроса:
   // GET /v1/assets/SBER@MISX/schedule
   // Authorization: <token>
   rpc Schedule(ScheduleRequest) returns (ScheduleResponse) {
@@ -245,14 +245,14 @@ service AssetsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol. The symbol must use ticker@mic format, for example SBER@MISX."
+          description: "Неверно передан символ. Символ должен быть в виде ticker@mic. Где ticker - это, например, SBER. А mic, например, MISX"
         }
       }
     };
   };
 
-  // Get the server time
-  // Example HTTP request:
+  // Получение времени на сервере
+  // Пример HTTP запроса:
   // GET /v1/assets/clock
   // Authorization: <token>
   rpc Clock(ClockRequest) returns (ClockResponse) {
@@ -270,7 +270,7 @@ service AssetsService {
     };
   };
 
-  // Get the composition of a stock index by its symbol
+  // Получить состав биржевого индекса по его символу
   rpc GetConstituents(GetConstituentsRequest) returns (GetConstituentsResponse) {
     option (google.api.http) = {
       get: "/v1/assets/{symbol}/constituents"
@@ -288,353 +288,356 @@ service AssetsService {
 
 }
 
-// Request for a list of available exchanges
+// Запрос получения списка доступных бирж
 message ExchangesRequest {
 }
 
-// List of available exchanges
+// Список доступных бирж
 message ExchangesResponse {
-  // Information about the exchange
+  // Информация о бирже
   repeated Exchange exchanges = 1;
 }
 
-// Request a list of available instruments
+// Запрос получения списка доступных инструментов
 message AssetsRequest {
 }
 
-// List of available instruments
+// Список доступных инструментов
 message AssetsResponse {
-  // Instrument information
+  // Информация об инструменте
   repeated Asset assets = 1;
 }
 
-// Request a list of available instruments
+// Запрос получения списка доступных инструментов
 message AllAssetsRequest {
-  // Cursor for pagination. Specifies the sec_id of the instrument the list should start with.
-  // For the first request, leave the field blank (value 0).
-  // For subsequent requests, use next_cursor from the previous response.
+  // Курсор для пагинации. Указывает sec_id инструмента, с которого должен начинаться список.
+  // Для первого запроса оставьте поле пустым (значение 0).
+  // Для последующих запросов используйте значение next_cursor из предыдущего ответа.
   int64 cursor = 1;
-  // Filtering by instrument status: only active (non-archived) instruments are selected
-  // Default: false.
+  // Фильтрация по статусу инструмента: выбираются только активные(неархивные) инструменты
+  // По умолчанию: false.
   bool only_active = 2;
-  // Filtering by instrument status: only inactive (archived) instruments are selected
-  // Default: false.
+  // Фильтрация по статусу инструмента: выбираются только неактивные(архивные) инструменты
+  // По умолчанию: false.
   bool only_disabled = 3;
 }
 
-// Response containing one page of available instruments
+// Ответ, содержащий часть доступных инструментов.
 message AllAssetsResponse {
-  // Page of instruments
+  // Часть списка инструментов
   repeated Asset assets = 1;
-  // Cursor to get the next page. Contains the sec_id of the last instrument in the current list.
-  // Pass this value in the next request's cursor field to retrieve the next page.
-  // If the value is 0 or missing, this is the last page.
+  // Курсор для получения следующей страницы. Содержит sec_id последнего инструмента в текущем списке.
+  // Передайте это значение в поле cursor следующего запроса, чтобы получить следующую часть данных.
+  // Если значение 0 или отсутствует — это последняя страница.
   int64 next_cursor = 2;
 }
 
-// Request information on a specific instrument
+// Запрос получения информации по конкретному инструменту
 message GetAssetRequest {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // ID of the account for which information on the instrument will be selected
+  // ID аккаунта для которого будет подбираться информация по инструменту
   string account_id = 2;
 }
 
-// Information about a specific instrument
+// Список информации по конкретному инструменту
 message GetAssetResponse {
-  // Specific parameters for an instrument of the "Futures" type
+  // Специфичные параметры для инструмента типа "Фьючерс"
   message FutureDetails {
-    // Date and time of expiration (execution) of the futures contract.
+    // Дата и время экспирации (исполнения) фьючерсного контракта.
     google.protobuf.Timestamp expiration_date = 1;
-    // Contract size (multiplier) is the number of units of the underlying asset in one contract.
+    // Размер контракта (мультипликатор) — количество единиц базового актива в одном контракте.
     google.type.Decimal contract_size = 2;
   }
-  // Specific parameters for an instrument of the "Option" type
+  // Специфичные параметры для инструмента типа "Опцион"
   message OptionDetails {
-    // Date and time of expiration (execution) of the option contract.
+    // Дата и время экспирации (исполнения) опционного контракта.
     google.protobuf.Timestamp expiration_date = 1;
-    // Contract size (multiplier) is the number of units of the underlying asset in one contract.
+    // Размер контракта (мультипликатор) — количество единиц базового актива в одном контракте.
     google.type.Decimal contract_size = 2;
-    // The exercise price (strike) of the option.
+    // Цена исполнения (страйк) опциона.
     google.type.Decimal strike = 3;
   }
-  // Specific parameters for the instrument type "Bond"
+  // Специфичные параметры для инструмента типа "Облигация"
   message BondDetails {
-    // The current face value of one bond.
+    // Текущая номинальная стоимость одной облигации.
     google.type.Decimal bond_face_value = 1;
-    // Symbolic code of the currency of the bond's par value (for example, RUB, USD).
+    // Символьный код валюты номинала облигации (например, RUB, USD).
     string currency = 2;
   }
-  // Trading mode code
+  // Код режима торгов
   string board = 1;
-  // Instrument ID
+  // Идентификатор инструмента
   string id = 2;
-  // Instrument ticker
+  // Тикер инструмента
   string ticker = 3;
-  // mic exchange ID
+  // mic идентификатор биржи
   string mic = 4;
-  // Isin instrument identifier
+  // Isin идентификатор инструмента
   string isin = 5;
-  // Instrument type
+  // Тип инструмента
   string type = 6;
-  // Instrument name
+  // Наименование инструмента
   string name = 7;
-  // Number of decimal places in price
+  // Кол-во десятичных знаков в цене
   int32 decimals = 10;
-  // Minimum price increment. Calculate the effective increment as min_step/(10^decimals).
+  // Минимальный шаг цены. Для расчета финального ценового шага: min_step/(10ˆdecimals)
   int64 min_step = 11;
-  // Number of units per lot
+  // Кол-во штук в лоте
   google.type.Decimal lot_size = 9;
-  // Futures expiration date
+  // Дата экспирации фьючерса
   google.type.Date expiration_date = 12 [deprecated = true];
-  // Quote currency may not coincide with the currency of the instrument trading mode
+  // Валюта котировки, может не совпадать с валютой режима торгов инструмента
   string quote_currency = 13;
 
   oneof asset_details {
-    // Specific parameters for an instrument of the "Futures" type
+    // Специфичные параметры для инструмента типа "Фьючерс"
     FutureDetails future_details = 14;
-    // Specific parameters for an instrument of the "Option" type
+    // Специфичные параметры для инструмента типа "Опцион"
     OptionDetails option_details = 15;
-    // Specific parameters for the instrument type "Bond"
+    // Специфичные параметры для инструмента типа "Облигация"
     BondDetails bond_details = 16;
   }
 }
 
-// Request for trading parameters of an instrument
+// Запрос торговых параметров инструмента
 message GetAssetParamsRequest {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Account ID for which trading parameters will be selected
+  // ID аккаунта для которого будут подбираться торговые параметры
   string account_id = 2;
 }
 
-// Trading parameters of the instrument
+// Торговые параметры инструмента
 message GetAssetParamsResponse {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Account ID for which trading parameters are selected
+  // ID аккаунта для которого подбираются торговые параметры
   string account_id = 2;
-  // Is trading available?
-  // Old field, marked as obsolete.
-  // Clients should switch to is_tradeable.
+  // Доступны ли торговые операции
+  // Старое поле, помечено как устаревшее.
+  // Клиентам следует перейти на is_tradeable.
   bool tradeable = 3 [deprecated = true];
-  // Whether long operations are available
+  // Доступны ли операции в Лонг
   Longable longable = 4;
-  // Whether short operations are available
+  // Доступны ли операции в Шорт
   Shortable shortable = 5;
-  // Risk rate for a long operation
+  // Ставка риска для операции в Лонг
   google.type.Decimal long_risk_rate = 6;
-  // Collateral required to maintain a long position
+  // Сумма обеспечения для поддержания позиции Лонг
   google.type.Money long_collateral = 7 [deprecated = true];
-  // Risk rate for a short operation
+  // Ставка риска для операции в Шорт
   google.type.Decimal short_risk_rate = 8;
-  // Collateral required to maintain a short position
+  // Сумма обеспечения для поддержания позиции Шорт
   google.type.Money short_collateral = 9 [deprecated = true];
-  // Initial margin required to open a long position; for FORTS accounts this equals the exchange margin requirement
+  // Начальные требования, сколько на счету должно быть свободных денежных средств, чтобы открыть лонг позицию, для FORTS счетов равен биржевому ГО
   google.type.Money long_initial_margin = 10;
-  // Initial margin required to open a short position; for FORTS accounts this equals the exchange margin requirement
+  // Начальные требования, сколько на счету должно быть свободных денежных средств, чтобы открыть шорт позицию, для FORTS счетов равен биржевому ГО
   google.type.Money short_initial_margin = 11;
-  // Is trading available?
-  // Replaces the legacy field and distinguishes false from an unset value.
+  // Доступны ли торговые операции
+  // Новое поле. Позволяет различать false и "не установлено".
   google.protobuf.BoolValue is_tradable = 12;
-  // Acceptable price. Helps determine whether it is possible to place orders with a negative price for a financial instrument
+  // Допустимая цена. Помогает определить можно ли выставлять ордера с отрицательной ценой для финансового инструмента
   PriceType price_type = 13;
+  // Размер лота инструмента для торговых операций. Если поле равно 0 - значение отсутствует
+  int64 trade_lot_size = 14;
 }
 
-// Request to receive an option chain
+// Запрос получения цепочки опционов
 message OptionsChainRequest {
-  // Symbol of the underlying asset of the option
+  // Символ базового актива опциона
   string underlying_symbol = 1;
-  // Optional parameter. Relevant for options on futures, by type (weekly, monthly).
-  // If the parameter is not specified, options with the closest expiration date will be returned.
+  // Опциональный параметр. Актуален для опционов на фьючерсы, по типу (недельные, месячные).
+  // Если параметр не указан, будут возвращены опционы с ближайшей датой экспирации.
   string root = 2;
-  // Optional filter by option expiration date.
-  // If the parameter is not specified, options with the closest expiration date will be returned.
+  // Опциональный фильтр по дате экспирации опционов.
+  // Если параметр не указан, будут возвращены опционы с ближайшей датой экспирации.
   google.type.Date expiration_date = 3;
 }
 
-// Option Chain Information
+// Информация о цепочке опционов
 message OptionsChainResponse {
-  // Symbol of the underlying asset of the option
+  // Символ базового актива опциона
   string symbol = 1;
-  // Option Information
+  // Информация об опционе
   repeated Option options = 2;
 }
 
-// Request an instrument schedule
+// Запрос получения расписания инструмента
 message ScheduleRequest {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
 }
 
-// Instrument schedule
+// Расписание инструмента
 message ScheduleResponse {
-  // Sessions
+  // Сессии
   message Sessions {
-    // Session type
+    // Тип сессии
     string type = 1;
-    // Session interval
+    // Интервал сессии
     google.type.Interval interval = 2;
   }
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Instrument sessions
+  // Сессии инструмента
   repeated Sessions sessions = 2;
 }
 
-// Request to get the time on the server
+// Запрос получения времени на сервере
 message ClockRequest {
 }
 
-// Server time
+// Время на сервере
 message ClockResponse {
-  // Timestamp
+  // Метка времени
   google.protobuf.Timestamp timestamp = 1;
 }
 
-// Information about the exchange
+// Информация о бирже
 message Exchange {
-  // Exchange ID mic
+  // Идентификатор биржи mic
   string mic = 1;
-  // Exchange name
+  // Наименование биржи
   string name = 2;
 }
 
-// Instrument information
+// Информация об инструменте
 message Asset {
-  // Instrument symbol ticker@mic
+  // Символ инструмента ticker@mic
   string symbol = 1;
-  // Instrument ID
+  // Идентификатор инструмента
   string id = 2;
-  // Instrument ticker
+  // Тикер инструмента
   string ticker = 3;
-  // mic exchange ID
+  // mic идентификатор биржи
   string mic = 4;
-  // Isin instrument identifier
+  // Isin идентификатор инструмента
   string isin = 5;
-  // Instrument type
+  // Тип инструмента
   string type = 6;
-  // Instrument name
+  // Наименование инструмента
   string name = 7;
-  // Archive instrument or not
+  // Архивный инструмент или нет
   bool is_archived = 8;
 }
 
-// Option information
+// Информация об опционе
 message Option {
-  // Option type
+  // Тип опциона
   enum Type {
-    // Undefined value
+    // Неопределенное значение
     TYPE_UNSPECIFIED = 0;
-    // Call
+    // Колл
     TYPE_CALL = 1;
-    // Put
+    // Пут
     TYPE_PUT = 2;
   }
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Instrument type
+  // Тип инструмента
   Type type = 2;
-  // Lot, the amount of the underlying asset in the instrument
+  // Лот, количество базового актива в инструменте
   google.type.Decimal contract_size = 4;
-  // Trading start date
+  // Дата старта торговли
   google.type.Date trade_first_day = 5;
-  // Trade end date
+  // Дата окончания торговли
   google.type.Date trade_last_day = 6;
-  // Option exercise price
+  // Цена исполнения опциона
   google.type.Decimal strike = 7;
-  // Option Multiplier
+  // Множитель опциона
   google.type.Decimal multiplier = 9;
-  // Expiration start date
+  // Дата начала экспирации
   google.type.Date expiration_first_day = 10;
-  // Expiration date
+  // Дата окончания экспирации
   google.type.Date expiration_last_day = 11;
 }
 
-// Long-operation availability
+// Доступны ли операции в Лонг
 message Longable {
-  // Status
+  // Статус
   enum Status {
-    // Not available
+    // Не доступен
     NOT_AVAILABLE = 0;
-    // Available
+    // Доступен
     AVAILABLE = 1;
-    // Prohibited at account level
+    // Запрещено на уровне счета
     ACCOUNT_NOT_APPROVED = 2;
   }
-  // Instrument status
+  // Статус инструмента
   Status value = 1;
-  // Number of days remaining in a long-operation restriction, if any
+  // Сколько дней действует запрет на операции в Лонг (если есть)
   int32 halted_days = 2;
 }
 
-// Short-operation availability
+// Доступны ли операции в Шорт
 message Shortable {
-  // Status
+  // Статус
   enum Status {
-    // Not available
+    // Не доступен
     NOT_AVAILABLE = 0;
-    // Available
+    // Доступен
     AVAILABLE = 1;
-    // Indicates that the security is hard to borrow
+    // Признак того, что бумага Hard To Borrow (если есть)
     HTB = 2;
-    // Prohibited at account level
+    // Запрещено на уровне счета
     ACCOUNT_NOT_APPROVED = 3;
-    // Allowed as part of a strategy
+    // Разрешено в составе стратегии
     AVAILABLE_STRATEGY = 4;
   }
-  // Instrument status
+  // Статус инструмента
   Status value = 1;
-  // Number of days remaining in a short-operation restriction, if any
+  // Сколько дней действует запрет на операции в Шорт (если есть)
   int32 halted_days = 2;
 }
 
-// Acceptable price
+// Допустимая цена
 enum PriceType {
-  // Unknown
+  // Неизвестно
   UNKNOWN = 0;
-  // Positive. Greater than zero
+  // Положительная. Больше нуля
   POSITIVE = 1;
-  // Non-negative. Greater than or equal to zero
+  // Неотрицательная. Больше или равна нулю
   NON_NEGATIVE = 2;
-  // Any
+  // Любая
   ANY = 3;
 }
 
-// Request for index composition
+// Запрос на получение состава индекса
 message GetConstituentsRequest {
-  // Index symbol (for example, "SPX@_SP" or "NDX@_SCI")
+  // Символьный код индекса (например, "SPX@_SP", "NDX@_SCI")
   string symbol = 1;
-  // Cursor for pagination. Specifies the sec_id of the instrument the list should start with.
-  // For the first request, leave the field blank (value 0).
-  // For subsequent requests, use next_cursor from the previous response.
+  // Курсор для пагинации. Указывает sec_id инструмента, с которого должен начинаться список.
+  // Для первого запроса оставьте поле пустым (значение 0).
+  // Для последующих запросов используйте значение next_cursor из предыдущего ответа.
   int64 cursor = 2;
 }
 
-// Index composition query result
+// Результат запроса состава индекса
 message GetConstituentsResponse {
-  // List of components (securities) included in the calculation base of the requested index
+  // Список компонентов (ценных бумаг), входящих в базу расчета запрошенного индекса
   repeated Constituents constituents = 1;
-  // Cursor to get the next page. Contains the sec_id of the last instrument in the current list.
-  // Pass this value in the next request's cursor field to retrieve the next page.
-  // If the value is 0 or missing, this is the last page
+  // Курсор для получения следующей страницы. Содержит sec_id последнего инструмента в текущем списке.
+  // Передайте это значение в поле cursor следующего запроса, чтобы получить следующую часть данных.
+  // Если значение 0 или отсутствует — это последняя страница
   int64 next_cursor = 2;
 }
 
-// Information about the component (security) included in the index
+// Информация о компоненте (ценной бумаге), входящем в индекс
 message Constituents {
-  // Instrument symbol code
+  // Символьный код инструмента
   string symbol = 1;
-  // Full name of the issuing company
+  // Полное наименование компании-эмитента
   string name = 2;
-  // Global economic sector to which the company belongs (for example, "Technology", "Healthcare")
+  // Глобальный сектор экономики, к которому относится компания (например, "Technology", "Healthcare")
   string sector = 3;
-  // Industry (sub-industry) of the company's activity (for example, "Software - Application")
+  // Отрасль (подотрасль) деятельности компании (например, "Software - Application")
   string sub_sector = 4;
-  // Unique company identifier in the US SEC database (Central Index Key)
+  // Уникальный идентификатор компании в базе данных SEC США (Central Index Key)
   string cik = 5;
-  // Date the security was added to the index
+  // Дата добавления бумаги в индекс
   google.type.Date index_inclusion_date = 6;
-  // Instrument weight in index
+  // Вес инструмента в индексе
   google.type.Decimal weight = 7;
 }
+

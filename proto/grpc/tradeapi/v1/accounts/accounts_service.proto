@@ -11,7 +11,7 @@ import "grpc/tradeapi/v1/side.proto";
 import "grpc/tradeapi/v1/trade.proto";
 import "grpc/gateway/protoc_gen_openapiv2/options/annotations.proto";
 
-option go_package = "github.com/limeint/tradingapi/go/grpc/tradeapi/v1/accounts";
+option go_package = "github.com/FinamWeb/finam-trade-api/go/grpc/tradeapi/v1/accounts";
 option java_multiple_files = true;
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   schemes: [
@@ -19,8 +19,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     HTTPS
   ]
   info: {
-    title: "Limeint Trade API"
-    description: "Limeint API for trading operations"
+    title: "Finam Trade-API"
+    description: "API для торговых операций"
   }
   security_definitions: {
     security: {
@@ -29,7 +29,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         type: TYPE_API_KEY
         in: IN_HEADER
         name: "Authorization"
-        description: "JWT authorization token"
+        description: "JWT токен авторизации"
       }
     }
   }
@@ -47,46 +47,46 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     {
       key: "500"
       value: {
-        description: "Internal service error. Try again later."
+        description: "Внутренняя ошибка сервиса. Попробуйте позже"
       }
     },
     {
       key: "503"
       value: {
-        description: "The service is currently unavailable. Try again later."
+        description: "Сервис на данный момент не доступен. Попробуйте позже"
       }
     },
     {
       key: "429"
       value: {
-        description: "Too many requests. The available limit is 200 requests per minute."
+        description: "Слишком много запросов. Доступный лимит - 200 запросов в минуту"
       }
     },
     {
       key: "401"
       value: {
-        description: "The token has expired or is invalid."
+        description: "Срок действия токена истек или токен недействителен"
       }
     },
     {
       key: "504"
       value: {
-        description: "The deadline was exceeded before the operation completed."
+        description: "Крайний срок истек до завершения операции"
       }
     },
     {
       key: "404"
       value: {
-        description: "Account was not found in token"
+        description: "Счёт не был найден в токене"
       }
     }
   ]
 };
 
-// Account service
+// Сервис аккаунтов
 service AccountsService {
-  // Get information about a specific account
-  // Example HTTP request:
+  // Получение информации по конкретному аккаунту
+  // Пример HTTP запроса:
   // GET /v1/accounts/A12345
   // Authorization: <token>
   rpc GetAccount(GetAccountRequest) returns (GetAccountResponse) {
@@ -104,14 +104,14 @@ service AccountsService {
     };
   };
 
-  // Get account trade history
-  // Example HTTP request:
+  // Получение истории по сделкам аккаунта
+  // Пример HTTP запроса:
   // GET /v1/accounts/A12345/trades?limit=50&interval.start_time=2023-01-01T00:00:00Z&interval.end_time=2023-01-31T23:59:59Z
   // Authorization: <token>
   //
-  // Parameters:
-  // - account_id is passed in the URL path
-  // - limit and interval are passed as query parameters
+  // Параметры:
+  // - account_id - передается в URL пути
+  // - limit и interval - передаются как query-параметры
   rpc Trades(TradesRequest) returns (TradesResponse) {
     option (google.api.http) = {
       get: "/v1/accounts/{account_id}/trades"
@@ -127,20 +127,20 @@ service AccountsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid interval"
+          description: "Неверно передан интервал"
         }
       }
     };
   };
 
-  // Get account transactions
-  // Example HTTP request:
+  // Получение списка транзакций аккаунта
+  // Пример HTTP запроса:
   // GET /v1/accounts/A12345/transactions?limit=50&interval.start_time=2023-01-01T00:00:00Z&interval.end_time=2023-01-31T23:59:59Z
   // Authorization: <token>
   //
-  // Parameters:
-  // - account_id is passed in the URL path
-  // - limit and interval are passed as query parameters
+  // Параметры:
+  // - account_id - передается в URL пути
+  // - limit и interval - передаются как query-параметры
   rpc Transactions(TransactionsRequest) returns (TransactionsResponse) {
     option (google.api.http) = {
       get: "/v1/accounts/{account_id}/transactions"
@@ -156,187 +156,188 @@ service AccountsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid interval"
+          description: "Неверно передан интервал"
         }
       }
     };
   };
 
-  // Subscribe to account information. Stream method
+  // Подписка на информацию по аккаунту. Стрим метод
   rpc SubscribeAccount(GetAccountRequest) returns (stream GetAccountResponse);
 
 }
 
-// Request information for a specific account
+// Запрос получения информации по конкретному аккаунту
 message GetAccountRequest {
-  // Account ID
+  // Идентификатор аккаунта
   string account_id = 1;
 }
 
-// Information about a specific account
+// Информация о конкретном аккаунте
 message GetAccountResponse {
-  // Account ID
+  // Идентификатор аккаунта
   string account_id = 1;
-  // Account type
+  // Тип аккаунта
   string type = 2;
-  // Account status
+  // Статус аккаунта
   string status = 3;
-  // Available funds plus cost of open positions
+  // Доступные средства плюс стоимость открытых позиций
   google.type.Decimal equity = 4;
-  // Unrealized profit
+  // Нереализованная прибыль
   google.type.Decimal unrealized_profit = 5;
-  // Open positions plus theoretical positions from unfilled active orders
+  // Позиции. Открытые, плюс теоретические (по неисполненным активным заявкам)
   repeated Position positions = 6;
-  // The amount of own funds in the account available for trading. Does not include margin funds.
+  // Сумма собственных денежных средств на счете, доступная для торговли. Не включает маржинальные средства.
   repeated google.type.Money cash = 7;
 
   oneof portfolio {
-    // General type for Moscow Exchange accounts. Includes both single and mono accounts.
+    // Общий тип для счетов Московской Биржи. Включает в себя как единые, так и моно счета.
     MC portfolio_mc = 8;
-    // Portfolio type for US markets accounts.
+    // Тип портфеля для счетов на американских рынках.
     MCT portfolio_mct = 9;
-    // Portfolio type for trading on the derivatives market of the Moscow Exchange.
+    // Тип портфеля для торговли на срочном рынке Московской Биржи.
     FORTS portfolio_forts = 10;
   }
-  // Account opening date
+  // Дата открытия счета
   google.protobuf.Timestamp open_account_date = 11;
-  // Date of first trade transaction
+  // Дата первой торговой транзакции
   google.protobuf.Timestamp first_trade_date = 12;
-  // Date of first non-trading transaction
+  // Дата первой неторговой транзакции
   google.protobuf.Timestamp first_non_trade_date = 13;
 }
 
-// General type for Moscow Exchange accounts. Includes both single and specialized (mono) accounts for different sections of the exchange.
-// Unified Trading Account (UTA): supports several markets (equities, FX, derivatives, SPB, foreign securities, and foreign futures) with a single cash position.
-// MOEX equities mono account: isolated account for trading stocks, bonds, and fund units.
-// MOEX FX mono account: isolated account for currency-pair transactions (for example, CNYRUB_TOM).
+// Общий тип для счетов Московской Биржи. Включает в себя как единые, так и специализированные (моно) счета для разных секций биржи.
+// Единый торговый счет (ЕТС): Позволяет торговать на нескольких рынках (фондовый, валютный. срочный, spb, иностранные бумаги, иностранные фьючерсы) с единой денежной позиции.
+// Моно-счет фондового рынка MOEX: Изолированный счет для торговли акциями, облигациями и паями.
+// Моно-счет валютного рынка MOEX: Изолированный счет для операций с валютными парами (например, CNYRUB_TOM).
 message MC {
-  // The amount of own funds in the account available for trading. Includes margin funds.
+  // Сумма собственных денежных средств на счете, доступная для торговли. Включает маржинальные средства.
   google.type.Decimal available_cash = 1;
-  // Initial Margin
+  // Начальная маржа
   google.type.Decimal initial_margin = 2;
-  // Minimum Margin
+  // Минимальная маржа
   google.type.Decimal maintenance_margin = 3;
 }
 
-// Portfolio type for US markets accounts.
-// Provides access to US exchanges: NYSE, NASDAQ, CBOE, CME, trade with US stocks, futures and options.
+// Тип портфеля для счетов на американских рынках.
+// Предоставляет доступ к биржам США: NYSE, NASDAQ, CBOE, CME, сделки с американскими акциями, фьючерсами и опционами.
 message MCT {
 }
 
-// Portfolio type for trading on the derivatives market of the Moscow Exchange.
-// Designed to work with derivative financial instruments: futures and options.
+// Тип портфеля для торговли на срочном рынке Московской Биржи.
+// Предназначен для работы с производными финансовыми инструментами: фьючерсами и опционами.
 message FORTS {
-  // The amount of own funds in the account available for trading. Includes margin funds.
+  // Сумма собственных денежных средств на счете, доступная для торговли. Включает маржинальные средства.
   google.type.Decimal available_cash = 1;
-  // Minimum margin (required amount of collateral for open positions)
+  // Минимальная маржа (необходимая сумма обеспечения под открытые позиции)
   google.type.Decimal money_reserved = 2;
 }
 
-// Request for trade history
+// Запрос получения истории по сделкам
 message TradesRequest {
-  // Account ID
+  // Идентификатор аккаунта
   string account_id = 1;
-  // Maximum number of trades
+  // Лимит количества сделок
   int32 limit = 2;
-  // Start and end of the requested period, Unix epoch time
+  // Начало и окончание запрашиваемого периода, Unix epoch time
   google.type.Interval interval = 3;
 }
 
-// Trade history
+// История по сделкам
 message TradesResponse {
-  // Account trades
+  // Сделки по аккаунту
   repeated AccountTrade trades = 1;
 }
 
-// Request for a list of transactions
+// Запрос получения списка транзакций
 message TransactionsRequest {
-  // Account ID
+  // Идентификатор аккаунта
   string account_id = 1;
-  // Transaction limit
+  // Лимит количества транзакций
   int32 limit = 2;
-  // Start and end of the requested period, Unix epoch time
+  // Начало и окончание запрашиваемого периода, Unix epoch time
   google.type.Interval interval = 3;
 }
 
-// List of transactions
+// Список транзакций
 message TransactionsResponse {
-  // Account transactions
+  // Транзакции по аккаунту
   repeated Transaction transactions = 1;
 }
 
-// Position information
+// Информация о позиции
 message Position {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Quantity in units, signed value (long-short)
+  // Количество в шт., значение со знаком определяющее (long-short)
   google.type.Decimal quantity = 2;
-  // Average price, not populated for FORTS positions
+  // Средняя цена. Не заполняется для FORTS позиций
   google.type.Decimal average_price = 3;
-  // Current price
+  // Текущая цена
   google.type.Decimal current_price = 4;
-  // Maintenance margin, populated only for FORTS positions
+  // Поддерживающее гарантийное обеспечение. Заполняется только для FORTS позиций
   google.type.Decimal maintenance_margin = 5;
-  // Profit or loss for the current day (PnL), not populated for FORTS positions
+  // Прибыль или убыток за текущий день (PnL). Не заполняется для FORTS позиций
   google.type.Decimal daily_pnl = 6;
-  // Total unrealized profit or loss (PnL) of the current position
+  // Суммарная нереализованная прибыль или убыток (PnL) текущей позиции
   google.type.Decimal unrealized_pnl = 7;
 }
 
-// Transaction information
+// Информация о транзакции
 message Transaction {
-  // Populated for trade-related transaction types
+  // Объект заполняется для торговых типов транзакций
   message Trade {
-    // Quantity in units
+    // Количество в шт.
     google.type.Decimal size = 1;
-    // Trade price per unit. For options, this is the execution price or premium reported by the trade.
+    // Цена сделки за штуку. Цена исполнения/Размер премии по опциону. Это цена заключения, значение берется из сделки.
     google.type.Decimal price = 2;
-    // Accrued interest, populated when the trade includes accrued interest
+    // НКД. Заполнено если в сделке есть НКД
     google.type.Decimal accrued_interest = 3;
   }
-  // Transaction categories.
+  // Категории транзакции.
   enum TransactionCategory {
-    // Other
+    // Прочее
     OTHERS = 0;
-    // Cash deposit
+    // Ввод ДС
     DEPOSIT = 1;
-    // Cash withdrawal
+    // Вывод ДС
     WITHDRAW = 2;
-    // Income
+    // Доход
     INCOME = 5;
-    // Commission
+    // Комиссия
     COMMISSION = 7;
-    // Tax
+    // Налог
     TAX = 8;
-    // Inheritance
+    // Наследство
     INHERITANCE = 9;
-    // Cash transfer
+    // Перевод ДС
     TRANSFER = 11;
-    // Termination of the contract
+    // Расторжение договора
     CONTRACT_TERMINATION = 12;
-    // Expenses
+    // Расходы
     OUTCOMES = 13;
-    // Fine
+    // Штраф
     FINE = 15;
-    // Loan
+    // Займ
     LOAN = 19;
   }
-  // Transaction ID
+  // Идентификатор транзакции
   string id = 1;
-  // Transaction type from TransactionCategory
+  // Тип транзакции из TransactionCategory
   string category = 2 [deprecated = true];
-  // Timestamp
+  // Метка времени
   google.protobuf.Timestamp timestamp = 4;
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 5;
-  // Change in money
+  // Изменение в деньгах
   google.type.Money change = 6;
-  // Trade information
+  // Информация о сделке
   Trade trade = 7;
-  // Transaction category from TransactionCategory.
+  // Категория транзакции из TransactionCategory.
   TransactionCategory transaction_category = 8;
-  // Transaction name
+  // Наименование транзакции
   string transaction_name = 9;
-  // Quantity change, populated only for securities transfers (TransactionCategory = TRANSFER)
+  // Изменение в штуках, только для трансфера бумаг (для TransactionCategory = TRANSFER)
   google.type.Decimal change_qty = 10;
 }
+

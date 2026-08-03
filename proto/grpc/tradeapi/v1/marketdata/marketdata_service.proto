@@ -9,7 +9,7 @@ import "google/type/interval.proto";
 import "grpc/tradeapi/v1/side.proto";
 import "grpc/gateway/protoc_gen_openapiv2/options/annotations.proto";
 
-option go_package = "github.com/limeint/tradingapi/go/grpc/tradeapi/v1/marketdata";
+option go_package = "github.com/FinamWeb/finam-trade-api/go/grpc/tradeapi/v1/marketdata";
 option java_multiple_files = true;
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   schemes: [
@@ -17,8 +17,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     HTTPS
   ]
   info: {
-    title: "Limeint Trade API"
-    description: "Limeint API for trading operations"
+    title: "Finam Trade-API"
+    description: "API для торговых операций"
   }
   security_definitions: {
     security: {
@@ -27,7 +27,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         type: TYPE_API_KEY
         in: IN_HEADER
         name: "Authorization"
-        description: "JWT authorization token"
+        description: "JWT токен авторизации"
       }
     }
   }
@@ -45,58 +45,58 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     {
       key: "500"
       value: {
-        description: "Internal service error. Try again later."
+        description: "Внутренняя ошибка сервиса. Попробуйте позже"
       }
     },
     {
       key: "503"
       value: {
-        description: "The service is currently unavailable. Try again later."
+        description: "Сервис на данный момент не доступен. Попробуйте позже"
       }
     },
     {
       key: "429"
       value: {
-        description: "Too many requests. The available limit is 200 requests per minute."
+        description: "Слишком много запросов. Доступный лимит - 200 запросов в минуту"
       }
     },
     {
       key: "401"
       value: {
-        description: "The token has expired or is invalid."
+        description: "Срок действия токена истек или токен недействителен"
       }
     },
     {
       key: "504"
       value: {
-        description: "The deadline was exceeded before the operation completed."
+        description: "Крайний срок истек до завершения операции"
       }
     },
     {
       key: "404"
       value: {
-        description: "Instrument not found"
+        description: "Инструмент не найден"
       }
     },
     {
       key: "400"
       value: {
-        description: "Invalid symbol. The symbol must use ticker@mic format, for example SBER@MISX."
+        description: "Неверно передан символ. Символ должен быть в виде ticker@mic. Где ticker - это, например, SBER. А mic, например, MISX"
       }
     }
   ]
 };
 
-// Market data service
+// Сервис рыночных данных
 service MarketDataService {
-  // Get historical bars for an instrument
-  // Example HTTP request:
+  // Получение исторических данных по инструменту (агрегированные свечи)
+  // Пример HTTP запроса:
   // GET /v1/instruments/SBER@MISX/bars?timeframe=TIME_FRAME_D&interval.start_time=2023-01-01T00:00:00Z&interval.end_time=2023-01-31T23:59:59Z
   // Authorization: <token>
   //
-  // Parameters:
-  // - symbol is passed in the URL path
-  // - timeframe and interval are passed as query parameters
+  // Параметры:
+  // - symbol - передается в URL пути
+  // - timeframe и interval - передаются как query-параметры
   rpc Bars(BarsRequest) returns (BarsResponse) {
     option (google.api.http) = {
       get: "/v1/instruments/{symbol}/bars"
@@ -112,14 +112,14 @@ service MarketDataService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol or interval. The symbol must use ticker@mic format, for example SBER@MISX."
+          description: "Неверно передан символ или интервал. Символ должен быть в виде ticker@mic. Где ticker - это, например, SBER. А mic, например, MISX"
         }
       }
     };
   };
 
-  // Get the latest quote for an instrument
-  // Example HTTP request:
+  // Получение последней котировки по инструменту
+  // Пример HTTP запроса:
   // GET /v1/instruments/SBER@MISX/quotes/latest
   // Authorization: <token>
   rpc LastQuote(QuoteRequest) returns (QuoteResponse) {
@@ -137,8 +137,8 @@ service MarketDataService {
     };
   };
 
-  // Get the current order book for an instrument
-  // Example HTTP request:
+  // Получение текущего стакана по инструменту
+  // Пример HTTP запроса:
   // GET /v1/instruments/SBER@MISX/orderbook
   // Authorization: <token>
   rpc OrderBook(OrderBookRequest) returns (OrderBookResponse) {
@@ -156,8 +156,8 @@ service MarketDataService {
     };
   };
 
-  // Get recent trades for an instrument
-  // Example HTTP request:
+  // Получение списка последних сделок по инструменту
+  // Пример HTTP запроса:
   // GET /v1/instruments/SBER@MISX/trades/latest
   // Authorization: <token>
   rpc LatestTrades(LatestTradesRequest) returns (LatestTradesResponse) {
@@ -175,177 +175,177 @@ service MarketDataService {
     };
   };
 
-  // Subscribe to quotes for an instrument. Stream method
+  // Подписка на котировки по инструменту. Стрим метод
   rpc SubscribeQuote(SubscribeQuoteRequest) returns (stream SubscribeQuoteResponse);
 
-  // Subscribe to an instrument's order book. Stream method
+  // Подписка на стакан по инструменту. Стрим метод
   rpc SubscribeOrderBook(SubscribeOrderBookRequest) returns (stream SubscribeOrderBookResponse);
 
-  // Subscribe to trades for an instrument. Stream method
+  // Подписка на сделки по инструменту. Стрим метод
   rpc SubscribeLatestTrades(SubscribeLatestTradesRequest) returns (stream SubscribeLatestTradesResponse);
 
-  // Subscribe to aggregated bars. Stream method
+  // Подписка на агрегированные свечи. Стрим метод
   rpc SubscribeBars(SubscribeBarsRequest) returns (stream SubscribeBarsResponse);
 
 }
 
-// Available bar timeframes
+// Доступные таймфреймы для свечей
 enum TimeFrame {
-  // Timeframe not specified
+  // Таймфрейм не указан
   TIME_FRAME_UNSPECIFIED = 0;
-  // 1 minute. Data depth 7 days.
+  // 1 минута. Глубина данных 7 дней.
   TIME_FRAME_M1 = 1;
-  // 5 minutes. Data depth 30 days.
+  // 5 минут. Глубина данных 30 дней.
   TIME_FRAME_M5 = 5;
-  // 15 minutes. Data depth 30 days.
+  // 15 минут. Глубина данных 30 дней.
   TIME_FRAME_M15 = 9;
-  // 30 minutes. Data depth 30 days.
+  // 30 минут. Глубина данных 30 дней.
   TIME_FRAME_M30 = 11;
-  // 1 hour. Data depth 30 days.
+  // 1 час. Глубина данных 30 дней.
   TIME_FRAME_H1 = 12;
-  // 2 hours. Data depth 30 days.
+  // 2 часа. Глубина данных 30 дней.
   TIME_FRAME_H2 = 13;
-  // 4 hours. Data depth 30 days.
+  // 4 часа. Глубина данных 30 дней.
   TIME_FRAME_H4 = 15;
-  // 8 hours. Data depth 30 days.
+  // 8 часов. Глубина данных 30 дней.
   TIME_FRAME_H8 = 17;
-  // Day. Data depth 365 days.
+  // День. Глубина данных 365 дней.
   TIME_FRAME_D = 19;
-  // Week. Data depth 365*5 days.
+  // Неделя. Глубина данных 365*5 дней.
   TIME_FRAME_W = 20;
-  // Month. Data depth 365*5 days.
+  // Месяц. Глубина данных 365*5 дней.
   TIME_FRAME_MN = 21;
-  // Quarter. Data depth 365*5 days.
+  // Квартал. Глубина данных 365*5 дней.
   TIME_FRAME_QR = 22;
 }
 
-// Request historical bars for an instrument
+// Запрос получения исторических данных по инструменту (агрегированные свечи)
 message BarsRequest {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Required timeframe
+  // Необходимый таймфрейм
   TimeFrame timeframe = 2;
-  // Start and end of the requested period
+  // Начало и окончание запрашиваемого периода
   google.type.Interval interval = 3;
 }
 
-// List of aggregated bars
+// Список агрегированных свеч
 message BarsResponse {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Aggregated bars
+  // Агрегированная свеча
   repeated Bar bars = 2;
 }
 
-// Request to receive the latest quote for an instrument
+// Запрос получения последней котировки по инструменту
 message QuoteRequest {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
 }
 
-// Latest quote for the instrument
+// Последняя котировка по инструменту
 message QuoteResponse {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Last trade price
+  // Цена последней сделки
   Quote quote = 2;
 }
 
-// Request the current order book for an instrument
+// Запрос получения текущего стакана по инструменту
 message OrderBookRequest {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
 }
 
-// Current order book by instrument
+// Текущий стакан по инструменту
 message OrderBookResponse {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Order book
+  // Стакан
   OrderBook orderbook = 2;
 }
 
-// Request recent trades for an instrument
+// Запрос списка последних сделок по инструменту
 message LatestTradesRequest {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
 }
 
-// Recent trades for an instrument
+// Список последних сделок по инструменту
 message LatestTradesResponse {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Recent trades
+  // Список последних сделок
   repeated Trade trades = 2;
 }
 
-// Request to subscribe to quotes for an instrument. Stream
+// Запрос подписки на котировки по инструменту. Стрим
 message SubscribeQuoteRequest {
-  // List of instrument symbols
+  // Список символов инструментов
   repeated string symbols = 1;
 }
 
-// Quotes by instrument. Stream
+// Котировки по инструменту. Стрим
 message SubscribeQuoteResponse {
-  // List of quotes
+  // Список котировок
   repeated Quote quote = 1;
-  // Stream service error
+  // Ошибка стрим сервиса
   StreamError error = 2;
 }
 
-// Request for subscription to order book by instrument. Stream
+// Запрос подписки на стакан по инструменту. Стрим
 message SubscribeOrderBookRequest {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
 }
 
-// Instrument order book stream
+// Стакан по инструменту. Стрим
 message SubscribeOrderBookResponse {
-  // List of order book streams
+  // Список стакан стримов
   repeated StreamOrderBook order_book = 1;
 }
 
-// Request an aggregated-bar subscription. Stream
+// Запрос подписки на агрегированные свечи. Стрим
 message SubscribeBarsRequest {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Required timeframe
+  // Необходимый таймфрейм
   TimeFrame timeframe = 2;
 }
 
-// Aggregated bars. Stream
+// Список агрегированных свеч. Стрим
 message SubscribeBarsResponse {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Aggregated bars
+  // Агрегированная свеча
   repeated Bar bars = 2;
 }
 
-// Aggregated bar information
+// Информация об агрегированной свече
 message Bar {
-  // Timestamp
+  // Метка времени
   google.protobuf.Timestamp timestamp = 1;
-  // Opening price
+  // Цена открытия свечи
   google.type.Decimal open = 2;
-  // High price
+  // Максимальная цена свечи
   google.type.Decimal high = 3;
-  // Low price
+  // Минимальная цена свечи
   google.type.Decimal low = 4;
-  // Closing price
+  // Цена закрытия свечи
   google.type.Decimal close = 5;
-  // Trading volume for the bar, in units
+  // Объём торгов за свечу в шт.
   google.type.Decimal volume = 6;
 }
 
-// Quote information
+// Информация о котировке
 message Quote {
-  // Option Information
+  // Информация об опционе
   message Option {
-    // Open Interest
+    // Открытый интерес
     google.type.Decimal open_interest = 1;
-    // Implied volatility
+    // Подразумеваемая волатильность
     google.type.Decimal implied_volatility = 2;
-    // Theoretical price
+    // Теоретическая цена
     google.type.Decimal theoretical_price = 3;
     // Delta
     google.type.Decimal delta = 4;
@@ -358,153 +358,154 @@ message Quote {
     // Rho
     google.type.Decimal rho = 8;
   }
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Timestamp
+  // Метка времени
   google.protobuf.Timestamp timestamp = 2;
-  // Ask. 0 if there is no active ask
+  // Аск. 0 при отсутствии активного аска
   google.type.Decimal ask = 3;
-  // Ask size
+  // Размер аска
   google.type.Decimal ask_size = 4;
-  // Bid. 0 if there is no active bid
+  // Бид. 0 при отсутствии активного бида
   google.type.Decimal bid = 5;
-  // Bid size
+  // Размер бида
   google.type.Decimal bid_size = 6;
-  // Last trade price
+  // Цена последней сделки
   google.type.Decimal last = 7;
-  // Last trade size
+  // Размер последней сделки
   google.type.Decimal last_size = 8;
-  // Daily trade volume
+  // Дневной объем сделок
   google.type.Decimal volume = 9;
-  // Daily trade turnover
+  // Дневной оборот сделок
   google.type.Decimal turnover = 10;
-  // Opening price. Daytime
+  // Цена открытия. Дневная
   google.type.Decimal open = 11;
-  // Maximum price. Daytime
+  // Максимальная цена. Дневная
   google.type.Decimal high = 12;
-  // Minimum price. Daytime
+  // Минимальная цена. Дневная
   google.type.Decimal low = 13;
-  // Closing price. Daytime
+  // Цена закрытия. Дневная
   google.type.Decimal close = 14;
-  // Price change (last minus close)
+  // Изменение цены (last минус close)
   google.type.Decimal change = 15;
-  // Open interest. The total number of open (active) derivative contracts.
+  // Открытый интерес. Общее количество незакрытых (активных) контрактов по деривативу.
   google.type.Decimal open_interest = 16;
 
   oneof additions {
-    // Option Information
+    // Информация об опционе
     Option option = 50;
   }
 }
 
-// Order book information
+// Информация о стакане
 message OrderBook {
-  // Information about the level in the order book (line)
+  // Информация об уровне в стакане (строке)
   message Row {
-    // Action
+    // Команда
     enum Action {
-      // Action not specified
+      // Действие не указано
       ACTION_UNSPECIFIED = 0;
-      // Delete
+      // Удалить
       ACTION_REMOVE = 1;
-      // Add
+      // Добавить
       ACTION_ADD = 2;
-      // Update
+      // Обновить
       ACTION_UPDATE = 3;
     }
-    // Price
+    // Цена
     google.type.Decimal price = 1;
 
     oneof side {
-      // Sell size
+      // Размер на продажу
       google.type.Decimal sell_size = 2;
-      // Buy size
+      // Размер на покупку
       google.type.Decimal buy_size = 3;
     }
-    // Action
+    // Команда
     Action action = 4;
-    // Market Participant ID
+    // Идентификатор участника рынка
     string mpid = 5;
-    // Timestamp
+    // Метка времени
     google.protobuf.Timestamp timestamp = 6;
   }
-  // Order book levels
+  // Уровни стакана
   repeated Row rows = 1;
 }
 
-// Trade information
+// Информация о сделке
 message Trade {
-  // Trade ID sent by the exchange
+  // Идентификатор сделки, отправленный биржей
   string trade_id = 1;
-  // Market Participant ID
+  // Идентификатор участника рынка
   string mpid = 2;
-  // Timestamp
+  // Метка времени
   google.protobuf.Timestamp timestamp = 3;
-  // Trade price
+  // Цена сделки
   google.type.Decimal price = 4;
-  // Trade size
+  // Размер сделки
   google.type.Decimal size = 5;
-  // Trade side (buy or sell)
+  // Сторона сделки (buy или sell)
   Side side = 6;
-  // Open interest at the time of the trade.
+  // Открытый интерес на момент совершения сделки.
   google.type.Decimal open_interest = 7;
 }
 
-// Stream service error
+// Ошибка стрим сервиса
 message StreamError {
-  // Error code
+  // Код ошибки
   int32 code = 1;
-  // Description of the error
+  // Описание ошибки
   string description = 2;
 }
 
-// Instrument order book stream
+// Стакан по инструменту. Стрим
 message StreamOrderBook {
-  // Information about the level in the order book (line)
+  // Информация об уровне в стакане (строке)
   message Row {
-    // Action
+    // Команда
     enum Action {
-      // Action not specified
+      // Действие не указано
       ACTION_UNSPECIFIED = 0;
-      // Delete
+      // Удалить
       ACTION_REMOVE = 1;
-      // Add
+      // Добавить
       ACTION_ADD = 2;
-      // Update
+      // Обновить
       ACTION_UPDATE = 3;
     }
-    // Price
+    // Цена
     google.type.Decimal price = 1;
 
     oneof side {
-      // Sell size
+      // Размер на продажу
       google.type.Decimal sell_size = 2;
-      // Buy size
+      // Размер на покупку
       google.type.Decimal buy_size = 3;
     }
-    // Action
+    // Команда
     Action action = 4;
-    // Market Participant ID
+    // Идентификатор участника рынка
     string mpid = 5;
-    // Timestamp
+    // Метка времени
     google.protobuf.Timestamp timestamp = 6;
   }
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Order book levels
+  // Уровни стакана
   repeated Row rows = 2;
 }
 
-// Request recent trades for an instrument. Stream
+// Запрос списка последних сделок по инструменту. Стрим
 message SubscribeLatestTradesRequest {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
 }
 
-// Recent trades for an instrument. Stream
+// Список последних сделок по инструменту. Стрим
 message SubscribeLatestTradesResponse {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // List of trades
+  // Список сделок
   repeated Trade trades = 2;
 }
+

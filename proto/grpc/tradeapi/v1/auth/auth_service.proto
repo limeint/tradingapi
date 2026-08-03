@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "grpc/gateway/protoc_gen_openapiv2/options/annotations.proto";
 
-option go_package = "github.com/limeint/tradingapi/go/grpc/tradeapi/v1/auth";
+option go_package = "github.com/FinamWeb/finam-trade-api/go/grpc/tradeapi/v1/auth";
 option java_multiple_files = true;
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   schemes: [
@@ -14,8 +14,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     HTTPS
   ]
   info: {
-    title: "Limeint Trade API"
-    description: "Limeint API for trading operations"
+    title: "Finam Trade-API"
+    description: "API для торговых операций"
   }
   responses: [
     {
@@ -31,46 +31,46 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     {
       key: "500"
       value: {
-        description: "Internal service error. Try again later."
+        description: "Внутренняя ошибка сервиса. Попробуйте позже"
       }
     },
     {
       key: "503"
       value: {
-        description: "The service is currently unavailable. Try again later."
+        description: "Сервис на данный момент не доступен. Попробуйте позже"
       }
     },
     {
       key: "429"
       value: {
-        description: "Too many requests. The available limit is 200 requests per minute."
+        description: "Слишком много запросов. Доступный лимит - 200 запросов в минуту"
       }
     },
     {
       key: "401"
       value: {
-        description: "The token has expired or is invalid."
+        description: "Срок действия токена истек или токен недействителен"
       }
     },
     {
       key: "504"
       value: {
-        description: "The deadline was exceeded before the operation completed."
+        description: "Крайний срок истек до завершения операции"
       }
     },
     {
       key: "400"
       value: {
-        description: "The token has expired or is invalid."
+        description: "Срок действия токена истек или токен недействителен"
       }
     }
   ]
 };
 
-// Authentication service
+// Сервис аутентификации
 service AuthService {
-  // Exchange an API secret for a JWT
-  // Example HTTP request:
+  // Получение JWT токена из API токена
+  // Пример HTTP запроса:
   // POST /v1/sessions
   // Content-Type: application/json
   //
@@ -78,7 +78,7 @@ service AuthService {
   //   "secret": "your-api-secret-key"
   // }
   //
-  // All fields are sent in the request body
+  // Все поля передаются в теле запроса
   rpc Auth(AuthRequest) returns (AuthResponse) {
     option (google.api.http) = {
       post: "/v1/sessions"
@@ -86,8 +86,8 @@ service AuthService {
     };
   };
 
-  // Get session token information
-  // Example HTTP request:
+  // Получение информации о токене сессии
+  // Пример HTTP запроса:
   // POST /v1/sessions/details
   // Content-Type: application/json
   //
@@ -95,8 +95,8 @@ service AuthService {
   //   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
   // }
   //
-  // The token is sent in the request body for security
-  // The response also includes the accounts available to the token.
+  // Токен передается в теле запроса для безопасности
+  // Получение информации о токене. Также включает список доступных счетов.
   rpc TokenDetails(TokenDetailsRequest) returns (TokenDetailsResponse) {
     option (google.api.http) = {
       post: "/v1/sessions/details"
@@ -104,89 +104,90 @@ service AuthService {
     };
   };
 
-  // Subscription to JWT token update. Stream method
+  // Подписка на обновление JWT токена. Стрим метод
   rpc SubscribeJwtRenewal(SubscribeJwtRenewalRequest) returns (stream SubscribeJwtRenewalResponse);
 
 }
 
-// Authorization request
+// Запрос авторизации
 message AuthRequest {
-  // API token (secret key)
+  // API токен (secret key)
   string secret = 1;
-  // Request source application ID
+  // Идентификатор приложения-источника запроса
   string source_app_id = 2;
 }
 
-// Authorization information
+// Информация об авторизации
 message AuthResponse {
-  // Received JWT token
+  // Полученный JWT-токен
   string token = 1;
 }
 
-// Requesting information about a token
+// Запрос информации о токене
 message TokenDetailsRequest {
-  // JWT token
+  // JWT-токен
   string token = 1;
 }
 
-// Token Information
+// Информация о токене
 message TokenDetailsResponse {
-  // Creation date and time
+  // Дата и время создания
   google.protobuf.Timestamp created_at = 1;
-  // Expiration date and time
+  // Дата и время экспирации
   google.protobuf.Timestamp expires_at = 2;
-  // Information about accessing market data
+  // Информация о доступе к рыночным данным
   repeated MDPermission md_permissions = 3;
-  // Account IDs
+  // Идентификаторы аккаунтов
   repeated string account_ids = 4;
-  // Session and trading accounts in the token will be marked readonly
+  // Сессия и торговые счета в токене будут помечены readonly
   bool readonly = 5;
 }
 
-// Information about accessing market data
+// Информация о доступе к рыночным данным
 message MDPermission {
-  // Quote level
+  // Уровень котировок
   enum QuoteLevel {
-    // Unspecified value
+    // Значение не указано
     QUOTE_LEVEL_UNSPECIFIED = 0;
-    // Last price
+    // Последняя цена
     QUOTE_LEVEL_LAST_PRICE = 1;
-    // Bid ask
+    // Бид аск
     QUOTE_LEVEL_BEST_BID_OFFER = 2;
-    // Aggregated order book
+    // Агрегированный стакан
     QUOTE_LEVEL_DEPTH_OF_MARKET = 3;
-    // Full order book
+    // Полный стакан
     QUOTE_LEVEL_DEPTH_OF_BOOK = 4;
-    // Access denied
+    // Доступ запрещен
     QUOTE_LEVEL_ACCESS_FORBIDDEN = 5;
   }
-  // Quote level
+  // Уровень котировок
   QuoteLevel quote_level = 1;
-  // Delay in minutes
+  // Задержка в минутах
   int32 delay_minutes = 2;
 
   oneof condition {
-    // Exchange ID mic
+    // Идентификатор биржи mic
     string mic = 3;
-    // Country
+    // Страна
     string country = 4;
-    // Continent
+    // Континент
     string continent = 5;
-    // The whole world
+    // Весь мир
     bool worldwide = 6;
   }
 }
 
-// Subscription request for JWT token update
+// Запрос подписки на обновление JWT токена
 message SubscribeJwtRenewalRequest {
-  // API token (secret key)
+  // API токен (secret key)
   string secret = 1;
-  // Request source application ID
+  // Идентификатор приложения-источника запроса
   string source_app_id = 2;
 }
 
-// Updated token. Stream
+// Обновленный токен. Стрим
 message SubscribeJwtRenewalResponse {
-  // Received JWT token
+  // Полученный JWT-токен
   string token = 1;
 }
+

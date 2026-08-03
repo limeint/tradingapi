@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "grpc/gateway/protoc_gen_openapiv2/options/annotations.proto";
 
-option go_package = "github.com/limeint/tradingapi/go/grpc/tradeapi/v1/metrics";
+option go_package = "github.com/FinamWeb/finam-trade-api/go/grpc/tradeapi/v1/metrics";
 option java_multiple_files = true;
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   schemes: [
@@ -14,8 +14,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     HTTPS
   ]
   info: {
-    title: "Limeint Trade API"
-    description: "Limeint API for trading operations"
+    title: "Finam Trade-API"
+    description: "API для торговых операций"
   }
   security_definitions: {
     security: {
@@ -24,7 +24,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         type: TYPE_API_KEY
         in: IN_HEADER
         name: "Authorization"
-        description: "JWT authorization token"
+        description: "JWT токен авторизации"
       }
     }
   }
@@ -42,42 +42,42 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     {
       key: "500"
       value: {
-        description: "Internal service error. Try again later."
+        description: "Внутренняя ошибка сервиса. Попробуйте позже"
       }
     },
     {
       key: "503"
       value: {
-        description: "The service is currently unavailable. Try again later."
+        description: "Сервис на данный момент не доступен. Попробуйте позже"
       }
     },
     {
       key: "429"
       value: {
-        description: "Too many requests. The available limit is 200 requests per minute."
+        description: "Слишком много запросов. Доступный лимит - 200 запросов в минуту"
       }
     },
     {
       key: "401"
       value: {
-        description: "The token has expired or is invalid."
+        description: "Срок действия токена истек или токен недействителен"
       }
     },
     {
       key: "504"
       value: {
-        description: "The deadline was exceeded before the operation completed."
+        description: "Крайний срок истек до завершения операции"
       }
     }
   ]
 };
 
-// Service that provides Trade API usage metrics.
-// Allows clients to track their activity, including information about current quotas and limits,
-// to avoid exceeding established limits.
+// Сервис для получения метрик использования TradeAPI.
+// Позволяет клиентам отслеживать свою активность, включая информацию о текущих квотах и лимитах,
+// чтобы избегать превышения установленных ограничений.
 service UsageMetricsService {
-  // Get current usage metrics for a user
-  // Example HTTP request:
+  // Получение текущих метрик использования для пользователя
+  // Пример HTTP запроса:
   // GET /v1/usage
   // Authorization: <token>
   rpc GetUsageMetrics(GetUsageMetricsRequest) returns (GetUsageMetricsResponse) {
@@ -97,23 +97,24 @@ service UsageMetricsService {
 
 }
 
-// Request to get current usage metrics
+// Запрос получения текущих метрик использования
 message GetUsageMetricsRequest {
 }
 
-// Information about current usage metrics
+// Информация о текущих метриках использования
 message GetUsageMetricsResponse {
-  // Quota
+  // Квота
   message QuotaUsage {
-    // Method name
+    // Название метода
     string name = 1;
-    // The total limit for this quota.
+    // Общий лимит по данной квоте.
     int64 limit = 2;
-    // How many available units are left in the current window.
+    // Сколько осталось доступных единиц в текущем окне.
     int64 remaining = 3;
-    // The time when the quota counter will be reset (start of a new window).
+    // Время, когда счетчик квоты будет сброшен (начало нового окна).
     google.protobuf.Timestamp reset_time = 4;
   }
-  // List of current quotas and their use.
+  // Список текущих квот и их использование.
   repeated QuotaUsage quotas = 1;
 }
+

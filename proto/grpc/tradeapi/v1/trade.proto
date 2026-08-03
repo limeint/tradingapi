@@ -6,33 +6,34 @@ import "google/protobuf/timestamp.proto";
 import "google/type/decimal.proto";
 import "grpc/tradeapi/v1/side.proto";
 
-option go_package = "github.com/limeint/tradingapi/go/grpc/tradeapi/v1";
+option go_package = "github.com/FinamWeb/finam-trade-api/go/grpc/tradeapi/v1";
 option java_multiple_files = true;
 
-// Trade information
+// Информация о сделке
 message AccountTrade {
-  // Trade ID
+  // Идентификатор сделки
   string trade_id = 1;
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 2;
-  // Execution price
+  // Цена исполнения
   google.type.Decimal price = 3;
-  // Size in units
+  // Размер в шт.
   google.type.Decimal size = 4;
-  // Trade side (long or short)
+  // Сторона сделки (long или short)
   Side side = 5;
-  // Timestamp
+  // Метка времени
   google.protobuf.Timestamp timestamp = 6;
-  // Order ID
+  // Идентификатор заявки
   string order_id = 7;
-  // Account ID
+  // Идентификатор аккаунта
   string account_id = 8;
-  // Order comment (maximum 128 characters)
+  // Метка заявки. (максимум 128 символов)
   string comment = 9;
-  // Accrued interest (populated on the day after the trade date)
+  // НКД (заполняется на следующий день после даты совершения сделки)
   google.type.Decimal accrued_interest = 10;
-  // Price currency (for example, RUB, USD, EUR)
-  // Populated only by the Trades method.
-  // SubscribeTrades may leave this field empty because its data source differs. Consumers should handle an empty value.
+  // Валюта цены (например, RUB, USD, EUR)
+  // Примечание: поле заполняется только при использовании метода Trades
+  // Для SubscribeTrades данное поле может быть пустым в связи с различиями в источниках данных. При обработке сделок из подписки рекомендуется учитывать возможность пустого значения.
   string currency = 11;
 }
+

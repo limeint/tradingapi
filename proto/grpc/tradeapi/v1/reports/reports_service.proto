@@ -7,7 +7,7 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "grpc/gateway/protoc_gen_openapiv2/options/annotations.proto";
 
-option go_package = "github.com/limeint/tradingapi/go/grpc/tradeapi/v1/reports";
+option go_package = "github.com/FinamWeb/finam-trade-api/go/grpc/tradeapi/v1/reports";
 option java_multiple_files = true;
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   schemes: [
@@ -15,8 +15,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     HTTPS
   ]
   info: {
-    title: "Limeint Trade API"
-    description: "Limeint API for trading operations"
+    title: "Finam Trade-API"
+    description: "API для торговых операций"
   }
   security_definitions: {
     security: {
@@ -25,7 +25,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         type: TYPE_API_KEY
         in: IN_HEADER
         name: "Authorization"
-        description: "JWT authorization token"
+        description: "JWT токен авторизации"
       }
     }
   }
@@ -43,40 +43,40 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     {
       key: "500"
       value: {
-        description: "Internal service error. Try again later."
+        description: "Внутренняя ошибка сервиса. Попробуйте позже"
       }
     },
     {
       key: "503"
       value: {
-        description: "The service is currently unavailable. Try again later."
+        description: "Сервис на данный момент не доступен. Попробуйте позже"
       }
     },
     {
       key: "429"
       value: {
-        description: "Request limit exceeded."
+        description: "Превышен лимит запросов."
       }
     },
     {
       key: "401"
       value: {
-        description: "The token has expired or is invalid."
+        description: "Срок действия токена истек или токен недействителен"
       }
     },
     {
       key: "504"
       value: {
-        description: "The deadline was exceeded before the operation completed."
+        description: "Крайний срок истек до завершения операции"
       }
     }
   ]
 };
 
-// Service for receiving custom reports.
+// Сервис для получения пользовательских отчетов.
 service ReportsService {
-  // Start generating an account report for the period
-  // Example HTTP request:
+  // Запустить генерацию отчета по счету за период
+  // Пример HTTP запроса:
   // POST /v1/report
   // Authorization: <token>
   rpc CreateAccountReport(CreateAccountReportRequest) returns (CreateAccountReportResponse) {
@@ -95,8 +95,8 @@ service ReportsService {
     };
   };
 
-  // Get the account report generation result
-  // Example HTTP request:
+  // Получение информации о результате генерации отчета по счету
+  // Пример HTTP запроса:
   // GET /v1/report/01KBMPQ3CEZ4BBCVGBW5JS8S8Y/info
   // Authorization: <token>
   rpc GetAccountReportInfo(GetAccountReportInfoRequest) returns (GetAccountReportInfoResponse) {
@@ -114,95 +114,96 @@ service ReportsService {
     };
   };
 
-  // Subscribe to information about the results of generating an account report. Stream method
+  // Подписка на информацию о результатах генерации отчета по счету. Стрим метод
   rpc SubscribeAccountReportInfo(SubscribeAccountReportInfoRequest) returns (stream SubscribeAccountReportInfoResponse);
 
 }
 
-// Request to generate an account report for a period
+// Запрос на генерацию отчёта по счёту за период
 message CreateAccountReportRequest {
-  // Time interval. Maximum date interval - 92 days
+  // Временной интервал. Максимальный интервал дат - 92 дня
   DateRange date_range = 1;
-  // Report form
+  // Форма отчета
   ReportForm report_form = 2;
-  // Account ID
+  // Идентификатор счета
   int64 account_id = 3;
 }
 
-// Information about the generated report
+// Информация о генерируемом отчёте
 message CreateAccountReportResponse {
-  // Report ID
+  // Идентификатор отчёта
   string report_id = 1;
 }
 
-// Request for report generation status
+// Запрос на получение статуса генерации отчёта
 message GetAccountReportInfoRequest {
-  // Report ID
+  // Идентификатор отчёта
   string report_id = 1;
 }
 
-// Information about the report generation status
+// Информация о статусе генерации отчёта
 message GetAccountReportInfoResponse {
-  // Information about the report generation status
+  // Информация о статусе генерации отчёта
   AccountReportInfo info = 1;
 }
 
-// Request to subscribe to receive report generation status
+// Запрос подписки на получение статуса генерации отчёта
 message SubscribeAccountReportInfoRequest {
-  // Report ID
+  // Идентификатор отчёта
   string report_id = 1;
 }
 
-// Information about the report generation status. Stream
+// Информация о статусе генерации отчёта. Стрим
 message SubscribeAccountReportInfoResponse {
-  // Information about the report generation status
+  // Информация о статусе генерации отчёта
   AccountReportInfo info = 1;
 }
 
-// Information about the report generation status
+// Информация о статусе генерации отчёта
 message AccountReportInfo {
-  // Report ID
+  // Идентификатор отчёта
   string report_id = 1;
-  // Report generation status
+  // Статус генерации отчёта
   ReportCreationStatus status = 2;
-  // Report time interval. Taken from the report generation request
+  // Временной интервал отчёта. Берётся из запроса на генерацию отчёта
   DateRange date_range = 3;
-  // Report form. Taken from the report generation request
+  // Форма отчета. Берётся из запроса на генерацию отчёта
   ReportForm report_form = 4;
-  // Account ID. Taken from the report generation request
+  // Идентификатор счета. Берётся из запроса на генерацию отчёта
   int64 account_id = 5;
-  // Link to download the report. Appears only if the report is successfully generated (ReportCreationStatus = SUCCESS). To download the report using this link, you must pass the Authorization header: Bearer <your_access_key>
+  // Ссылка на скачивание отчёта. Появляется только в случае успешной генерации отчёта (ReportCreationStatus = SUCCESS). Для скачивания отчёта по данной ссылке необходимо передать заголовок Authorization: Bearer <your_access_key>
   google.protobuf.StringValue url = 6;
 }
 
-// Time interval
+// Временной интервал
 message DateRange {
-  // Time interval start date
+  // Дата начала временного интервала
   google.protobuf.Timestamp date_begin = 1;
-  // End date of the time interval
+  // Дата конца временного интервала
   google.protobuf.Timestamp date_end = 2;
 }
 
-// Report form
+// Форма отчета
 enum ReportForm {
-  // Not specified
+  // Не указана
   REPORT_FORM_UNKNOWN = 0;
-  // Brief
+  // Краткая
   REPORT_FORM_SHORT = 1;
-  // Full
+  // Полная
   REPORT_FORM_LONG = 2;
 }
 
-// Report generation status
+// Статус генерации отчёта
 enum ReportCreationStatus {
-  // Not found
+  // Не найден
   NOT_FOUND = 0;
-  // Waiting to be generated
+  // Ожидает генерации
   PENDING = 1;
-  // Generation started
+  // Генерация запущена
   IN_PROGRESS = 2;
-  // Generation completed successfully
+  // Генерация завершена успешно
   SUCCESS = 3;
-  // Generation completed with error
+  // Генерация завершена с ошибкой
   ERROR = 4;
 }
+

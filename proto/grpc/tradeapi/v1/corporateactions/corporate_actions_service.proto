@@ -8,7 +8,7 @@ import "grpc/gateway/protoc_gen_openapiv2/options/annotations.proto";
 import "google/type/decimal.proto";
 import "google/type/date.proto";
 
-option go_package = "github.com/limeint/tradingapi/go/grpc/tradeapi/v1/corporateactions";
+option go_package = "github.com/FinamWeb/finam-trade-api/go/grpc/tradeapi/v1/corporateactions";
 option java_multiple_files = true;
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   schemes: [
@@ -16,8 +16,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     HTTPS
   ]
   info: {
-    title: "Limeint Trade API"
-    description: "Limeint API for trading operations"
+    title: "Finam Trade-API"
+    description: "API для торговых операций"
   }
   security_definitions: {
     security: {
@@ -26,7 +26,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         type: TYPE_API_KEY
         in: IN_HEADER
         name: "Authorization"
-        description: "JWT authorization token"
+        description: "JWT токен авторизации"
       }
     }
   }
@@ -44,39 +44,39 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     {
       key: "500"
       value: {
-        description: "Internal service error. Try again later."
+        description: "Внутренняя ошибка сервиса. Попробуйте позже"
       }
     },
     {
       key: "503"
       value: {
-        description: "The service is currently unavailable. Try again later."
+        description: "Сервис на данный момент не доступен. Попробуйте позже"
       }
     },
     {
       key: "429"
       value: {
-        description: "Too many requests. The available limit is 200 requests per minute."
+        description: "Слишком много запросов. Доступный лимит - 200 запросов в минуту"
       }
     },
     {
       key: "401"
       value: {
-        description: "The token has expired or is invalid."
+        description: "Срок действия токена истек или токен недействителен"
       }
     },
     {
       key: "504"
       value: {
-        description: "The deadline was exceeded before the operation completed."
+        description: "Крайний срок истек до завершения операции"
       }
     }
   ]
 };
 
-// Service for providing information on corporate actions (dividends, splits)
+// Сервис предоставления информации по корпоративным действиям (дивиденды, сплиты)
 service CorporateActionsService {
-  // Get upcoming split events by instrument
+  // Получить предстоящие события сплитов по инструменту
   rpc GetFutureSplits(GetFutureSplitsRequest) returns (GetFutureSplitsResponse) {
     option (google.api.http) = {
       get: "/v1/splits/future"
@@ -92,7 +92,7 @@ service CorporateActionsService {
     };
   };
 
-  // Get the history of splits by instrument
+  // Получить историю сплитов по инструменту
   rpc GetPastSplits(GetPastSplitsRequest) returns (GetPastSplitsResponse) {
     option (google.api.http) = {
       get: "/v1/splits/past"
@@ -108,7 +108,7 @@ service CorporateActionsService {
     };
   };
 
-  // Get a calendar of future bond events
+  // Получить календарь будущих событий по облигациям
   rpc GetFutureBondsEvents(GetFutureBondsEventsRequest) returns (GetFutureBondsEventsResponse) {
     option (google.api.http) = {
       get: "/v1/bonds/future"
@@ -124,7 +124,7 @@ service CorporateActionsService {
     };
   };
 
-  // Get a calendar of historical bond events
+  // Получить календарь исторических событий по облигациям
   rpc GetPastBondsEvents(GetPastBondsEventsRequest) returns (GetPastBondsEventsResponse) {
     option (google.api.http) = {
       get: "/v1/bonds/past"
@@ -140,7 +140,7 @@ service CorporateActionsService {
     };
   };
 
-  // Get a list of upcoming (future) dividend payments for an instrument.
+  // Получить список предстоящих (будущих) дивидендных выплат по инструменту.
   rpc GetFutureDividends(GetFutureDividendsRequest) returns (GetFutureDividendsResponse) {
     option (google.api.http) = {
       get: "/v1/future-dividends"
@@ -156,13 +156,13 @@ service CorporateActionsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol. The symbol must use ticker@mic format, for example SBER@MISX."
+          description: "Неверно передан символ. Символ должен быть в виде ticker@mic. Где ticker - это, например, SBER. А mic, например, MISX"
         }
       }
     };
   };
 
-  // Get historical data on dividends paid for an instrument
+  // Получить исторические данные по выплаченным дивидендам инструмента
   rpc GetPastDividends(GetPastDividendsRequest) returns (GetPastDividendsResponse) {
     option (google.api.http) = {
       get: "/v1/past-dividends"
@@ -178,7 +178,7 @@ service CorporateActionsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol or interval. The symbol must use ticker@mic format, for example SBER@MISX."
+          description: "Неверно передан символ или интервал. Символ должен быть в виде ticker@mic. Где ticker - это, например, SBER. А mic, например, MISX"
         }
       }
     };
@@ -186,128 +186,128 @@ service CorporateActionsService {
 
 }
 
-// Request upcoming split events by instrument
+// Запрос предстоящих событий сплитов по инструменту
 message GetFutureSplitsRequest {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Sorting direction by date: asc - from old to new, desc - from new to old
+  // Направление сортировки по дате: asc — от старых к новым, desc — от новых к старым
   SortDirection sort_direction = 2;
-  // Limit. Limits the number of splits returned in the list
+  // Лимит. Ограничивает количество возвращаемых сплитов в списке
   int32 limit = 3;
-  // Offset. Specifies the number of splits to skip before starting to return the result
+  // Смещение. Указывает количество сплитов, которые нужно пропустить перед тем, как начать возвращать результат
   int32 offset = 4;
 }
 
-// Upcoming split events by instrument
+// Предстоящие события сплитов по инструменту
 message GetFutureSplitsResponse {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Pagination options
+  // Параметры пагинации
   Pagination pagination = 2;
-  // Split information
+  // Информация о сплитах
   repeated SplitInfo splits = 3;
 }
 
-// Request for split history by instrument
+// Запрос истории сплитов по инструменту
 message GetPastSplitsRequest {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Start of time interval
+  // Начало временного интервала
   google.type.Date date_from = 2;
-  // End of time interval
+  // Конец временного интервала
   google.type.Date date_to = 3;
-  // Sorting direction by date: asc - from old to new, desc - from new to old
+  // Направление сортировки по дате: asc — от старых к новым, desc — от новых к старым
   SortDirection sort_direction = 4;
-  // Limit. Limits the number of splits returned in the list
+  // Лимит. Ограничивает количество возвращаемых сплитов в списке
   int32 limit = 5;
-  // Offset. Specifies the number of splits to skip before starting to return the result
+  // Смещение. Указывает количество сплитов, которые нужно пропустить перед тем, как начать возвращать результат
   int32 offset = 6;
 }
 
-// History of splits by instrument
+// История сплитов по инструменту
 message GetPastSplitsResponse {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Pagination options
+  // Параметры пагинации
   Pagination pagination = 2;
-  // Split information
+  // Информация о сплитах
   repeated SplitInfo splits = 3;
 }
 
-// Request a calendar of future bond events
+// Запрос календаря будущих событий по облигациям
 message GetFutureBondsEventsRequest {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Start of time interval
+  // Начало временного интервала
   google.type.Date date_from = 2;
-  // End of the time interval. By default, the response covers one year.
+  // Конец временного интервала. По умолчанию отдаются данные за год.
   google.type.Date date_to = 3;
-  // Sorting direction by date: asc - from old to new, desc - from new to old
+  // Направление сортировки по дате: asc — от старых к новым, desc — от новых к старым
   SortDirection sort_direction = 4;
-  // Limit. Limits the number of events returned for bonds in the list
+  // Лимит. Ограничивает количество возвращаемых событий по облигациям в списке
   int32 limit = 5;
-  // Offset. Specifies the number of bond events to skip before returning a result
+  // Смещение. Указывает количество событий по облигациям, которые нужно пропустить перед тем, как начать возвращать результат
   int32 offset = 6;
 }
 
-// Calendar of future bond events
+// Календарь будущих событий по облигациям
 message GetFutureBondsEventsResponse {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Pagination options. The total parameter is ignored.
+  // Параметры пагинации. Параметр total игнорируется.
   Pagination pagination = 2;
-  // Bond events
+  // События по облигациям
   repeated BondEvent events = 3;
 }
 
-// Request a calendar of historical bond events
+// Запрос календаря исторических событий по облигациям
 message GetPastBondsEventsRequest {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Start of time interval
+  // Начало временного интервала
   google.type.Date date_from = 2;
-  // End of the time interval. By default, the response covers one year.
+  // Конец временного интервала. По умолчанию отдаются данные за год.
   google.type.Date date_to = 3;
-  // Sorting direction by date: asc - from old to new, desc - from new to old
+  // Направление сортировки по дате: asc — от старых к новым, desc — от новых к старым
   SortDirection sort_direction = 4;
-  // Limit. Limits the number of events returned for bonds in the list
+  // Лимит. Ограничивает количество возвращаемых событий по облигациям в списке
   int32 limit = 5;
-  // Offset. Specifies the number of bond events to skip before returning a result
+  // Смещение. Указывает количество событий по облигациям, которые нужно пропустить перед тем, как начать возвращать результат
   int32 offset = 6;
 }
 
-// Calendar of historical events on bonds
+// Календарь исторических событий по облигациям
 message GetPastBondsEventsResponse {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Pagination options. The total parameter is ignored.
+  // Параметры пагинации. Параметр total игнорируется.
   Pagination pagination = 2;
-  // Bond events
+  // События по облигациям
   repeated BondEvent events = 3;
 }
 
-// Bond event
+// Событие по облигации
 message BondEvent {
-  // Event date
+  // Дата события
   google.type.Date date = 1;
-  // Event type
+  // Тип события
   BondEventType type = 2;
-  // Payment amount; may be omitted for offers where only the price is relevant
+  // Сумма выплаты (опционально: для оферты может отсутствовать, если важна только цена)
   google.type.Decimal value = 3;
-  // Payout currency
+  // Валюта выплаты
   google.protobuf.StringValue currency = 4;
-  // Event specific details
+  // Специфичные детали события
   oneof event_details {
-    // Coupon payment details
+    // Детали купонной выплаты
     CouponEventDetails coupon_details = 5;
-    // Details of amortization (partial repayment of bond par value)
+    // Детали амортизации (частичного погашения номинала облигации)
     AmortizationEventDetails amortization_details = 6;
-    // Offer details (early repurchase or repayment event)
+    // Детали оферты (событие досрочного выкупа или погашения)
     OfferEventDetails offer_details = 7;
   }
 }
 
-// Bond event type
+// Тип события по облигациям
 enum BondEventType {
 
   UNSPECIFIED = 0;
@@ -319,150 +319,151 @@ enum BondEventType {
   OFFER = 3;
 }
 
-// Coupon payment details
+// Детали купонной выплаты
 message CouponEventDetails {
-  // Record Date
+  // Дата фиксации реестра (Record Date)
   google.type.Date record_date = 1;
-  // Coupon period start date
+  // Дата начала купонного периода
   google.type.Date start_date = 2;
-  // Face value used to calculate the coupon
+  // Номинал, на который начисляется купон
   google.type.Decimal face_value = 3;
-  // Coupon rate as a percentage
+  // Ставка купона в процентах
   google.type.Decimal value_percent = 4;
 }
 
-// Amortization details (partial repayment of bond face value)
+// Детали амортизации (частичного погашения номинала облигации)
 message AmortizationEventDetails {
-  // Remaining face value after amortization
+  // Остаточный номинал после амортизации
   google.type.Decimal new_face_value = 1;
-  // Original security face value
+  // Первоначальный номинал бумаги
   google.type.Decimal initial_face_value = 2;
-  // Amortized percentage of face value
+  // Доля амортизации от номинала в процентах
   google.type.Decimal amortization_percent = 3;
 }
 
-// Offer details (early repurchase or repayment event)
+// Детали оферты (событие досрочного выкупа или погашения)
 message OfferEventDetails {
-  // PUT or CALL
+  // PUT или CALL
   google.protobuf.StringValue offer_type = 1;
-  // Offer price as a percentage of face value (or in currency)
+  // Цена оферты в процентах от номинала (или в валюте)
   google.type.Decimal price = 2;
-  // Start date of the offer submission period
+  // Дата начала периода предъявления к оферте
   google.type.Date start_date = 3;
-  // End date of the offer submission period
+  // Дата окончания периода предъявления к оферте
   google.type.Date end_date = 4;
-  // Offer agent
+  // Агент по оферте
   google.protobuf.StringValue agent = 5;
 }
 
-// Corporate Action Information
+// Информация о корпоративном действии
 message SplitInfo {
-  // Effective date of the corporate action (execution date)
+  // Дата вступления в силу корпоративного действия (дата исполнения)
   google.type.Date exec_date = 1;
-  // Number of securities before conversion (numerator of the coefficient)
+  // Количество ценных бумаг до проведения конвертации (числитель коэффициента)
   google.type.Decimal old_ratio = 2;
-  // Number of securities after conversion (coefficient denominator)
+  // Количество ценных бумаг после проведения конвертации (знаменатель коэффициента)
   google.type.Decimal new_ratio = 3;
-  // New instrument lot size after execution of a corporate action
+  // Новый размер лота инструмента после исполнения корпоративного действия
   google.protobuf.Int32Value new_lot = 4;
-  // Event type (split/consolidation, etc.)
+  // Тип события (сплит / консолидация и т.д.)
   ConvertationType convertation_type = 5;
 }
 
-// Possible event types
+// Возможные типы событий
 enum ConvertationType {
-  // Unknown event/conversion type. Used by default
+  // Неизвестный тип события/конвертации. Используется по умолчанию
   CONVTYPE_UNKNOWN = 0;
-  // Share buyback. Acquisition by the issuing company of its own shares
+  // Обратный выкуп акций. Приобретение компанией-эмитентом собственных акций
   BUYBACK = 1;
-  // Execution of Call offer. Early redemption (revocation) of a security at the initiative of the issuer
+  // Исполнение Call-оферты. Досрочное погашение (отзыв) ценной бумаги по инициативе эмитента
   CALL_OPTION_EXERCISED = 2;
-  // Partial face-value redemption (amortization) or scheduled redemption without a lottery
+  // Частичное погашение номинала (амортизация) или плановый тираж без проведения лотереи
   DRAWINGS = 3;
-  // Lottery redemption. Early repayment of part of a bond issue where securities are selected by lottery
+  // Погашение по жребию(тираж). Досрочное погашение части выпуска облигаций, где погашаемые бумаги выбираются путем лотереи
   DRAWINGS_BY_LOTTERY = 4;
-  // Early conversion. Exchange of one security for another before the scheduled date (for example, convertible bonds into shares)
+  // Досрочная конвертация. Обмен одних ценных бумаг на другие до наступления планового срока (например, конвертируемых облигаций в акции)
   EARLY_CONVERSION = 5;
-  // Redemption at maturity. Scheduled full redemption when the security reaches maturity
+  // Погашение по сроку. Плановое полное погашение ценной бумаги по истечении срока её обращения
   MATURITY = 6;
-  // Planned (regular) conversion. Standard corporate action: split, consolidation or planned exchange of securities
+  // Плановая (обычная) конвертация. Стандартное корпоративное действие: сплит, консолидация или плановый обмен бумаг
   ORDINARY = 7;
-  // Execution of the Put offer. Early repurchase of a security by the issuer at the request of the investor (owner)
+  // Исполнение Put-оферты. Досрочный выкуп ценной бумаги эмитентом по требованию инвестора (владельца)
   PUT_OPTION_EXERCISED = 8;
-  // Tender proposal. Public offer to shareholders to buy out their securities (often during mergers/acquisitions)
+  // Тендерное предложение. Публичное предложение акционерам о выкупе их бумаг (часто при слияниях/поглощениях)
   TENDER_OFFER = 9;
 }
 
-// Request to receive a list of upcoming dividend payments for an instrument
+// Запрос на получение списка предстоящих дивидендных выплат по инструменту
 message GetFutureDividendsRequest {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Sorting direction by date: asc - from old to new, desc - from new to old.
+  // Направление сортировки по дате: asc — от старых к новым, desc — от новых к старым.
   SortDirection sort_direction = 2;
-  // Limit. Limits the number of elements returned
+  // Лимит. Ограничивает количество возвращаемых элементов
   int32 limit = 3;
-  // Offset. Specifies how many items to skip before returning results.
+  // Смещение. Указывает количество элементов, которые нужно пропустить перед тем, как начать возвращать результат
   int32 offset = 4;
 }
 
-// List of upcoming dividend payments for an instrument with pagination
+// Список предстоящих выплат дивидендов по инструменту с пагинацией
 message GetFutureDividendsResponse {
-  // Pagination options
+  // Параметры пагинации
   Pagination pagination = 1;
-  // List of dividends
+  // Список дивидендов
   repeated Dividend dividends = 2;
 }
 
-// Request to obtain historical data on dividends paid for an instrument
+// Запрос на получение исторических данных о выплаченных дивидендах по инструменту
 message GetPastDividendsRequest {
-  // Instrument symbol
+  // Символ инструмента
   string symbol = 1;
-  // Sorting direction by date: asc - from old to new, desc - from new to old.
+  // Направление сортировки по дате: asc — от старых к новым, desc — от новых к старым.
   SortDirection sort_direction = 2;
-  // Start of time interval
+  // Начало временного интервала
   google.type.Date date_from = 3;
-  // End of time interval
+  // Конец временного интервала
   google.type.Date date_to = 4;
-  // Limit. Limits the number of elements returned
+  // Лимит. Ограничивает количество возвращаемых элементов
   int32 limit = 5;
-  // Offset. Specifies how many items to skip before returning results.
+  // Смещение. Указывает количество элементов, которые нужно пропустить перед тем, как начать возвращать результат
   int32 offset = 6;
 }
 
-// Historical data on dividends paid for an instrument with pagination
+// Исторические данные о выплаченных дивидендах по инструменту с пагинацией
 message GetPastDividendsResponse {
-  // Pagination options
+  // Параметры пагинации
   Pagination pagination = 1;
-  // List of dividends
+  // Список дивидендов
   repeated Dividend dividends = 2;
 }
 
-// Information about dividend payment
+// Информация о дивидендной выплате
 message Dividend {
-  // Registry closing date
+  // Дата закрытия реестра
   google.type.Date date = 1;
-  // Dividend per share
+  // Размер дивиденда на одну акцию
   google.type.Decimal amount = 2;
-  // Dividend payment currency
+  // Валюта выплаты дивиденда
   string currency = 3;
 }
 
-// Pagination options
+// Параметры пагинации
 message Pagination {
-  // Total number of elements
+  // Общее количество элементов
   int32 total = 1;
-  // Limit. Limits the number of elements returned
+  // Лимит. Ограничивает количество возвращаемых элементов
   int32 limit = 2;
-  // Offset. Specifies how many items to skip before returning results.
+  // Смещение. Указывает количество элементов, которые нужно пропустить перед тем, как начать возвращать результат
   int32 offset = 3;
-  // Next page flag. Indicates whether the next page of data exists
+  // Флаг следующей страницы. Указывает, существует ли следующая страница данных
   bool has_next = 4;
 }
 
-// Sort direction
+// Направление сортировки
 enum SortDirection {
-  // Ascending
+  // По возрастанию
   ASC = 0;
-  // Descending
+  // По убыванию
   DESC = 1;
 }
+
