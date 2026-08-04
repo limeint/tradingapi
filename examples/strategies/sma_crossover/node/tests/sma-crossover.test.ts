@@ -1,3 +1,4 @@
+import type { Bar } from "@limeint/trade-api/market-data";
 import { describe, expect, it, vi } from "vitest";
 
 import type { Config } from "../config.js";
@@ -5,14 +6,15 @@ import type { StrategyApi } from "../runner.js";
 import { orderedBars, placeOrder, resolveAccountId, run } from "../runner.js";
 import { evaluate } from "../strategy.js";
 
-const bar = (seconds: number, close = "0") => ({
-  timestamp: new Date(seconds * 1_000),
-  open: undefined,
-  high: undefined,
-  low: undefined,
-  close: { value: close },
-  volume: undefined,
-});
+const bar = (seconds: number, close = "0") =>
+  ({
+    timestamp: new Date(seconds * 1_000),
+    open: undefined,
+    high: undefined,
+    low: undefined,
+    close: { value: close },
+    volume: undefined,
+  }) as Bar;
 
 const config = (overrides: Partial<Config> = {}): Config => ({
   secret: "secret",

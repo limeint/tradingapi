@@ -5,11 +5,15 @@ on:
     branches: [ "main" ]
     paths:
       - 'sdk/node/**'
+      - 'examples/sdk/node/**'
+      - 'examples/strategies/sma_crossover/node/**'
       - 'proto/**'
       - '.github/workflows/node_test.yml'
   pull_request:
     paths:
       - 'sdk/node/**'
+      - 'examples/sdk/node/**'
+      - 'examples/strategies/sma_crossover/node/**'
       - 'proto/**'
       - '.github/workflows/node_test.yml'
   workflow_dispatch:
@@ -55,3 +59,19 @@ jobs:
 
       - name: Verify package contents
         run: npm pack --dry-run
+
+      - name: Check focused examples against this SDK
+        if: matrix.node-version == 20
+        working-directory: examples/sdk/node
+        run: |
+          npm ci
+          npm install --no-save ../../../sdk/node
+          npm run check
+
+      - name: Check strategy against this SDK
+        if: matrix.node-version == 20
+        working-directory: examples/strategies/sma_crossover/node
+        run: |
+          npm ci
+          npm install --no-save ../../../../sdk/node
+          npm run check

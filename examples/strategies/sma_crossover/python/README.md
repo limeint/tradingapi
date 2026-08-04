@@ -84,6 +84,18 @@ uv run pytest
 The calculation is independent of the SDK and can be reused or tested without
 credentials, networking, or protobuf messages.
 
+Repository contributors can temporarily install the SDK from this checkout in
+editable mode without changing `pyproject.toml` or `uv.lock`. Run from the
+repository root:
+
+```sh
+just examples-use-local-python
+just examples-status
+```
+
+While the override is active, use the root smoke command or `uv run --no-sync`.
+Restore the published wheel with `just examples-use-published-python`.
+
 ## Published SDK boundary
 
 This directory is self-contained and can be copied out of the repository. For

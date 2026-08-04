@@ -132,10 +132,11 @@ with TradeAPIClient(secret=os.environ["TRADE_API_SECRET"]) as client:
 ```
 
 The repository also includes focused examples for
-[authentication and accounts](examples/auth_and_account.py),
-[async quote streaming](examples/subscribe_quotes_async.py), and
-[real order placement with cancellation](examples/place_limit_order.py). See the
-[examples guide](examples/) for local commands and safety requirements.
+[authentication and accounts](../../examples/sdk/python/auth_and_account.py),
+[async quote streaming](../../examples/sdk/python/subscribe_quotes_async.py),
+and [real order placement with cancellation](../../examples/sdk/python/place_limit_order.py).
+They live in a [standalone consumer project](../../examples/sdk/python/) that
+installs the published package by default.
 
 ## Available services
 
@@ -309,8 +310,8 @@ From the repository root:
 cd sdk/python
 uv sync --locked
 uv run ./scripts/generate_proto.sh
-uv run ruff check trade_api examples tests
-uv run mypy trade_api examples
+uv run ruff check trade_api tests
+uv run mypy trade_api
 uv run pytest
 ```
 
@@ -327,7 +328,6 @@ sdk/python/
 ├── LICENSE
 ├── scripts/
 │   └── generate_proto.sh      # protoc invocation (contributors only)
-├── examples/                   # runnable scripts
 └── trade_api/
     ├── __init__.py
     ├── client.py               # TradeAPIClient (sync)

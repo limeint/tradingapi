@@ -71,10 +71,10 @@ how dry-run streaming, candle completion, signals, and guarded execution work.
 - [Node.js SDK](sdk/node/README.md) — Promise-based unary calls and
   `AsyncIterable` streams, installed as `@limeint/trade-api`.
 
-Both quick starts begin with authentication and account discovery. Smaller SDK
-examples live under [`sdk/python/examples/`](sdk/python/examples/) and
-[`sdk/node/examples/`](sdk/node/examples/). Complete applications live under
-[`examples/`](examples/).
+Both quick starts begin with authentication and account discovery. Standalone
+consumer examples live under [`examples/sdk/`](examples/sdk/); their manifests
+and lockfiles install the published SDKs. Complete strategy applications live
+under [`examples/strategies/`](examples/strategies/).
 
 ## Repository map
 
@@ -82,6 +82,7 @@ examples live under [`sdk/python/examples/`](sdk/python/examples/) and
 proto/                  source protobuf contracts
 sdk/python/             publishable Python SDK
 sdk/node/               publishable Node.js SDK
+examples/sdk/           focused examples using the published SDKs
 examples/strategies/    complete applications using the published SDKs
 ```
 
@@ -100,9 +101,22 @@ just check
 
 `just bootstrap` installs locked dependencies, configures pre-commit, and
 generates language bindings. `just check` runs formatting checks, linting, type
-checking, and credential-free tests for both SDKs and both strategy examples.
-Use `just format` to apply formatting changes and `just generate` after changing
+checking, and credential-free tests for both SDKs and all example projects. Use
+`just format` to apply formatting changes and `just generate` after changing
 files under `proto/`.
+
+Examples use published SDKs after `just bootstrap`. To debug every example
+against SDKs from the current checkout without editing a manifest or lockfile:
+
+```sh
+just examples-use-local
+just examples-status
+```
+
+Use `just examples-use-published` to restore the locked packages. With
+`TRADE_API_SECRET` exported, `just smoke-examples-local` and
+`just smoke-examples-published` run the bounded authentication and strategy
+checks in the requested mode. Neither command places orders.
 
 ## Releases
 

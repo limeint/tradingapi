@@ -2,10 +2,6 @@
 
 The order can fill before cancellation. Run the read-only auth example first,
 use a dedicated account, and review every value before opting in.
-
-Usage:
-    TRADE_API_SECRET=... TRADE_API_EXECUTE=1 TRADE_API_LIMIT_PRICE=... \
-      uv run python examples/place_limit_order.py
 """
 
 from __future__ import annotations
@@ -13,8 +9,7 @@ from __future__ import annotations
 import os
 from uuid import uuid4
 
-from google.type.decimal_pb2 import Decimal  # type: ignore[import-untyped]
-
+from google.type.decimal_pb2 import Decimal
 from trade_api import TradeAPIClient
 from trade_api.auth_messages import TokenDetailsRequest
 from trade_api.orders import (
@@ -41,7 +36,10 @@ def main() -> None:
     quantity = os.environ.get("TRADE_API_QUANTITY", "1")
 
     with TradeAPIClient(secret=secret) as client:
-        token = client.get_token() or ""
+        token = client.get_token()
+        if token is None:
+            raise RuntimeError("authentication did not return a token")
+
         details = client.auth.TokenDetails(TokenDetailsRequest(token=token))
         if len(details.account_ids) != 1:
             raise RuntimeError(

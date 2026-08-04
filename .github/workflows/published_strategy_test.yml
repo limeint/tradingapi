@@ -1,13 +1,15 @@
-name: Published SDK Strategy CI
+name: Published SDK Consumer CI
 
 on:
   push:
     branches: [ "main" ]
     paths:
+      - 'examples/sdk/**'
       - 'examples/strategies/sma_crossover/**'
       - '.github/workflows/published_strategy_test.yml'
   pull_request:
     paths:
+      - 'examples/sdk/**'
       - 'examples/strategies/sma_crossover/**'
       - '.github/workflows/published_strategy_test.yml'
   workflow_dispatch:
@@ -16,6 +18,84 @@ permissions:
   contents: read
 
 jobs:
+  python-sdk-example:
+    name: Python examples against TestPyPI SDK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/sdk/python
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          python-version: "3.12"
+          version: "0.11.32"
+          enable-cache: false
+
+      - name: Install published SDK and check tools
+        run: uv sync --locked
+
+      - name: Verify published SDK identity
+        env:
+          REPOSITORY_SDK_SOURCE: ${{ github.workspace }}/sdk/python
+        run: |
+          uv run python -c "
+          import os
+          from importlib.metadata import version
+          from pathlib import Path
+          import trade_api
+
+          assert version('limeint-sdk') == '2.18.1rc1'
+          package_path = Path(trade_api.__file__).resolve()
+          source_path = Path(os.environ['REPOSITORY_SDK_SOURCE']).resolve()
+          assert not package_path.is_relative_to(source_path), package_path
+          print(f'Python example uses limeint-sdk {version(\"limeint-sdk\")} from {package_path}')
+          "
+
+      - name: Lint and type-check
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+          uv run mypy .
+
+  node-sdk-example:
+    name: Node examples against npm SDK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/sdk/node
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: examples/sdk/node/package-lock.json
+
+      - name: Install published SDK and check tools
+        run: npm ci
+
+      - name: Verify published SDK identity
+        env:
+          REPOSITORY_SDK_SOURCE: ${{ github.workspace }}/sdk/node
+        run: |
+          npm ls @limeint/trade-api@2.18.1-rc.1 --depth=0
+          node --input-type=module -e '
+            import { realpathSync } from "node:fs";
+            import { fileURLToPath } from "node:url";
+            const sdk = await import("@limeint/trade-api");
+            if (typeof sdk.withTradeApi !== "function") process.exit(1);
+            const packagePath = realpathSync(fileURLToPath(import.meta.resolve("@limeint/trade-api")));
+            const sourcePath = realpathSync(process.env.REPOSITORY_SDK_SOURCE);
+            if (packagePath.startsWith(`${sourcePath}/`)) process.exit(1);
+            console.log(`Node example imported the published SDK from ${packagePath}`);
+          '
+
+      - name: Lint and type-check
+        run: npm run check
+
   python:
     name: Python strategy against TestPyPI SDK
     runs-on: ubuntu-latest

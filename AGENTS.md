@@ -12,8 +12,10 @@ belong after user onboarding.
 - `proto/` contains the source protobuf contracts.
 - `sdk/python/` contains the `limeint-sdk` package, imported as `trade_api`.
 - `sdk/node/` contains the `@limeint/trade-api` package.
-- `examples/strategies/` contains self-contained applications that depend on the
-  published SDKs, never on SDK source from this repository.
+- `examples/sdk/` contains focused, self-contained applications that depend on
+  the published SDKs by default.
+- `examples/strategies/` contains complete applications that depend on the
+  published SDKs by default.
 - `justfile` is the repository-wide contributor command surface.
 
 Read the closest README before changing a package or example. Keep language-
@@ -37,8 +39,10 @@ strategy-level README.
 - Run `just generate` after changing protobuf contracts.
 - Handwritten SDK code must expose generated functionality through the existing
   public client and per-service module patterns.
-- Strategy implementations must remain copyable and must import only the
-  published package for their language.
+- Example implementations must remain copyable and import only the public
+  package for their language. Their committed manifests and lockfiles must
+  resolve published artifacts; contributor commands may override installed
+  environments locally without editing those files.
 - Python and Node.js package versions move together. Python uses the normalized
   PEP 440 spelling such as `2.18.1rc1`; Node.js uses `2.18.1-rc.1`.
 
@@ -65,15 +69,23 @@ that cross package boundaries.
 # Node.js SDK
 npm --prefix sdk/node run check
 
+# Node.js focused examples
+npm --prefix examples/sdk/node run check
+
 # Node.js strategy
 npm --prefix examples/strategies/sma_crossover/node run check
 
 # Python SDK (generate bindings first when starting from a clean clone)
 (cd sdk/python && uv run ./scripts/generate_proto.sh)
-(cd sdk/python && uv run ruff check trade_api examples tests)
-(cd sdk/python && uv run ruff format --check trade_api examples tests)
-(cd sdk/python && uv run mypy trade_api examples)
+(cd sdk/python && uv run ruff check trade_api tests)
+(cd sdk/python && uv run ruff format --check trade_api tests)
+(cd sdk/python && uv run mypy trade_api)
 (cd sdk/python && uv run pytest)
+
+# Python focused examples
+(cd examples/sdk/python && uv run ruff check .)
+(cd examples/sdk/python && uv run ruff format --check .)
+(cd examples/sdk/python && uv run mypy .)
 
 # Python strategy
 (cd examples/strategies/sma_crossover/python && uv run ruff check .)
