@@ -18,11 +18,11 @@ Applications should receive deployment-specific values from their environment:
 | Variable | Meaning |
 | --- | --- |
 | `TRADE_API_SECRET` | API secret used by the SDK and strategies |
-| `TRADE_API_ACCOUNT_ID` | Trading account used by strategies |
 | `TRADE_API_SYMBOL` | Strategy instrument in `ticker@mic` form |
 | `TRADE_API_TIMEFRAME` | Strategy candle timeframe |
 
-Do not commit production secrets or customer account IDs.
+Trading account IDs are discovered from `AuthService.TokenDetails` after
+authentication. Do not commit production secrets or customer account IDs.
 
 ## Package coordinates
 

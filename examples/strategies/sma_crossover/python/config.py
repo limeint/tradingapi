@@ -30,7 +30,6 @@ TIMEFRAMES: dict[str, tuple[int, int]] = {
 @dataclass(frozen=True, slots=True)
 class Config:
     secret: str
-    account_id: str | None
     symbol: str
     timeframe: str
     quantity: Decimal
@@ -48,7 +47,6 @@ def parse_config(
         description="Run the SMA 9/30 crossover strategy",
     )
     parser.add_argument("--secret", default=environ.get("TRADE_API_SECRET"))
-    parser.add_argument("--account-id", default=environ.get("TRADE_API_ACCOUNT_ID"))
     parser.add_argument("--symbol", default=environ.get("TRADE_API_SYMBOL"))
     parser.add_argument(
         "--timeframe",
@@ -75,8 +73,6 @@ def parse_config(
         parser.error("--symbol must use ticker@mic format, for example AAPL@XNAS")
     if args.check and args.execute:
         parser.error("--check and --execute cannot be used together")
-    if args.execute and not args.account_id:
-        parser.error("--account-id or TRADE_API_ACCOUNT_ID is required with --execute")
 
     try:
         quantity = Decimal(str(args.quantity))
@@ -87,7 +83,6 @@ def parse_config(
 
     return Config(
         secret=str(args.secret),
-        account_id=str(args.account_id) if args.account_id else None,
         symbol=str(args.symbol),
         timeframe=str(args.timeframe),
         quantity=quantity,

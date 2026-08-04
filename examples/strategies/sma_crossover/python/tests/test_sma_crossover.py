@@ -6,11 +6,12 @@ from typing import Any
 
 import pytest
 from trade_api.accounts import GetAccountResponse, Position
+from trade_api.auth_messages import TokenDetailsResponse
 from trade_api.market_data import Bar, BarsResponse
 from trade_api.orders import OrderState, Side
 
 from config import Config
-from runner import ordered_bars, place_order, run
+from runner import ordered_bars, place_order, resolve_account_id, run
 from strategy import evaluate
 
 
@@ -27,7 +28,6 @@ def config(**overrides: Any) -> Config:
         "symbol": "AAPL@XNAS",
         "timeframe": "M5",
         "quantity": Decimal(2),
-        "account_id": "A1",
         "execute": False,
         "check": False,
         "log_level": "INFO",
@@ -42,7 +42,16 @@ class FakeClient:
         bars: list[Bar],
         position: str = "0",
         updates: list[BarsResponse] | None = None,
+        account_ids: list[str] | None = None,
     ) -> None:
+        self.token_details_calls = 0
+
+        def token_details(request: Any) -> TokenDetailsResponse:
+            self.token_details_calls += 1
+            return TokenDetailsResponse(account_ids=account_ids or ["A1"])
+
+        self.auth = SimpleNamespace(TokenDetails=token_details)
+        self.get_token = lambda: "jwt"
         self.market_data = SimpleNamespace(
             Bars=lambda request: BarsResponse(symbol="AAPL@XNAS", bars=bars),
             SubscribeBars=lambda request: iter(updates or []),
@@ -98,6 +107,7 @@ def test_history_check_is_read_only(capsys: pytest.CaptureFixture[str]) -> None:
     client = FakeClient([make_bar(index, str(index)) for index in range(1, 33)])
     run(client, config(check=True))  # type: ignore[arg-type]
     assert "History check passed" in capsys.readouterr().out
+    assert client.token_details_calls == 0
     assert client.account_calls == 0
     assert client.placed == []
 
@@ -117,20 +127,33 @@ def test_stream_confirms_the_pending_bar(caplog: pytest.LogCaptureFixture) -> No
 
 def test_dry_run_does_not_read_account_or_place_order() -> None:
     client = FakeClient([])
-    place_order(client, config(), "entry", make_bar(1))  # type: ignore[arg-type]
+    place_order(client, config(), None, "entry", make_bar(1))  # type: ignore[arg-type]
+    assert client.token_details_calls == 0
     assert client.account_calls == 0
     assert client.placed == []
 
 
 def test_live_entry_buys_only_when_flat() -> None:
     client = FakeClient([])
-    place_order(client, config(execute=True), "entry", make_bar(1))  # type: ignore[arg-type]
+    place_order(client, config(execute=True), "A1", "entry", make_bar(1))  # type: ignore[arg-type]
     assert client.placed[0].side == Side.SIDE_BUY
     assert client.placed[0].quantity.value == "2"
 
 
 def test_live_exit_cannot_create_a_short() -> None:
     client = FakeClient([], position="0.5")
-    place_order(client, config(execute=True), "exit", make_bar(1))  # type: ignore[arg-type]
+    place_order(client, config(execute=True), "A1", "exit", make_bar(1))  # type: ignore[arg-type]
     assert client.placed[0].side == Side.SIDE_SELL
     assert client.placed[0].quantity.value == "0.5"
+
+
+def test_resolves_the_sole_account_from_token_details() -> None:
+    client = FakeClient([])
+    assert resolve_account_id(client) == "A1"  # type: ignore[arg-type]
+    assert client.token_details_calls == 1
+
+
+def test_rejects_ambiguous_account_access() -> None:
+    client = FakeClient([], account_ids=["A1", "A2"])
+    with pytest.raises(RuntimeError, match="expected exactly one available account; received 2"):
+        resolve_account_id(client)  # type: ignore[arg-type]

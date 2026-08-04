@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { Config } from "../config.js";
 import type { StrategyApi } from "../runner.js";
-import { orderedBars, placeOrder, run } from "../runner.js";
+import { orderedBars, placeOrder, resolveAccountId, run } from "../runner.js";
 import { evaluate } from "../strategy.js";
 
 const bar = (seconds: number, close = "0") => ({
@@ -16,7 +16,6 @@ const bar = (seconds: number, close = "0") => ({
 
 const config = (overrides: Partial<Config> = {}): Config => ({
   secret: "secret",
-  accountId: "A1",
   symbol: "AAPL@XNAS",
   timeframe: "M5",
   quantity: 2,
@@ -26,12 +25,23 @@ const config = (overrides: Partial<Config> = {}): Config => ({
   ...overrides,
 });
 
-const fakeApi = (bars = Array.from({ length: 32 }, (_, index) => bar(index + 1, `${index}`))) => {
+const fakeApi = (
+  bars = Array.from({ length: 32 }, (_, index) => bar(index + 1, `${index}`)),
+  accountIds = ["A1"],
+) => {
   let accountCalls = 0;
+  let tokenDetailsCalls = 0;
   const placed: Array<{ side?: number; quantity?: { value?: string } }> = [];
   let positionValue = "0";
 
   const api = {
+    getToken: () => "jwt",
+    auth: {
+      tokenDetails: async () => {
+        tokenDetailsCalls += 1;
+        return { accountIds };
+      },
+    },
     marketData: {
       bars: async () => ({ symbol: "AAPL@XNAS", bars }),
       subscribeBars: async function* () {},
@@ -59,6 +69,7 @@ const fakeApi = (bars = Array.from({ length: 32 }, (_, index) => bar(index + 1, 
     api,
     placed,
     accountCalls: () => accountCalls,
+    tokenDetailsCalls: () => tokenDetailsCalls,
     setPosition: (value: string) => {
       positionValue = value;
     },
@@ -100,6 +111,7 @@ describe("SMA 9/30 strategy", () => {
     try {
       await run(fake.api, config({ check: true }));
       expect(output).toHaveBeenCalledWith(expect.stringContaining("History check passed"));
+      expect(fake.tokenDetailsCalls()).toBe(0);
       expect(fake.accountCalls()).toBe(0);
       expect(fake.placed).toEqual([]);
     } finally {
@@ -109,21 +121,35 @@ describe("SMA 9/30 strategy", () => {
 
   it("does not read the account or place an order in dry-run", async () => {
     const fake = fakeApi();
-    await placeOrder(fake.api, config(), "entry", bar(1));
+    await placeOrder(fake.api, config(), undefined, "entry", bar(1));
+    expect(fake.tokenDetailsCalls()).toBe(0);
     expect(fake.accountCalls()).toBe(0);
     expect(fake.placed).toEqual([]);
   });
 
   it("buys only when flat", async () => {
     const fake = fakeApi();
-    await placeOrder(fake.api, config({ execute: true }), "entry", bar(1));
+    await placeOrder(fake.api, config({ execute: true }), "A1", "entry", bar(1));
     expect(fake.placed[0]).toMatchObject({ side: 1, quantity: { value: "2" } });
   });
 
   it("caps an exit at the current long position", async () => {
     const fake = fakeApi();
     fake.setPosition("0.5");
-    await placeOrder(fake.api, config({ execute: true }), "exit", bar(1));
+    await placeOrder(fake.api, config({ execute: true }), "A1", "exit", bar(1));
     expect(fake.placed[0]).toMatchObject({ side: 2, quantity: { value: "0.5" } });
+  });
+
+  it("resolves the sole account from token details", async () => {
+    const fake = fakeApi();
+    await expect(resolveAccountId(fake.api)).resolves.toBe("A1");
+    expect(fake.tokenDetailsCalls()).toBe(1);
+  });
+
+  it("rejects ambiguous account access", async () => {
+    const fake = fakeApi(undefined, ["A1", "A2"]);
+    await expect(resolveAccountId(fake.api)).rejects.toThrow(
+      "Expected exactly one available account; received 2",
+    );
   });
 });

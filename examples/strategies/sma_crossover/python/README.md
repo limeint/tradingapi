@@ -18,6 +18,7 @@ modules:
 
 - `trade_api`
 - `trade_api.accounts`
+- `trade_api.auth_messages`
 - `trade_api.market_data`
 - `trade_api.orders`
 
@@ -71,11 +72,12 @@ For the bounded read-only smoke test against the live API:
 TRADE_API_SECRET=... python main.py --symbol AAPL@XNAS --check
 ```
 
-To place real market orders, pass an account ID and `--execute`:
+To place real market orders, pass `--execute`. The account ID is retrieved from
+`AuthService.TokenDetails`; execution stops unless the token exposes exactly one
+account:
 
 ```sh
 TRADE_API_SECRET=... \
-TRADE_API_ACCOUNT_ID=... \
 python main.py --symbol AAPL@XNAS --quantity 1 --execute
 ```
 
