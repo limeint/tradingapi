@@ -8,14 +8,14 @@ if (!secret) {
 
 await withTradeApi({ secret }, async (api) => {
   const details = await api.auth.tokenDetails({ token: api.getToken() });
-  const [accountId] = details.accountIds;
-  if (details.accountIds.length !== 1 || !accountId) {
-    throw new Error(
-      `Expected exactly one available account; received ${details.accountIds.length}`,
-    );
-  }
-  const account = await api.accounts.getAccount({ accountId });
+  console.log("Available account IDs:", details.accountIds);
 
-  console.log("Available accounts:", details.accountIds);
-  console.log("Account:", account);
+  const [accountId] = details.accountIds;
+  if (!accountId) {
+    console.log("Authentication succeeded; this secret exposes no trading accounts.");
+    return;
+  }
+
+  const account = await api.accounts.getAccount({ accountId });
+  console.log("First account:", account);
 });

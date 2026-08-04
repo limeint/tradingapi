@@ -6,12 +6,14 @@ on:
     paths:
       - 'sdk/python/**'
       - 'proto/**'
+      - 'examples/sdk/python/**'
       - 'examples/strategies/sma_crossover/python/**'
       - '.github/workflows/python_test.yml'
   pull_request:
     paths:
       - 'sdk/python/**'
       - 'proto/**'
+      - 'examples/sdk/python/**'
       - 'examples/strategies/sma_crossover/python/**'
       - '.github/workflows/python_test.yml'
   workflow_dispatch:
@@ -54,12 +56,12 @@ jobs:
 
       - name: Lint and check formatting
         run: |
-          uv run ruff check trade_api examples tests
-          uv run ruff format --check trade_api examples tests
+          uv run ruff check trade_api tests
+          uv run ruff format --check trade_api tests
 
       - name: Type-check with mypy
         if: matrix.python-version == '3.13'
-        run: uv run mypy trade_api examples
+        run: uv run mypy trade_api
 
       - name: Run tests with coverage
         run: |
@@ -68,26 +70,6 @@ jobs:
             --cov-report=term-missing \
             --cov-report=xml \
             --cov-fail-under=95
-
-      - name: Smoke-import examples
-        # Catches example bitrot — e.g. an imported message that no longer
-        # exists, or a stale call signature. Examples need env vars at run
-        # time but should import cleanly without them.
-        env:
-          TRADE_API_SECRET: ''
-        run: |
-          for f in examples/*.py; do
-            uv run python -c "
-          import ast, sys
-          src = open('$f').read()
-          ast.parse(src)  # syntax
-          # Replace the __main__ guard execution by parsing only; importing
-          # the module file would try to read env vars at import time. Some
-          # examples do that (auth_and_account.py uses os.environ['TRADE_API_SECRET']
-          # inside main()), so the AST parse is the right level of smoke test.
-          print('OK:', '$f')
-          "
-          done
 
       - name: Upload coverage artifact
         if: matrix.python-version == '3.12'
@@ -178,6 +160,56 @@ jobs:
           python -m pip install dist/*.whl
           python -c \
             "from trade_api import TradeAPIClient; from trade_api.market_data import BarsRequest; print('wheel import passed')"
+
+  sdk-example-test:
+    name: Focused examples against installed SDK wheel
+    runs-on: ubuntu-latest
+    needs: build
+
+    defaults:
+      run:
+        working-directory: examples/sdk/python
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup uv and Python
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          python-version: "3.12"
+          version: "0.11.32"
+          enable-cache: false
+
+      - name: Download SDK distribution
+        uses: actions/download-artifact@v4
+        with:
+          name: python-dist
+          path: ${{ runner.temp }}/python-dist
+
+      - name: Install the SDK wheel and example dependencies
+        run: |
+          uv sync --locked --no-install-package limeint-sdk
+          uv pip install --python .venv/bin/python "$RUNNER_TEMP"/python-dist/*.whl
+
+      - name: Verify and check the focused examples
+        env:
+          REPOSITORY_SDK_SOURCE: ${{ github.workspace }}/sdk/python
+        run: |
+          .venv/bin/python -c "
+          import os
+          from pathlib import Path
+          import trade_api
+
+          package_path = Path(trade_api.__file__).resolve()
+          source_path = Path(os.environ['REPOSITORY_SDK_SOURCE']).resolve()
+          if package_path.is_relative_to(source_path):
+              raise SystemExit(f'example imported repository SDK source: {package_path}')
+          print(f'example uses installed SDK: {package_path}')
+          "
+          .venv/bin/ruff check .
+          .venv/bin/ruff format --check .
+          .venv/bin/mypy .
 
   strategy-test:
     name: Strategy test against installed SDK wheel

@@ -76,3 +76,16 @@ only when you intend to modify formatting.
 The directory is self-contained and imports no SDK source or protobuf files from
 this repository. Its exact package pin also makes it a consumer test for the
 published release candidate.
+
+Repository contributors can temporarily link the SDK from this checkout
+without changing `package.json` or `package-lock.json`. Run from the repository
+root:
+
+```sh
+just examples-use-local-node
+just examples-status
+```
+
+Use `just watch-node-sdk` in a second terminal to rebuild linked SDK code as it
+changes. Restore the published dependency with
+`just examples-use-published-node`.

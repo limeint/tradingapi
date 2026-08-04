@@ -103,10 +103,11 @@ await withTradeApi({ secret }, async (api) => {
 ```
 
 The repository also includes focused examples for
-[authentication and accounts](examples/auth-and-account.ts),
-[quote streaming](examples/subscribe-quotes.ts), and
-[real order placement](examples/place-limit-order.ts). See the
-[examples guide](examples/) for runnable commands and safety requirements.
+[authentication and accounts](../../examples/sdk/node/auth-and-account.ts),
+[quote streaming](../../examples/sdk/node/subscribe-quotes.ts), and
+[real order placement](../../examples/sdk/node/place-limit-order.ts). They live
+in a [standalone consumer project](../../examples/sdk/node/) that installs the
+published package by default.
 
 ## Services
 

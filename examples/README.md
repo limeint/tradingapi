@@ -26,14 +26,19 @@ TRADE_API_SECRET=... npm start -- --symbol AAPL@XNAS --check
 See [Trading strategies](strategies/) for the available strategies and shared
 safety conventions.
 
-## SDK-sized examples
+## Focused SDK examples
 
-Use the smaller examples when you want one operation at a time:
+Use the smaller standalone projects when you want one operation at a time:
 
-- [Python SDK examples](../sdk/python/examples/) — authentication and account
+- [Python SDK examples](sdk/python/) — authentication and account
   discovery, async quotes, and a limit-order example.
-- [Node.js SDK examples](../sdk/node/examples/) — authentication and account
+- [Node.js SDK examples](sdk/node/) — authentication and account
   discovery, quotes, and a limit-order example.
+
+Each project pins and installs a published SDK exactly as a separate consuming
+application would. Contributors can temporarily replace those installations
+with the SDKs from this checkout through the root `just` commands documented in
+[Repository development](../README.md#repository-development).
 
 Order examples send real requests. Read their warnings and use a dedicated test
 account; the strategy history check above is the recommended first run.
