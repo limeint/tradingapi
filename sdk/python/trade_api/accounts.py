@@ -10,7 +10,6 @@ deeply nested generated module path.
 
 from .proto.grpc.tradeapi.v1.accounts.accounts_service_pb2 import (
     FORTS,
-    MC,
     MCT,
     GetAccountRequest,
     GetAccountResponse,
@@ -24,7 +23,6 @@ from .proto.grpc.tradeapi.v1.accounts.accounts_service_pb2 import (
 
 __all__ = [
     "FORTS",
-    "MC",
     "MCT",
     "GetAccountRequest",
     "GetAccountResponse",
