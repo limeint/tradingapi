@@ -8,6 +8,32 @@ against the corresponding published Trade API SDK.
 | Python | [`python/`](python/) | `limeint-sdk` |
 | Node.js | [`node/`](node/) | `@limeint/trade-api` |
 
+## Quick start: read-only history check
+
+Run one implementation from the repository root. Check mode authenticates,
+fetches historical bars, prints the latest confirmed SMA values, and exits. It
+does not inspect an account, open a live subscription, or place an order.
+
+```sh
+# Python 3.10+ and uv
+cd examples/strategies/sma_crossover/python
+uv sync --locked
+TRADE_API_SECRET=... uv run python main.py --symbol AAPL@XNAS --check
+```
+
+```sh
+# Node.js 20+
+cd examples/strategies/sma_crossover/node
+npm ci
+TRADE_API_SECRET=... npm start -- --symbol AAPL@XNAS --check
+```
+
+Expected output starts with:
+
+```text
+History check passed: close=... sma9=... sma30=... signal=...
+```
+
 This page describes the strategy itself: the rule, how candles are handled, and
 the safety guards every implementation must honor. Each language directory has
 its own README covering only installation, running, and tests for that
@@ -69,13 +95,25 @@ opened by the strategy. Real market orders also carry price and liquidity risk.
 
 ## Configuration
 
-Every implementation reads the same settings, whether from flags or environment
-variables. Copy [`.env.example`](.env.example) as a reference.
+Every implementation reads the same settings from flags or environment
+variables. The programs do not load `.env` automatically. To use a local file,
+copy [`.env.example`](.env.example), edit it, and export its values in your shell
+before starting an implementation:
+
+```sh
+cp .env.example .env
+# Edit .env, then:
+set -a
+source .env
+set +a
+```
+
+The repository ignores `.env`; never commit real secrets.
 
 | Environment variable | Required | Default |
 | --- | --- | --- |
-| `TRADE_API_SECRET` | Yes | — |
-| `TRADE_API_SYMBOL` | Yes | — |
+| `TRADE_API_SECRET` | Yes, unless `--secret` is used | — |
+| `TRADE_API_SYMBOL` | Yes, unless `--symbol` is used | — |
 | `TRADE_API_TIMEFRAME` | No | `M5` |
 | `TRADE_API_QUANTITY` | No | `1` |
 | `TRADE_API_LOG_LEVEL` | No | `INFO` |
