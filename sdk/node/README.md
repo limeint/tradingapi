@@ -13,50 +13,100 @@ A small, functional TypeScript SDK around Limeint's gRPC Trade API.
 
 Node.js 20 or newer is required.
 
+This checkout currently targets the `2.18.1-rc.1` prerelease:
+
 ```sh
-npm install @limeint/trade-api
+npm install @limeint/trade-api@2.18.1-rc.1
 ```
 
-## Quickstart
+## Quick start
 
-`withTradeApi()` closes the channel and token-renewal stream for you:
+The first program below authenticates and prints the account IDs visible to the
+secret. It is bounded and does not place an order.
+
+Create a clean application directory:
+
+```sh
+mkdir limeint-node-quickstart
+cd limeint-node-quickstart
+npm init -y
+npm install @limeint/trade-api@2.18.1-rc.1
+```
+
+Save this as `quickstart.mjs`. The `.mjs` extension makes the SDK's ESM import
+work without additional project configuration:
 
 ```ts
 import { withTradeApi } from "@limeint/trade-api";
 
-await withTradeApi(
-  { secret: process.env.TRADE_API_SECRET! },
-  async (api) => {
-    const account = await api.accounts.getAccount({
-      accountId: "A12345",
-    });
-    console.log(account);
+const secret = process.env.TRADE_API_SECRET;
+if (!secret) throw new Error("Set TRADE_API_SECRET");
 
-    for await (const update of api.marketData.subscribeQuote({
-      symbols: ["AAPL@XNAS"],
-    })) {
-      console.log(update);
-    }
-  },
-);
+await withTradeApi({ secret }, async (api) => {
+  const details = await api.auth.tokenDetails({ token: api.getToken() });
+  console.log("Available account IDs:", details.accountIds);
+});
 ```
 
-For a long-lived application, manage the client explicitly:
+Run it with your secret:
+
+```sh
+TRADE_API_SECRET=... node quickstart.mjs
+```
+
+If authentication fails, confirm that the secret is active. An empty account
+list means the token does not expose a trading account; it may still be usable
+for market data if it has the required entitlement.
+
+`withTradeApi()` always closes the channel and token-renewal stream. Once this
+works, save this as another `.mjs` file to fetch an account using one of the
+discovered IDs:
 
 ```ts
-import { createTradeApi } from "@limeint/trade-api";
+import { withTradeApi } from "@limeint/trade-api";
 
-const api = await createTradeApi({
-  secret: process.env.TRADE_API_SECRET!,
-});
+const secret = process.env.TRADE_API_SECRET;
+if (!secret) throw new Error("Set TRADE_API_SECRET");
 
-try {
+await withTradeApi({ secret }, async (api) => {
   const details = await api.auth.tokenDetails({ token: api.getToken() });
-  console.log(details.accountIds);
-} finally {
-  await api.close();
-}
+  const accountId = details.accountIds[0];
+  if (!accountId) throw new Error("This secret exposes no accounts");
+
+  const account = await api.accounts.getAccount({ accountId });
+  console.log(account);
+});
 ```
+
+## Subscribe to market data
+
+Server streams are async iterables. This example runs until Ctrl-C and closes
+cleanly through an `AbortSignal`:
+
+```ts
+import { withTradeApi } from "@limeint/trade-api";
+
+const secret = process.env.TRADE_API_SECRET;
+if (!secret) throw new Error("Set TRADE_API_SECRET");
+
+const abort = new AbortController();
+process.once("SIGINT", () => abort.abort());
+
+await withTradeApi({ secret }, async (api) => {
+  for await (const update of api.marketData.subscribeQuote(
+    { symbols: ["AAPL@XNAS"] },
+    { signal: abort.signal },
+  )) {
+    console.log(update);
+  }
+});
+```
+
+The repository also includes focused examples for
+[authentication and accounts](examples/auth-and-account.ts),
+[quote streaming](examples/subscribe-quotes.ts), and
+[real order placement](examples/place-limit-order.ts). See the
+[examples guide](examples/) for runnable commands and safety requirements.
 
 ## Services
 
@@ -75,6 +125,10 @@ The returned object exposes generated methods directly:
 
 Request fields use idiomatic lower camel case. TypeScript checks every plain
 object against the generated protobuf type:
+
+> **Warning:** The following call places a real order. Use a dedicated account,
+> validate the account ID and order parameters, and do not use it as your first
+> SDK test.
 
 ```ts
 import { OrderType, Side, TimeInForce } from "@limeint/trade-api/orders";
@@ -121,6 +175,26 @@ for await (const update of api.marketData.subscribeQuote(
 
 Streams are not automatically retried because only the application knows how
 to resume without losing or duplicating events.
+
+## Client lifecycle
+
+Use `withTradeApi()` for bounded work. For a long-lived application, manage the
+client explicitly and always close it:
+
+```ts
+import { createTradeApi } from "@limeint/trade-api";
+
+const secret = process.env.TRADE_API_SECRET;
+if (!secret) throw new Error("Set TRADE_API_SECRET");
+
+const api = await createTradeApi({ secret });
+try {
+  const details = await api.auth.tokenDetails({ token: api.getToken() });
+  console.log(details.accountIds);
+} finally {
+  await api.close();
+}
+```
 
 ## Errors and retries
 

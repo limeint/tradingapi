@@ -1,92 +1,68 @@
 # Limeint SMA 9/30 crossover — Python
 
-Python implementation of the [SMA 9/30 crossover strategy](../README.md), built
-on the published Limeint SDK (`limeint-sdk==2.18.1rc1`, imported as
-`trade_api`).
+Python implementation of the [SMA 9/30 crossover strategy](../README.md), using
+the published Limeint SDK (`limeint-sdk==2.18.1rc1`, imported as `trade_api`).
 
-Read [`../README.md`](../README.md) first for the rule, candle handling, and
-safety guards. This page covers only how to install, run, and test the Python
-version.
+## Quick start
 
-This directory is self-contained — copy it out of the repository and it still
-runs.
-
-## SDK boundary
-
-For Trade API functionality, the strategy imports only the SDK's public
-modules:
-
-- `trade_api`
-- `trade_api.accounts`
-- `trade_api.auth_messages`
-- `trade_api.market_data`
-- `trade_api.orders`
-
-It does not import from `sdk/python`, generated modules under
-`trade_api.proto`, or the repository's raw `proto/` directory. The dependency
-lockfile pins the published TestPyPI wheel and its SHA-256 digest. Consumer CI
-verifies that `trade_api` resolves from the installed distribution rather than
-this repository's source tree.
-
-## Read the implementation in this order
-
-1. [`strategy.py`](strategy.py) — the small, pure SMA calculation and crossover rule.
-2. [`config.py`](config.py) — typed command-line and environment configuration.
-3. [`runner.py`](runner.py) — market data, completed bars, and guarded orders.
-4. [`main.py`](main.py) — the small executable entry point.
-5. [`tests/test_sma_crossover.py`](tests/test_sma_crossover.py) — executable behavior examples.
-
-The calculation is deliberately independent of the SDK. It can be tested or
-reused without credentials, networking, or protobuf messages.
-
-## Install
-
-Python 3.10 or newer is required — the published SDK wheel carries protobuf 7
-gencode, and protobuf 7 dropped Python 3.9.
+Requires Python 3.10 or newer and [uv](https://docs.astral.sh/uv/). From the
+repository root:
 
 ```sh
 cd examples/strategies/sma_crossover/python
 uv sync --locked
+TRADE_API_SECRET=... uv run python main.py --symbol AAPL@XNAS --check
 ```
 
-## Run
+Check mode authenticates, fetches historical bars, calculates the latest
+confirmed SMA values, prints one result, and exits. It does not read an account,
+open a live subscription, or place an order.
 
-Dry-run is the default: the example reads real market data and prints signals,
-but never reads an account or places an order.
+```text
+History check passed: close=... sma9=... sma30=... signal=...
+```
+
+If authentication fails, confirm that the secret is active and has market-data
+access. If no bars are returned, verify the `ticker@mic` symbol and its market.
+
+`uv sync` creates a local virtual environment but does not activate it. Keep the
+`uv run` prefix on the commands below unless you activate `.venv` yourself.
+
+## Run the live dry-run
+
+Dry-run is the default. It reads real historical and streaming market data and
+logs signals, but it never reads an account or places an order. Stop it with
+Ctrl-C.
 
 ```sh
 TRADE_API_SECRET=... \
-python main.py \
+uv run python main.py \
   --symbol AAPL@XNAS \
   --timeframe M5 \
   --quantity 1
 ```
 
-Environment variables work in place of flags — see the table in
-[`../README.md`](../README.md#configuration). Python does not load
-[`../.env.example`](../.env.example) automatically; it is a reference.
+Flags can be replaced by the environment variables in the shared
+[configuration table](../README.md#configuration). Python does not load
+[`../.env.example`](../.env.example) automatically. Use
+`uv run python main.py --help` for all flags.
 
-For the bounded read-only smoke test against the live API:
+## Enable real execution
 
-```sh
-TRADE_API_SECRET=... python main.py --symbol AAPL@XNAS --check
-```
-
-To place real market orders, pass `--execute`. The account ID is retrieved from
-`AuthService.TokenDetails`; execution stops unless the token exposes exactly one
-account:
+> **Warning:** `--execute` can place real market orders. Use a dedicated account,
+> understand the [safety limitations](../README.md#safety-guards), and verify
+> check and dry-run modes first.
 
 ```sh
 TRADE_API_SECRET=... \
-python main.py --symbol AAPL@XNAS --quantity 1 --execute
+uv run python main.py --symbol AAPL@XNAS --quantity 1 --execute
 ```
 
-Full flag reference: `python main.py --help`.
+At startup, the strategy discovers account IDs through
+`AuthService.TokenDetails` and refuses to execute unless the token exposes
+exactly one account.
 
-The example stays flat and separates pure calculation, configuration,
-orchestration, and startup so each file can be read independently.
-
-## Test
+## Test locally
 
 No secret or network access is required:
 
@@ -96,3 +72,23 @@ uv run ruff format --check .
 uv run mypy .
 uv run pytest
 ```
+
+## Read the implementation
+
+1. [`strategy.py`](strategy.py) — pure SMA calculation and crossover rule.
+2. [`config.py`](config.py) — flags and environment configuration.
+3. [`runner.py`](runner.py) — completed bars and guarded orders.
+4. [`main.py`](main.py) — executable entry point.
+5. [`tests/test_sma_crossover.py`](tests/test_sma_crossover.py) — behavior examples.
+
+The calculation is independent of the SDK and can be reused or tested without
+credentials, networking, or protobuf messages.
+
+## Published SDK boundary
+
+This directory is self-contained and can be copied out of the repository. For
+Trade API functionality it imports only public `trade_api` modules. It does not
+import from `sdk/python`, generated modules under `trade_api.proto`, or the raw
+repository `proto/` directory. The lockfile pins the TestPyPI wheel and its
+SHA-256 digest, and consumer CI verifies that imports resolve from that installed
+distribution.

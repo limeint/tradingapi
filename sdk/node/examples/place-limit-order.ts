@@ -5,9 +5,17 @@ import { OrderType, Side, TimeInForce } from "@limeint/trade-api/orders";
 
 const secret = process.env.TRADE_API_SECRET;
 const symbol = process.env.TRADE_API_SYMBOL ?? "AAPL@XNAS";
+const quantity = process.env.TRADE_API_QUANTITY ?? "1";
+const limitPrice = process.env.TRADE_API_LIMIT_PRICE;
 
 if (!secret) {
   throw new Error("Set TRADE_API_SECRET");
+}
+if (process.env.TRADE_API_EXECUTE !== "1") {
+  throw new Error("Set TRADE_API_EXECUTE=1 to acknowledge that this example places a real order");
+}
+if (!limitPrice) {
+  throw new Error("Set TRADE_API_LIMIT_PRICE to the limit price you intend to submit");
 }
 
 await withTradeApi({ secret }, async (api) => {
@@ -21,11 +29,11 @@ await withTradeApi({ secret }, async (api) => {
   const order = await api.orders.placeOrder({
     accountId,
     symbol,
-    quantity: { value: "1" },
+    quantity: { value: quantity },
     side: Side.SIDE_BUY,
     type: OrderType.ORDER_TYPE_LIMIT,
     timeInForce: TimeInForce.TIME_IN_FORCE_DAY,
-    limitPrice: { value: "280.00" },
+    limitPrice: { value: limitPrice },
     clientOrderId: randomUUID().replaceAll("-", "").slice(0, 20),
   });
 

@@ -1,16 +1,17 @@
-"""Place a limit order, then cancel it.
+"""Place a real limit order, then attempt to cancel it.
 
-This example sends a far-from-market limit order so it will not be filled
-immediately, allowing the cancel to demonstrate cleanly. Do not run against
-a real account without changing the symbol/price/quantity.
+The order can fill before cancellation. Run the read-only auth example first,
+use a dedicated account, and review every value before opting in.
 
 Usage:
-    TRADE_API_SECRET=... python examples/place_limit_order.py
+    TRADE_API_SECRET=... TRADE_API_EXECUTE=1 TRADE_API_LIMIT_PRICE=... \
+      uv run python examples/place_limit_order.py
 """
 
 from __future__ import annotations
 
 import os
+from uuid import uuid4
 
 from google.type.decimal_pb2 import Decimal  # type: ignore[import-untyped]
 
@@ -27,6 +28,17 @@ from trade_api.orders import (
 
 def main() -> None:
     secret = os.environ["TRADE_API_SECRET"]
+    if os.environ.get("TRADE_API_EXECUTE") != "1":
+        raise RuntimeError(
+            "set TRADE_API_EXECUTE=1 to acknowledge that this example places a real order"
+        )
+    try:
+        limit_price = os.environ["TRADE_API_LIMIT_PRICE"]
+    except KeyError as exc:
+        raise RuntimeError("set TRADE_API_LIMIT_PRICE to the intended limit price") from exc
+
+    symbol = os.environ.get("TRADE_API_SYMBOL", "AAPL@XNAS")
+    quantity = os.environ.get("TRADE_API_QUANTITY", "1")
 
     with TradeAPIClient(secret=secret) as client:
         token = client.get_token() or ""
@@ -38,13 +50,13 @@ def main() -> None:
         account_id = details.account_ids[0]
         order = Order(
             account_id=account_id,
-            symbol="AAPL@XNAS",
-            quantity=Decimal(value="1"),
+            symbol=symbol,
+            quantity=Decimal(value=quantity),
             side=Side.SIDE_BUY,
             type=OrderType.ORDER_TYPE_LIMIT,
             time_in_force=TimeInForce.TIME_IN_FORCE_DAY,
-            limit_price=Decimal(value="100.00"),  # far below market
-            client_order_id="example-001",
+            limit_price=Decimal(value=limit_price),
+            client_order_id=uuid4().hex[:20],
         )
         state = client.orders.PlaceOrder(order)
         print(f"Placed: {state.order_id} status={state.status}")

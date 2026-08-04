@@ -4,63 +4,142 @@ Limeint's Python SDK for the gRPC Trade API. It wraps the generated stubs with:
 
 - a single `TradeAPIClient` / `AsyncTradeAPIClient` entry point,
 - automatic JWT issuance and background refresh (via `AuthService.SubscribeJwtRenewal`),
-- typed exceptions mapped from gRPC status codes,
-- exponential-backoff retries on transient failures (`UNAVAILABLE`, `RESOURCE_EXHAUSTED`).
+- a `from_rpc_error()` helper for typed errors,
+- exponential-backoff retries for `UNAVAILABLE` and server-approved rate-limit retries.
 
-Service methods are invoked directly on the generated stubs, so the full proto
-surface is available without an extra translation layer.
+Service methods are invoked directly on the generated stubs, without an extra
+request or response translation layer.
 
 ## Installation
 
 Python 3.10 or newer is required.
 
+This checkout currently targets `2.18.1rc1`. The prerelease is on TestPyPI and
+is not yet available from the main PyPI index. Create and activate a virtual
+environment, then install the exact prerelease while resolving its runtime
+dependencies from PyPI:
+
 ```sh
-pip install limeint-sdk
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install \
+  --index-url https://test.pypi.org/simple/ \
+  --extra-index-url https://pypi.org/simple/ \
+  limeint-sdk==2.18.1rc1
 ```
 
 > The PyPI distribution is `limeint-sdk`; the Python import name is `trade_api`.
 
-## Quickstart (sync)
+## Quick start
+
+The first program authenticates and prints the account IDs visible to the
+secret. It is bounded and does not place an order.
+
+Save this as `quickstart.py`:
 
 ```python
+import os
+
+from trade_api import TradeAPIClient
+from trade_api.auth_messages import TokenDetailsRequest
+
+
+secret = os.environ["TRADE_API_SECRET"]
+
+with TradeAPIClient(secret=secret) as client:
+    token = client.get_token()
+    if token is None:
+        raise RuntimeError("Authentication did not return a token")
+
+    details = client.auth.TokenDetails(TokenDetailsRequest(token=token))
+    print("Available account IDs:", list(details.account_ids))
+```
+
+Run it inside the activated virtual environment:
+
+```sh
+TRADE_API_SECRET=... python quickstart.py
+```
+
+If authentication fails, confirm that the secret is active. An empty account
+list means the token does not expose a trading account; it may still be usable
+for market data if it has the required entitlement.
+
+To fetch one of the discovered accounts, extend the program like this:
+
+```python
+import os
+
 from trade_api import TradeAPIClient
 from trade_api.accounts import GetAccountRequest
+from trade_api.auth_messages import TokenDetailsRequest
+
+
+with TradeAPIClient(secret=os.environ["TRADE_API_SECRET"]) as client:
+    token = client.get_token()
+    if token is None:
+        raise RuntimeError("Authentication did not return a token")
+
+    details = client.auth.TokenDetails(TokenDetailsRequest(token=token))
+    if not details.account_ids:
+        raise RuntimeError("This secret exposes no accounts")
+
+    account_id = details.account_ids[0]
+    account = client.accounts.GetAccount(GetAccountRequest(account_id=account_id))
+    print(account)
+```
+
+## Asyncio quick start
+
+```python
+import asyncio
+import os
+
+from trade_api import AsyncTradeAPIClient
+from trade_api.auth_messages import TokenDetailsRequest
+
+
+async def main() -> None:
+    async with AsyncTradeAPIClient(secret=os.environ["TRADE_API_SECRET"]) as client:
+        token = client.get_token()
+        if token is None:
+            raise RuntimeError("Authentication did not return a token")
+
+        details = await client.auth.TokenDetails(TokenDetailsRequest(token=token))
+        print("Available account IDs:", list(details.account_ids))
+
+
+asyncio.run(main())
+```
+
+## Subscribe to market data
+
+Streaming RPCs return iterators. This synchronous example runs until Ctrl-C;
+leaving the context manager closes the channel and token-renewal stream:
+
+```python
+import os
+
+from trade_api import TradeAPIClient
 from trade_api.market_data import SubscribeQuoteRequest
 
-with TradeAPIClient(secret="YOUR_API_TOKEN") as client:
-    account = client.accounts.GetAccount(GetAccountRequest(account_id="A12345"))
-    print(account)
 
-    # Streaming RPCs return iterators.
+with TradeAPIClient(secret=os.environ["TRADE_API_SECRET"]) as client:
     for tick in client.market_data.SubscribeQuote(
         SubscribeQuoteRequest(symbols=["AAPL@XNAS"])
     ):
         print(tick)
 ```
 
-## Quickstart (asyncio)
-
-```python
-import asyncio
-
-from trade_api import AsyncTradeAPIClient
-from trade_api.market_data import SubscribeQuoteRequest
-
-
-async def main() -> None:
-    async with AsyncTradeAPIClient(secret="YOUR_API_TOKEN") as client:
-        async for tick in client.market_data.SubscribeQuote(
-            SubscribeQuoteRequest(symbols=["AAPL@XNAS"])
-        ):
-            print(tick)
-
-
-asyncio.run(main())
-```
+The repository also includes focused examples for
+[authentication and accounts](examples/auth_and_account.py),
+[async quote streaming](examples/subscribe_quotes_async.py), and
+[real order placement with cancellation](examples/place_limit_order.py). See the
+[examples guide](examples/) for local commands and safety requirements.
 
 ## Available services
 
-The client exposes the full Trade API surface via sub-clients:
+The client currently exposes these Trade API services as sub-clients:
 
 | Attribute            | gRPC service          | What it does                                  |
 | -------------------- | --------------------- | --------------------------------------------- |
@@ -72,11 +151,14 @@ The client exposes the full Trade API surface via sub-clients:
 | `client.reports`     | `ReportsService`      | Account reports.                              |
 | `client.metrics`     | `UsageMetricsService` | API usage / quota metrics.                    |
 
+The protobuf contracts also contain `CorporateActionsService`, but the current
+Python client does not yet expose it as a sub-client. The Node.js SDK does.
+
 ## API reference
 
-Every RPC defined in the `.proto` files is exposed directly on the sub-client.
-Request and response message types are re-exported from short, per-service
-modules:
+Every RPC belonging to the services listed below is exposed directly on its
+sub-client. Request and response message types are re-exported from short,
+per-service modules:
 
 | Module                    | Use with                                                    |
 | ------------------------- | ----------------------------------------------------------- |
@@ -180,7 +262,8 @@ Legend: ▶ unary · ⇉ server-stream · ⇄ bidi-stream
 
 ## Error handling
 
-Wrap raw `grpc.RpcError` into a typed `TradeAPIError`:
+SDK calls raise raw `grpc.RpcError` instances. Use `from_rpc_error()` when your
+application benefits from the SDK's typed `TradeAPIError` hierarchy:
 
 ```python
 import grpc
@@ -203,10 +286,11 @@ All inherit from `TradeAPIError`.
 
 ## Retries
 
-Unary RPCs are retried automatically on `UNAVAILABLE` and `RESOURCE_EXHAUSTED`
-with exponential backoff + jitter. Streaming RPCs are _not_ retried — the
-caller is expected to handle reconnection at a meaningful boundary
-(e.g. resuming from the last received bar).
+Unary RPCs retry `UNAVAILABLE` automatically with exponential backoff and
+jitter. `RESOURCE_EXHAUSTED` is retried only when the server supplies
+`grpc-retry-pushback-ms`; otherwise the SDK returns the rate-limit error instead
+of amplifying the throttle. Streaming RPCs are _not_ retried — the caller is
+expected to reconnect at a meaningful boundary, such as the last received bar.
 
 Override the policy:
 

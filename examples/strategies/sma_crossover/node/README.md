@@ -1,48 +1,78 @@
 # Limeint SMA 9/30 crossover — Node.js
 
-TypeScript implementation of the [SMA 9/30 crossover strategy](../README.md).
-It consumes the published `@limeint/trade-api@2.18.1-rc.1` package from npm;
-there are no imports from this repository's SDK source or protobuf directory.
+TypeScript implementation of the [SMA 9/30 crossover strategy](../README.md),
+using the published `@limeint/trade-api@2.18.1-rc.1` package.
 
-## Install and test
+## Quick start
 
-Node.js 20 or newer is required.
+Requires Node.js 20 or newer. From the repository root:
 
 ```sh
 cd examples/strategies/sma_crossover/node
 npm ci
-npm ls @limeint/trade-api
-npm run format
-npm run check
+TRADE_API_SECRET=... npm start -- --symbol AAPL@XNAS --check
 ```
 
-The SDK dependency is pinned exactly so this directory is also a reproducible
-consumer test for the published release candidate.
+Check mode authenticates, fetches historical bars, calculates the latest
+confirmed SMA values, prints one result, and exits. It does not read an account,
+open a live subscription, or place an order.
 
-## Run
+```text
+History check passed: close=... sma9=... sma30=... signal=...
+```
 
-Dry-run is the default:
+If authentication fails, confirm that the secret is active and has market-data
+access. If no bars are returned, verify the `ticker@mic` symbol and its market.
+
+## Run the live dry-run
+
+Dry-run is the default. It reads real historical and streaming market data and
+logs signals, but it never reads an account or places an order. Stop it with
+Ctrl-C.
 
 ```sh
 TRADE_API_SECRET=... \
 npm start -- --symbol AAPL@XNAS --timeframe M5 --quantity 1
 ```
 
-Run the bounded, read-only history check:
+Flags can be replaced by the environment variables in the shared
+[configuration table](../README.md#configuration). Neither Node.js nor this
+example loads `.env` automatically. Use `npm start -- --help` for all flags.
 
-```sh
-TRADE_API_SECRET=... npm start -- --symbol AAPL@XNAS --check
-```
+## Enable real execution
 
-Allow real market orders with `--execute`. The account ID is retrieved from
-`AuthService.TokenDetails`; execution stops unless the token exposes exactly one
-account:
+> **Warning:** `--execute` can place real market orders. Use a dedicated account,
+> understand the [safety limitations](../README.md#safety-guards), and verify
+> check and dry-run modes first.
 
 ```sh
 TRADE_API_SECRET=... \
 npm start -- --symbol AAPL@XNAS --quantity 1 --execute
 ```
 
-Use `npm start -- --help` for the short command reference. The environment
-variables are shared with the Python implementation and documented in
-[`../README.md`](../README.md#configuration).
+At startup, the strategy discovers account IDs through
+`AuthService.TokenDetails` and refuses to execute unless the token exposes
+exactly one account.
+
+## Test locally
+
+No secret or network access is required:
+
+```sh
+npm run check
+```
+
+This runs Biome, TypeScript, and the focused unit tests. Use `npm run format`
+only when you intend to modify formatting.
+
+## Read the implementation
+
+1. [`strategy.ts`](strategy.ts) — pure SMA calculation and crossover rule.
+2. [`config.ts`](config.ts) — flags and environment configuration.
+3. [`runner.ts`](runner.ts) — completed bars and guarded orders.
+4. [`main.ts`](main.ts) — executable entry point.
+5. [`tests/sma-crossover.test.ts`](tests/sma-crossover.test.ts) — behavior examples.
+
+The directory is self-contained and imports no SDK source or protobuf files from
+this repository. Its exact package pin also makes it a consumer test for the
+published release candidate.

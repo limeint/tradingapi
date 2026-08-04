@@ -1,56 +1,113 @@
 # Limeint Trade API
 
-This repository contains Limeint's Python and Node.js SDKs, protocol
-definitions, and example trading strategies for the gRPC Trade API:
+Use Limeint's Trade API from Python or Node.js, or start from a complete example
+strategy. The SDKs handle gRPC transport, authentication, token renewal, retries,
+and streaming so applications can focus on trading logic.
 
-- protobuf contracts used to generate both clients;
-- the publishable Python and Node.js packages;
-- [example trading strategies](examples/strategies/).
+## Start here
 
-The wire-level protobuf namespace remains `grpc.tradeapi.v1`. Keeping that
-namespace stable preserves compatibility with the existing API backend and RPC
-method names.
-
-## Runtime configuration
-
-Applications should receive deployment-specific values from their environment:
-
-| Variable | Meaning |
+| Goal | Recommended path |
 | --- | --- |
-| `TRADE_API_SECRET` | API secret used by the SDK and strategies |
-| `TRADE_API_SYMBOL` | Strategy instrument in `ticker@mic` form |
-| `TRADE_API_TIMEFRAME` | Strategy candle timeframe |
+| See the API work without placing an order | [Run the SMA strategy history check](#run-a-safe-strategy-check) |
+| Build a Python application | [Python SDK quick start](sdk/python/README.md#quick-start) |
+| Build a Node.js application | [Node.js SDK quick start](sdk/node/README.md#quick-start) |
+| Understand a complete strategy | [SMA 9/30 crossover](examples/strategies/sma_crossover/) |
+| Work on this repository | [Repository development](#repository-development) |
 
-Trading account IDs are discovered from `AuthService.TokenDetails` after
-authentication. Do not commit production secrets or customer account IDs.
+The checkout currently targets the `2.18.1-rc.1` prerelease. The Node.js
+package is on npm. The Python prerelease is on TestPyPI; it is not yet available
+from the main PyPI index.
 
-## Package coordinates
+## Before you begin
 
-- Python: `limeint-sdk`, imported as `trade_api`
-- Node.js: `@limeint/trade-api`
+You need a Trade API secret issued by Limeint. Ask your Limeint account
+administrator or support contact if you do not have one. Treat it like a
+password: keep it in your environment or a gitignored `.env` file, and never
+paste it into source code, chat, issues, or logs.
 
-Both packages share a version. Publishing one GitHub Release with a bare
-version tag such as `2.18.1` publishes Python to PyPI and Node.js to npm.
-Maintainers should follow [the SDK release guide](sdk/node/RELEASING.md).
+Examples use symbols in `ticker@mic` form, such as `AAPL@XNAS`. The account and
+market-data permissions attached to your secret determine which operations and
+symbols are available.
 
-The repository and issue tracker are at
-<https://github.com/limeint/tradingapi>.
+## Run a safe strategy check
 
-## Development
+The bounded `--check` mode authenticates, fetches historical candles, calculates
+the latest SMA values, prints one result, and exits. It does not subscribe to a
+live stream, inspect an account, or place an order.
 
-From the repository root:
+### Python
+
+Requires Python 3.10 or newer and [uv](https://docs.astral.sh/uv/).
+
+```sh
+cd examples/strategies/sma_crossover/python
+uv sync --locked
+TRADE_API_SECRET=... uv run python main.py --symbol AAPL@XNAS --check
+```
+
+### Node.js
+
+Requires Node.js 20 or newer.
+
+```sh
+cd examples/strategies/sma_crossover/node
+npm ci
+TRADE_API_SECRET=... npm start -- --symbol AAPL@XNAS --check
+```
+
+Expected output starts with:
+
+```text
+History check passed: close=... sma9=... sma30=... signal=...
+```
+
+Continue with the [strategy guide](examples/strategies/sma_crossover/) to learn
+how dry-run streaming, candle completion, signals, and guarded execution work.
+
+## Use an SDK
+
+- [Python SDK](sdk/python/README.md) — synchronous and asyncio clients, installed
+  as `limeint-sdk` and imported as `trade_api`.
+- [Node.js SDK](sdk/node/README.md) — Promise-based unary calls and
+  `AsyncIterable` streams, installed as `@limeint/trade-api`.
+
+Both quick starts begin with authentication and account discovery. Smaller SDK
+examples live under [`sdk/python/examples/`](sdk/python/examples/) and
+[`sdk/node/examples/`](sdk/node/examples/). Complete applications live under
+[`examples/`](examples/).
+
+## Repository map
+
+```text
+proto/                  source protobuf contracts
+sdk/python/             publishable Python SDK
+sdk/node/               publishable Node.js SDK
+examples/strategies/    complete applications using the published SDKs
+```
+
+The wire-level protobuf namespace is `grpc.tradeapi.v1`. Generated bindings are
+build artifacts; edit the contracts under `proto/`, not generated files.
+
+## Repository development
+
+This section is for contributors rather than SDK consumers. Install Node.js 20+,
+Python 3.10+, `uv`, `just`, and `zsh`, then run from the repository root:
 
 ```sh
 just bootstrap
-just format
 just check
 ```
 
-`just` is the single command surface. Biome formats and lints TypeScript; Ruff
-does the same for Python; TypeScript and mypy enforce types; pre-commit runs the
-fast checks before every commit. Python dependencies are locked by `uv`, and npm
-lockfiles cover Node.js.
+`just bootstrap` installs locked dependencies, configures pre-commit, and
+generates language bindings. `just check` runs formatting checks, linting, type
+checking, and credential-free tests for both SDKs and both strategy examples.
+Use `just format` to apply formatting changes and `just generate` after changing
+files under `proto/`.
 
-Generated protobuf bindings are build artifacts. `just generate` recreates
-them from `proto/`; they are excluded from review so changes stay focused on
-the source contracts and handwritten SDK code.
+## Releases
+
+Python and Node.js packages share one version. A GitHub Release with a bare
+version tag publishes both packages. Maintainers should follow the
+[combined SDK release guide](sdk/node/RELEASING.md).
+
+Repository and issue tracker: <https://github.com/limeint/tradingapi>.

@@ -1,7 +1,7 @@
 """Subscribe to live quotes using the asyncio client.
 
 Usage:
-    TRADE_API_SECRET=... python examples/subscribe_quotes_async.py AAPL@XNAS MSFT@XNAS
+    TRADE_API_SECRET=... uv run python examples/subscribe_quotes_async.py AAPL@XNAS MSFT@XNAS
 """
 
 from __future__ import annotations

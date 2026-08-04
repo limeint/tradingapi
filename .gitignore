@@ -2,6 +2,11 @@
 build/
 out/
 
+# Local secrets and runtime configuration
+.env
+.env.*
+!.env.example
+
 # Python build artifacts
 __pycache__/
 *.py[cod]
