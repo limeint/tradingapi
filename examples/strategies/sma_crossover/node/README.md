@@ -25,13 +25,13 @@ Dry-run is the default:
 
 ```sh
 TRADE_API_SECRET=... \
-npm start -- --symbol SBER@MISX --timeframe M5 --quantity 1
+npm start -- --symbol AAPL@XNAS --timeframe M5 --quantity 1
 ```
 
 Run the bounded, read-only history check:
 
 ```sh
-TRADE_API_SECRET=... npm start -- --symbol SBER@MISX --check
+TRADE_API_SECRET=... npm start -- --symbol AAPL@XNAS --check
 ```
 
 Allow real market orders only with both an account ID and `--execute`:
@@ -39,7 +39,7 @@ Allow real market orders only with both an account ID and `--execute`:
 ```sh
 TRADE_API_SECRET=... \
 TRADE_API_ACCOUNT_ID=... \
-npm start -- --symbol SBER@MISX --quantity 1 --execute
+npm start -- --symbol AAPL@XNAS --quantity 1 --execute
 ```
 
 Use `npm start -- --help` for the short command reference. The environment

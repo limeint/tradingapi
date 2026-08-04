@@ -145,7 +145,7 @@ service AssetsService {
 
   // Getting information on a specific asset
   // HTTP request example:
-  // GET /v1/assets/SBER@MISX?account_id=1440399
+  // GET /v1/assets/AAPL@XNAS?account_id=1440399
   // Authorization: <token>
   //
   // Parameters:
@@ -166,7 +166,7 @@ service AssetsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol or account passed. The symbol must be in the form ticker@mic. Where ticker is, for example, SBER. And mic is, for example, MISX."
+          description: "Invalid symbol or account passed. The symbol must be in the form ticker@mic. Where ticker is, for example, AAPL. And mic is, for example, XNAS."
         }
       }
     };
@@ -174,7 +174,7 @@ service AssetsService {
 
   // Getting trading parameters for an asset
   // HTTP request example:
-  // GET /v1/assets/SBER@MISX/params?account_id=1440399
+  // GET /v1/assets/AAPL@XNAS/params?account_id=1440399
   // Authorization: <token>
   //
   // Parameters:
@@ -195,7 +195,7 @@ service AssetsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol or account passed. The symbol must be in the form ticker@mic. Where ticker is, for example, SBER. And mic is, for example, MISX."
+          description: "Invalid symbol or account passed. The symbol must be in the form ticker@mic. Where ticker is, for example, AAPL. And mic is, for example, XNAS."
         }
       }
     };
@@ -203,7 +203,7 @@ service AssetsService {
 
   // Getting the options chain for the underlying asset
   // HTTP request example:
-  // GET /v1/assets/SBER@MISX/options
+  // GET /v1/assets/AAPL@XNAS/options
   // Authorization: <token>
   rpc OptionsChain(OptionsChainRequest) returns (OptionsChainResponse) {
     option (google.api.http) = {
@@ -220,7 +220,7 @@ service AssetsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol passed. The symbol must be in the form ticker@mic. Where ticker is, for example, SBER. And mic is, for example, MISX."
+          description: "Invalid symbol passed. The symbol must be in the form ticker@mic. Where ticker is, for example, AAPL. And mic is, for example, XNAS."
         }
       }
     };
@@ -228,7 +228,7 @@ service AssetsService {
 
   // Getting a trading schedule for an asset
   // HTTP request example:
-  // GET /v1/assets/SBER@MISX/schedule
+  // GET /v1/assets/AAPL@XNAS/schedule
   // Authorization: <token>
   rpc Schedule(ScheduleRequest) returns (ScheduleResponse) {
     option (google.api.http) = {
@@ -245,7 +245,7 @@ service AssetsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol passed. The symbol must be in the form ticker@mic. Where ticker is, for example, SBER. And mic is, for example, MISX."
+          description: "Invalid symbol passed. The symbol must be in the form ticker@mic. Where ticker is, for example, AAPL. And mic is, for example, XNAS."
         }
       }
     };
@@ -639,4 +639,3 @@ message Constituents {
   // Weight of the instrument in the index
   google.type.Decimal weight = 7;
 }
-

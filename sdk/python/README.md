@@ -33,7 +33,7 @@ with TradeAPIClient(secret="YOUR_API_TOKEN") as client:
 
     # Streaming RPCs return iterators.
     for tick in client.market_data.SubscribeQuote(
-        SubscribeQuoteRequest(symbols=["SBER@MISX"])
+        SubscribeQuoteRequest(symbols=["AAPL@XNAS"])
     ):
         print(tick)
 ```
@@ -50,7 +50,7 @@ from trade_api.market_data import SubscribeQuoteRequest
 async def main() -> None:
     async with AsyncTradeAPIClient(secret="YOUR_API_TOKEN") as client:
         async for tick in client.market_data.SubscribeQuote(
-            SubscribeQuoteRequest(symbols=["SBER@MISX"])
+            SubscribeQuoteRequest(symbols=["AAPL@XNAS"])
         ):
             print(tick)
 

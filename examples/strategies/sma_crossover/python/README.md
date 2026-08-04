@@ -56,7 +56,7 @@ but never reads an account or places an order.
 ```sh
 TRADE_API_SECRET=... \
 python main.py \
-  --symbol SBER@MISX \
+  --symbol AAPL@XNAS \
   --timeframe M5 \
   --quantity 1
 ```
@@ -68,7 +68,7 @@ Environment variables work in place of flags — see the table in
 For the bounded read-only smoke test against the live API:
 
 ```sh
-TRADE_API_SECRET=... python main.py --symbol SBER@MISX --check
+TRADE_API_SECRET=... python main.py --symbol AAPL@XNAS --check
 ```
 
 To place real market orders, pass an account ID and `--execute`:
@@ -76,7 +76,7 @@ To place real market orders, pass an account ID and `--execute`:
 ```sh
 TRADE_API_SECRET=... \
 TRADE_API_ACCOUNT_ID=... \
-python main.py --symbol SBER@MISX --quantity 1 --execute
+python main.py --symbol AAPL@XNAS --quantity 1 --execute
 ```
 
 Full flag reference: `python main.py --help`.

@@ -78,7 +78,7 @@ variables. Copy [`.env.example`](.env.example) as a reference.
 | `TRADE_API_QUANTITY` | No | `1` |
 | `TRADE_API_LOG_LEVEL` | No | `INFO` |
 
-Symbols use `ticker@mic` format, for example `SBER@MISX`. Supported timeframes
+Symbols use `ticker@mic` format, for example `AAPL@XNAS`. Supported timeframes
 are `M1`, `M5`, `M15`, `M30`, `H1`, `H2`, `H4`, `H8`, `D`, `W`, `MN`, and `QR`.
 
 ## Read-only smoke test

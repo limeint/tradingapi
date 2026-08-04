@@ -1,7 +1,7 @@
 """Subscribe to live quotes using the asyncio client.
 
 Usage:
-    TRADE_API_SECRET=... python examples/subscribe_quotes_async.py SBER@MISX GAZP@MISX
+    TRADE_API_SECRET=... python examples/subscribe_quotes_async.py AAPL@XNAS MSFT@XNAS
 """
 
 from __future__ import annotations
@@ -24,5 +24,5 @@ async def main(symbols: list[str]) -> None:
 
 
 if __name__ == "__main__":
-    syms = sys.argv[1:] or ["SBER@MISX"]
+    syms = sys.argv[1:] or ["AAPL@XNAS"]
     asyncio.run(main(syms))

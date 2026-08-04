@@ -72,7 +72,7 @@ def parse_config(
     if not args.secret:
         parser.error("--secret or TRADE_API_SECRET is required")
     if not args.symbol or "@" not in args.symbol:
-        parser.error("--symbol must use ticker@mic format, for example SBER@MISX")
+        parser.error("--symbol must use ticker@mic format, for example AAPL@XNAS")
     if args.check and args.execute:
         parser.error("--check and --execute cannot be used together")
     if args.execute and not args.account_id:

@@ -1,7 +1,7 @@
 import { withTradeApi } from "@limeint/trade-api";
 
 const secret = process.env.TRADE_API_SECRET;
-const symbol = process.env.TRADE_API_SYMBOL ?? "SBER@MISX";
+const symbol = process.env.TRADE_API_SYMBOL ?? "AAPL@XNAS";
 
 if (!secret) throw new Error("Set TRADE_API_SECRET");
 

@@ -5,7 +5,7 @@ RPCs return async iterators that can be consumed with ``async for``.
 
     async with AsyncTradeAPIClient(secret="...") as client:
         accounts = await client.accounts.GetAccount(GetAccountRequest(account_id="A12345"))
-        async for tick in client.market_data.SubscribeQuote(SubscribeQuoteRequest(symbol="SBER@MISX")):
+        async for tick in client.market_data.SubscribeQuote(SubscribeQuoteRequest(symbol="AAPL@XNAS")):
             ...
 """
 

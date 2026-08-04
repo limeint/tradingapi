@@ -68,7 +68,7 @@ def test_unary_call_retries_on_unavailable_then_succeeds() -> None:
         with TradeAPIClient.for_testing(
             secret="s", endpoint=endpoint, retry_policy=_fast_retry()
         ) as client:
-            state = client.orders.PlaceOrder(Order(account_id="A1", symbol="SBER@MISX"))
+            state = client.orders.PlaceOrder(Order(account_id="A1", symbol="AAPL@XNAS"))
             assert state.order_id == "ord-1"
             assert len(orders.placed) == 1
         auth.close_stream()
@@ -83,7 +83,7 @@ def test_unary_call_surfaces_typed_error_after_giving_up() -> None:
             secret="s", endpoint=endpoint, retry_policy=_fast_retry()
         ) as client:
             with pytest.raises(grpc.RpcError) as exc_info:
-                client.orders.PlaceOrder(Order(account_id="A1", symbol="SBER@MISX"))
+                client.orders.PlaceOrder(Order(account_id="A1", symbol="AAPL@XNAS"))
             typed = from_rpc_error(exc_info.value)
             assert typed.code is grpc.StatusCode.UNAVAILABLE
         auth.close_stream()
@@ -98,7 +98,7 @@ def test_invalid_argument_is_not_retried_and_maps_cleanly() -> None:
             secret="s", endpoint=endpoint, retry_policy=_fast_retry()
         ) as client:
             with pytest.raises(grpc.RpcError) as exc_info:
-                client.orders.PlaceOrder(Order(account_id="A1", symbol="SBER@MISX"))
+                client.orders.PlaceOrder(Order(account_id="A1", symbol="AAPL@XNAS"))
             typed = from_rpc_error(exc_info.value)
             assert isinstance(typed, InvalidArgumentError)
         # No retries — failure consumed exactly once.
@@ -117,7 +117,7 @@ def test_rate_limit_is_not_retried_by_default() -> None:
             secret="s", endpoint=endpoint, retry_policy=_fast_retry()
         ) as client:
             with pytest.raises(grpc.RpcError) as exc_info:
-                client.orders.PlaceOrder(Order(account_id="A1", symbol="SBER@MISX"))
+                client.orders.PlaceOrder(Order(account_id="A1", symbol="AAPL@XNAS"))
             typed = from_rpc_error(exc_info.value)
             assert isinstance(typed, RateLimitError)
             # Only ONE call should have happened (no retries).
@@ -143,7 +143,7 @@ def test_place_and_cancel_order_round_trip() -> None:
     orders = FakeOrdersService()
     with fake_server(auth=auth, orders=orders) as (endpoint, _):
         with TradeAPIClient.for_testing(secret="s", endpoint=endpoint) as client:
-            state = client.orders.PlaceOrder(Order(account_id="A1", symbol="SBER@MISX"))
+            state = client.orders.PlaceOrder(Order(account_id="A1", symbol="AAPL@XNAS"))
             assert state.order_id == "ord-1"
             cancelled = client.orders.CancelOrder(
                 CancelOrderRequest(account_id="A1", order_id=state.order_id)
@@ -336,6 +336,6 @@ async def test_async_unary_retry_does_not_leak_call_objects() -> None:
         async with AsyncTradeAPIClient.for_testing(
             secret="s", endpoint=endpoint, retry_policy=_fast_retry()
         ) as client:
-            state = await client.orders.PlaceOrder(Order(account_id="A1", symbol="SBER@MISX"))
+            state = await client.orders.PlaceOrder(Order(account_id="A1", symbol="AAPL@XNAS"))
             assert state.order_id == "ord-1"
         auth.close_stream()

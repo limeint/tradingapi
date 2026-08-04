@@ -17,7 +17,7 @@ const bar = (seconds: number, close = "0") => ({
 const config = (overrides: Partial<Config> = {}): Config => ({
   secret: "secret",
   accountId: "A1",
-  symbol: "SBER@MISX",
+  symbol: "AAPL@XNAS",
   timeframe: "M5",
   quantity: 2,
   execute: false,
@@ -33,7 +33,7 @@ const fakeApi = (bars = Array.from({ length: 32 }, (_, index) => bar(index + 1, 
 
   const api = {
     marketData: {
-      bars: async () => ({ symbol: "SBER@MISX", bars }),
+      bars: async () => ({ symbol: "AAPL@XNAS", bars }),
       subscribeBars: async function* () {},
     },
     accounts: {
@@ -43,7 +43,7 @@ const fakeApi = (bars = Array.from({ length: 32 }, (_, index) => bar(index + 1, 
           positions:
             positionValue === "0"
               ? []
-              : [{ symbol: "SBER@MISX", quantity: { value: positionValue } }],
+              : [{ symbol: "AAPL@XNAS", quantity: { value: positionValue } }],
         };
       },
     },

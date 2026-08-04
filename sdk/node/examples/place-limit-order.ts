@@ -5,7 +5,7 @@ import { OrderType, Side, TimeInForce } from "@limeint/trade-api/orders";
 
 const secret = process.env.TRADE_API_SECRET;
 const accountId = process.env.TRADE_API_ACCOUNT_ID;
-const symbol = process.env.TRADE_API_SYMBOL ?? "SBER@MISX";
+const symbol = process.env.TRADE_API_SYMBOL ?? "AAPL@XNAS";
 
 if (!secret || !accountId) {
   throw new Error("Set TRADE_API_SECRET and TRADE_API_ACCOUNT_ID");

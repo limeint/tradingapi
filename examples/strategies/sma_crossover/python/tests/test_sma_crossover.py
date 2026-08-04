@@ -24,7 +24,7 @@ def make_bar(seconds: int, close: str = "0") -> Bar:
 def config(**overrides: Any) -> Config:
     values = {
         "secret": "secret",
-        "symbol": "SBER@MISX",
+        "symbol": "AAPL@XNAS",
         "timeframe": "M5",
         "quantity": Decimal(2),
         "account_id": "A1",
@@ -44,10 +44,10 @@ class FakeClient:
         updates: list[BarsResponse] | None = None,
     ) -> None:
         self.market_data = SimpleNamespace(
-            Bars=lambda request: BarsResponse(symbol="SBER@MISX", bars=bars),
+            Bars=lambda request: BarsResponse(symbol="AAPL@XNAS", bars=bars),
             SubscribeBars=lambda request: iter(updates or []),
         )
-        positions = [] if position == "0" else [Position(symbol="SBER@MISX")]
+        positions = [] if position == "0" else [Position(symbol="AAPL@XNAS")]
         if positions:
             positions[0].quantity.value = position
         self.account_calls = 0
