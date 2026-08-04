@@ -12,6 +12,7 @@ from google.type.decimal_pb2 import Decimal as ProtoDecimal
 from google.type.interval_pb2 import Interval
 from trade_api import TradeAPIClient
 from trade_api.accounts import GetAccountRequest
+from trade_api.auth_messages import TokenDetailsRequest
 from trade_api.market_data import Bar, BarsRequest, SubscribeBarsRequest
 from trade_api.orders import Order, OrderStatus, OrderType, Side, TimeInForce
 
@@ -64,9 +65,20 @@ def _position(client: TradeAPIClient, account_id: str, symbol: str) -> Decimal:
     return _decimal(match.quantity) if match else Decimal(0)
 
 
+def resolve_account_id(client: TradeAPIClient) -> str:
+    token = client.get_token() or ""
+    details = client.auth.TokenDetails(TokenDetailsRequest(token=token))
+    if len(details.account_ids) != 1:
+        raise RuntimeError(
+            f"expected exactly one available account; received {len(details.account_ids)}"
+        )
+    return str(details.account_ids[0])
+
+
 def place_order(
     client: TradeAPIClient,
     config: Config,
+    account_id: str | None,
     signal: Signal,
     bar: Bar,
 ) -> None:
@@ -75,10 +87,10 @@ def place_order(
     if not config.execute:
         logger.warning("DRY RUN: %s %s units of %s", signal, config.quantity, config.symbol)
         return
-    if not config.account_id:
+    if not account_id:
         raise RuntimeError("account ID is required in execute mode")
 
-    current = _position(client, config.account_id, config.symbol)
+    current = _position(client, account_id, config.symbol)
     if signal == "entry" and current != 0:
         logger.warning("Skipping entry: current position is %s, expected zero", current)
         return
@@ -91,7 +103,7 @@ def place_order(
     suffix = str(bar.timestamp.seconds)[-10:]
     state = client.orders.PlaceOrder(
         Order(
-            account_id=config.account_id,
+            account_id=account_id,
             symbol=config.symbol,
             quantity=ProtoDecimal(value=format(quantity, "f")),
             side=side,
@@ -105,6 +117,7 @@ def place_order(
 
 
 def run(client: TradeAPIClient, config: Config) -> None:
+    account_id = resolve_account_id(client) if config.execute else None
     closes, pending = _history(client, config)
     result = evaluate(closes)
     logger.info("History ready: close=%s sma9=%s sma30=%s", closes[-1], result.fast, result.slow)
@@ -135,5 +148,5 @@ def run(client: TradeAPIClient, config: Config) -> None:
                 result.slow,
                 result.signal or "none",
             )
-            place_order(client, config, result.signal, pending)
+            place_order(client, config, account_id, result.signal, pending)
             pending = bar

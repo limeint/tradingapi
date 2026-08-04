@@ -32,6 +32,7 @@ market_data.Bars ───────┐
                         ├─> completed candles ─> SMA 9/30 ─> signal
 market_data.SubscribeBars┘                                  │
                                                            ├─> dry-run log
+auth.TokenDetails ─> account ID ────────────────────────────┤
 accounts.GetAccount ────────────────────────────────────────┤
 orders.PlaceOrder <─────────────────────────────────────────┘
 ```
@@ -49,9 +50,11 @@ Historical bars warm up the averages without placing orders.
 
 ## Safety guards
 
-Dry-run is the default. Reading market data and printing signals must never
-require an account ID, and must never read an account or place an order. Real
-trading requires an account ID plus an explicit opt-in flag.
+Dry-run is the default. Reading market data and printing signals does not inspect
+token accounts and must never read an account or place an order. Real trading
+requires an explicit opt-in flag. At startup, the strategy retrieves the account
+ID from `AuthService.TokenDetails` and refuses to trade unless the token exposes
+exactly one account.
 
 Before an order is submitted:
 
@@ -73,7 +76,6 @@ variables. Copy [`.env.example`](.env.example) as a reference.
 | --- | --- | --- |
 | `TRADE_API_SECRET` | Yes | — |
 | `TRADE_API_SYMBOL` | Yes | — |
-| `TRADE_API_ACCOUNT_ID` | Only when placing real orders | — |
 | `TRADE_API_TIMEFRAME` | No | `M5` |
 | `TRADE_API_QUANTITY` | No | `1` |
 | `TRADE_API_LOG_LEVEL` | No | `INFO` |

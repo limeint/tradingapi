@@ -4,14 +4,20 @@ import { withTradeApi } from "@limeint/trade-api";
 import { OrderType, Side, TimeInForce } from "@limeint/trade-api/orders";
 
 const secret = process.env.TRADE_API_SECRET;
-const accountId = process.env.TRADE_API_ACCOUNT_ID;
 const symbol = process.env.TRADE_API_SYMBOL ?? "AAPL@XNAS";
 
-if (!secret || !accountId) {
-  throw new Error("Set TRADE_API_SECRET and TRADE_API_ACCOUNT_ID");
+if (!secret) {
+  throw new Error("Set TRADE_API_SECRET");
 }
 
 await withTradeApi({ secret }, async (api) => {
+  const details = await api.auth.tokenDetails({ token: api.getToken() });
+  const [accountId] = details.accountIds;
+  if (details.accountIds.length !== 1 || !accountId) {
+    throw new Error(
+      `Expected exactly one available account; received ${details.accountIds.length}`,
+    );
+  }
   const order = await api.orders.placeOrder({
     accountId,
     symbol,

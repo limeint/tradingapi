@@ -7,6 +7,8 @@ import type { Signal } from "./strategy.js";
 import { evaluate } from "./strategy.js";
 
 export type StrategyApi = Readonly<{
+  auth: Pick<TradeApi["auth"], "tokenDetails">;
+  getToken: TradeApi["getToken"];
   marketData: Pick<TradeApi["marketData"], "bars" | "subscribeBars">;
   accounts: Pick<TradeApi["accounts"], "getAccount">;
   orders: Pick<TradeApi["orders"], "placeOrder">;
@@ -75,9 +77,21 @@ const position = async (api: StrategyApi, accountId: string, symbol: string): Pr
   return decimal(account.positions.find((item) => item.symbol === symbol)?.quantity);
 };
 
+export const resolveAccountId = async (api: StrategyApi): Promise<string> => {
+  const details = await api.auth.tokenDetails({ token: api.getToken() });
+  const [accountId] = details.accountIds;
+  if (details.accountIds.length !== 1 || !accountId) {
+    throw new Error(
+      `Expected exactly one available account; received ${details.accountIds.length}`,
+    );
+  }
+  return accountId;
+};
+
 export const placeOrder = async (
   api: StrategyApi,
   config: Config,
+  accountId: string | undefined,
   signal: Signal,
   bar: Bar,
 ): Promise<void> => {
@@ -87,7 +101,6 @@ export const placeOrder = async (
     return;
   }
 
-  const accountId = config.accountId;
   if (!accountId) throw new Error("account ID is required in execute mode");
 
   const current = await position(api, accountId, config.symbol);
@@ -132,6 +145,7 @@ const processBar = async (
   config: Config,
   state: MarketState,
   bar: Bar,
+  accountId: string | undefined,
 ): Promise<MarketState> => {
   if (barKey(bar) < barKey(state.pending)) return state;
   if (barKey(bar) === barKey(state.pending)) return { ...state, pending: bar };
@@ -144,11 +158,12 @@ const processBar = async (
     `Closed bar: close=${closes.at(-1)} sma9=${result.fast} ` +
       `sma30=${result.slow} signal=${result.signal ?? "none"}`,
   );
-  await placeOrder(api, config, result.signal, state.pending);
+  await placeOrder(api, config, accountId, result.signal, state.pending);
   return { closes, pending: bar };
 };
 
 export const run = async (api: StrategyApi, config: Config): Promise<void> => {
+  const accountId = config.execute ? await resolveAccountId(api) : undefined;
   let state = await history(api, config);
   const result = evaluate(state.closes);
   log(
@@ -171,7 +186,7 @@ export const run = async (api: StrategyApi, config: Config): Promise<void> => {
     timeframe,
   })) {
     for (const bar of orderedBars(response.bars)) {
-      state = await processBar(api, config, state, bar);
+      state = await processBar(api, config, state, bar, accountId);
     }
   }
 };

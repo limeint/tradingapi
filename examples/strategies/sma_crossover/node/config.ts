@@ -22,7 +22,6 @@ export type LogLevel = "DEBUG" | "INFO" | "WARNING" | "ERROR";
 
 export type Config = Readonly<{
   secret: string;
-  accountId?: string;
   symbol: string;
   timeframe: TimeframeName;
   quantity: number;
@@ -66,11 +65,8 @@ const validLogLevel = (value: string): LogLevel => {
   return value;
 };
 
-const validateMode = (execute: boolean, check: boolean, accountId: string | undefined): void => {
+const validateMode = (execute: boolean, check: boolean): void => {
   if (check && execute) throw new Error("--check and --execute cannot be combined");
-  if (execute && !accountId) {
-    throw new Error("--account-id or TRADE_API_ACCOUNT_ID is required with --execute");
-  }
 };
 
 export const parseConfig = (
@@ -81,7 +77,6 @@ export const parseConfig = (
     args: [...argv],
     options: {
       secret: { type: "string" },
-      "account-id": { type: "string" },
       symbol: { type: "string" },
       timeframe: { type: "string" },
       quantity: { type: "string" },
@@ -93,7 +88,6 @@ export const parseConfig = (
   });
 
   const secret = requiredSecret(values.secret ?? env.TRADE_API_SECRET);
-  const accountId = values["account-id"] ?? env.TRADE_API_ACCOUNT_ID;
   const symbol = validSymbol(values.symbol ?? env.TRADE_API_SYMBOL);
   const timeframe = validTimeframe(
     (values.timeframe ?? env.TRADE_API_TIMEFRAME ?? "M5").toUpperCase(),
@@ -102,11 +96,10 @@ export const parseConfig = (
   const logLevel = validLogLevel(
     (values["log-level"] ?? env.TRADE_API_LOG_LEVEL ?? "INFO").toUpperCase(),
   );
-  validateMode(values.execute, values.check, accountId);
+  validateMode(values.execute, values.check);
 
   return {
     secret,
-    accountId,
     symbol,
     timeframe,
     quantity,
@@ -119,6 +112,6 @@ export const parseConfig = (
 export const USAGE = `Usage:
   npm start -- --symbol AAPL@XNAS [--timeframe M5] [--quantity 1]
   npm start -- --symbol AAPL@XNAS --check
-  npm start -- --symbol AAPL@XNAS --account-id A123 --execute
+  npm start -- --symbol AAPL@XNAS --execute
 
 TRADE_API_SECRET is required. Dry-run is the default.`;

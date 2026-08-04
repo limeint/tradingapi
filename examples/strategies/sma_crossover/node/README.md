@@ -34,11 +34,12 @@ Run the bounded, read-only history check:
 TRADE_API_SECRET=... npm start -- --symbol AAPL@XNAS --check
 ```
 
-Allow real market orders only with both an account ID and `--execute`:
+Allow real market orders with `--execute`. The account ID is retrieved from
+`AuthService.TokenDetails`; execution stops unless the token exposes exactly one
+account:
 
 ```sh
 TRADE_API_SECRET=... \
-TRADE_API_ACCOUNT_ID=... \
 npm start -- --symbol AAPL@XNAS --quantity 1 --execute
 ```
 

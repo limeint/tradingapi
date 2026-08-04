@@ -5,7 +5,7 @@ immediately, allowing the cancel to demonstrate cleanly. Do not run against
 a real account without changing the symbol/price/quantity.
 
 Usage:
-    TRADE_API_SECRET=... TRADE_API_ACCOUNT_ID=... python examples/place_limit_order.py
+    TRADE_API_SECRET=... python examples/place_limit_order.py
 """
 
 from __future__ import annotations
@@ -15,6 +15,7 @@ import os
 from google.type.decimal_pb2 import Decimal  # type: ignore[import-untyped]
 
 from trade_api import TradeAPIClient
+from trade_api.auth_messages import TokenDetailsRequest
 from trade_api.orders import (
     CancelOrderRequest,
     Order,
@@ -26,9 +27,15 @@ from trade_api.orders import (
 
 def main() -> None:
     secret = os.environ["TRADE_API_SECRET"]
-    account_id = os.environ["TRADE_API_ACCOUNT_ID"]
 
     with TradeAPIClient(secret=secret) as client:
+        token = client.get_token() or ""
+        details = client.auth.TokenDetails(TokenDetailsRequest(token=token))
+        if len(details.account_ids) != 1:
+            raise RuntimeError(
+                f"expected exactly one available account; received {len(details.account_ids)}"
+            )
+        account_id = details.account_ids[0]
         order = Order(
             account_id=account_id,
             symbol="AAPL@XNAS",

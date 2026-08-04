@@ -75,7 +75,6 @@ jobs:
         # time but should import cleanly without them.
         env:
           TRADE_API_SECRET: ''
-          TRADE_API_ACCOUNT_ID: ''
         run: |
           for f in examples/*.py; do
             uv run python -c "
