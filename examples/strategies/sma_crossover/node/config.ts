@@ -43,7 +43,7 @@ const requiredSecret = (value: string | undefined): string => {
 
 const validSymbol = (value: string | undefined): string => {
   if (!value?.includes("@")) {
-    throw new Error("--symbol must use ticker@mic format, for example SBER@MISX");
+    throw new Error("--symbol must use ticker@mic format, for example AAPL@XNAS");
   }
   return value;
 };
@@ -117,8 +117,8 @@ export const parseConfig = (
 };
 
 export const USAGE = `Usage:
-  npm start -- --symbol SBER@MISX [--timeframe M5] [--quantity 1]
-  npm start -- --symbol SBER@MISX --check
-  npm start -- --symbol SBER@MISX --account-id A123 --execute
+  npm start -- --symbol AAPL@XNAS [--timeframe M5] [--quantity 1]
+  npm start -- --symbol AAPL@XNAS --check
+  npm start -- --symbol AAPL@XNAS --account-id A123 --execute
 
 TRADE_API_SECRET is required. Dry-run is the default.`;

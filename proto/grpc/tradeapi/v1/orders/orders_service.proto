@@ -84,7 +84,7 @@ service OrdersService {
   // Authorization: <token>
   //
   // {
-  //  "symbol": "SBER@MISX"
+  //  "symbol": "AAPL@XNAS"
   //  "quantity": {
   //  "value": "10"
   //  }"
@@ -228,7 +228,7 @@ service OrdersService {
   // Authorization: <token>
   //
   // {
-  //  "symbol": "SBER@MISX"
+  //  "symbol": "AAPL@XNAS"
   //  "side": "SIDE_BUY"
   //  "quantity_sl": {
   //  "value": "10"
@@ -605,4 +605,3 @@ enum TPSpreadMeasure {
   //  as a percentage with maximum accuracy to hundredths of a percent
   TP_SPREAD_MEASURE_PERCENT = 2;
 }
-

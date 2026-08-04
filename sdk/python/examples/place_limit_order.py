@@ -31,7 +31,7 @@ def main() -> None:
     with TradeAPIClient(secret=secret) as client:
         order = Order(
             account_id=account_id,
-            symbol="SBER@MISX",
+            symbol="AAPL@XNAS",
             quantity=Decimal(value="1"),
             side=Side.SIDE_BUY,
             type=OrderType.ORDER_TYPE_LIMIT,

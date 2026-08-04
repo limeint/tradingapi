@@ -6,7 +6,7 @@ proto) since it's the primary type users reach for when placing orders.
 
     from trade_api.orders import Order, OrderType, Side, TimeInForce
     client.orders.PlaceOrder(
-        Order(symbol="SBER@MISX", side=Side.SIDE_BUY, type=OrderType.ORDER_TYPE_LIMIT, ...)
+        Order(symbol="AAPL@XNAS", side=Side.SIDE_BUY, type=OrderType.ORDER_TYPE_LIMIT, ...)
     )
 """
 

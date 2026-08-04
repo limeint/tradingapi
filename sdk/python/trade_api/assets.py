@@ -4,7 +4,7 @@ Re-exports the proto request/response messages used with
 ``client.assets.*`` RPCs.
 
     from trade_api.assets import GetAssetRequest
-    client.assets.GetAsset(GetAssetRequest(symbol="SBER@MISX"))
+    client.assets.GetAsset(GetAssetRequest(symbol="AAPL@XNAS"))
 """
 
 from .proto.grpc.tradeapi.v1.assets.assets_service_pb2 import (

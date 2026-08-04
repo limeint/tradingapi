@@ -7,7 +7,7 @@ takes care of channel setup, authentication, retries, and error mapping.
 
     with TradeAPIClient(secret="...") as client:
         accounts = client.accounts.GetAccount(GetAccountRequest(account_id="A12345"))
-        for tick in client.market_data.SubscribeQuote(SubscribeQuoteRequest(symbol="SBER@MISX")):
+        for tick in client.market_data.SubscribeQuote(SubscribeQuoteRequest(symbol="AAPL@XNAS")):
             ...
 """
 
