@@ -14,18 +14,13 @@ request or response translation layer.
 
 Python 3.10 or newer is required.
 
-This checkout currently targets `2.18.1rc1`. The prerelease is on TestPyPI and
-is not yet available from the main PyPI index. Create and activate a virtual
-environment, then install the exact prerelease while resolving its runtime
-dependencies from PyPI:
+This checkout currently targets `2.18.2`, which is on PyPI. Create and activate
+a virtual environment, then install it:
 
 ```sh
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install \
-  --index-url https://test.pypi.org/simple/ \
-  --extra-index-url https://pypi.org/simple/ \
-  limeint-sdk==2.18.1rc1
+python -m pip install limeint-sdk==2.18.2
 ```
 
 > The PyPI distribution is `limeint-sdk`; the Python import name is `trade_api`.

@@ -13,10 +13,10 @@ A small, functional TypeScript SDK around Limeint's gRPC Trade API.
 
 Node.js 20 or newer is required.
 
-This checkout currently targets the `2.18.1-rc.1` prerelease:
+This checkout currently targets `2.18.2`:
 
 ```sh
-npm install @limeint/trade-api@2.18.1-rc.1
+npm install @limeint/trade-api@2.18.2
 ```
 
 ## Quick start
@@ -30,7 +30,7 @@ Create a clean application directory:
 mkdir limeint-node-quickstart
 cd limeint-node-quickstart
 npm init -y
-npm install @limeint/trade-api@2.18.1-rc.1
+npm install @limeint/trade-api@2.18.2
 ```
 
 Save this as `quickstart.mjs`. The `.mjs` extension makes the SDK's ESM import
