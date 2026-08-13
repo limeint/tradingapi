@@ -9,6 +9,33 @@ The PyPI distribution is `limeint-sdk`; the Python import name is
 
 ## [Unreleased]
 
+## [2.18.2] — 2026-08-13
+
+First stable release of the shared Python and Node.js version line. `2.18.1`
+was tagged but never published to any registry; upgrade from `2.18.1-rc.1`
+directly to this version.
+
+### Changed
+
+- The default endpoint is now `api.limeint.eu:443`, replacing
+  `api.finam.ru:443`. Callers that relied on the old default must upgrade;
+  an explicit `endpoint=` argument is unaffected.
+- Protobuf contracts are re-synced with the Trade API `2.18.1` release line:
+  accounts, assets, auth, corporate actions, market data, orders, usage
+  metrics, `Side`, and `trade`.
+- `trade_api.__version__` now reports the installed distribution version
+  instead of a hardcoded literal, which had drifted to `2.18.0`.
+
+### Removed
+
+- `CorporateActionsService.GetFutureBondsEvents` and
+  `CorporateActionsService.GetPastBondsEvents`, along with the `BondEvent`,
+  `CouponEventDetails`, `AmortizationEventDetails`, `OfferEventDetails`, and
+  `BondEventType` definitions added in `2.17.0`. Splits and dividends are
+  unchanged.
+- The `MC` account message and the `portfolio_mc` field it populated on the
+  accounts response.
+
 ## [2.18.1-rc.1] — 2026-07-30
 
 ### Changed
@@ -78,7 +105,8 @@ Initial public release.
 - Distribution name on PyPI is `limeint-sdk`. The import name remains
   `trade_api`.
 
-[Unreleased]: https://github.com/limeint/tradingapi/compare/2.18.1-rc.1...HEAD
+[Unreleased]: https://github.com/limeint/tradingapi/compare/2.18.2...HEAD
+[2.18.2]: https://github.com/limeint/tradingapi/releases/tag/2.18.2
 [2.18.1-rc.1]: https://github.com/limeint/tradingapi/releases/tag/2.18.1-rc.1
 [2.18.0]: https://github.com/limeint/tradingapi/releases/tag/2.18.0
 [2.17.0]: https://github.com/limeint/tradingapi/releases/tag/2.17.0
