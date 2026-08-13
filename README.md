@@ -13,6 +13,7 @@ and streaming so applications can focus on trading logic.
 | Build a Node.js application | [Node.js SDK quick start](sdk/node/README.md#quick-start) |
 | Understand a complete strategy | [SMA 9/30 crossover](examples/strategies/sma_crossover/) |
 | See a second, asymmetric rule | [MACD 12/26/9 zero cross](examples/strategies/macd_zero_cross/) |
+| See a mean-reversion rule | [RSI 14 threshold](examples/strategies/rsi_threshold/) |
 | Work on this repository | [Repository development](#repository-development) |
 
 The checkout currently targets the `2.18.1-rc.1` prerelease. The Node.js

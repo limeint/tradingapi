@@ -75,6 +75,7 @@ npm --prefix examples/sdk/node run check
 # Node.js strategies
 npm --prefix examples/strategies/sma_crossover/node run check
 npm --prefix examples/strategies/macd_zero_cross/node run check
+npm --prefix examples/strategies/rsi_threshold/node run check
 
 # Python SDK (generate bindings first when starting from a clean clone)
 (cd sdk/python && uv run ./scripts/generate_proto.sh)
@@ -88,7 +89,8 @@ npm --prefix examples/strategies/macd_zero_cross/node run check
 (cd examples/sdk/python && uv run ruff format --check .)
 (cd examples/sdk/python && uv run mypy .)
 
-# Python strategies; STRATEGY is sma_crossover or macd_zero_cross
+# Python strategies; STRATEGY is sma_crossover, macd_zero_cross, or
+# rsi_threshold
 STRATEGY=sma_crossover
 (cd examples/strategies/$STRATEGY/python && uv run ruff check .)
 (cd examples/strategies/$STRATEGY/python && uv run ruff format --check .)

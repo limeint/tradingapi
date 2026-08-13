@@ -102,7 +102,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        example: [sma_crossover, macd_zero_cross]
+        example: [sma_crossover, macd_zero_cross, rsi_threshold]
     defaults:
       run:
         working-directory: examples/strategies/${{ matrix.example }}/python
@@ -148,7 +148,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        example: [sma_crossover, macd_zero_cross]
+        example: [sma_crossover, macd_zero_cross, rsi_threshold]
     defaults:
       run:
         working-directory: examples/strategies/${{ matrix.example }}/node
