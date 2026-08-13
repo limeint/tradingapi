@@ -34,10 +34,15 @@ execution.
 | --- | --- | --- |
 | [SMA 9/30 crossover](sma_crossover/README.md) | Enter when SMA 9 crosses above SMA 30; exit on the reverse crossover | [Python](sma_crossover/python/), [Node.js](sma_crossover/node/) |
 | [MACD 12/26/9 zero cross](macd_zero_cross/README.md) | Enter when the MACD line crosses zero upwards; exit after two consecutive declining MACD values | [Python](macd_zero_cross/python/), [Node.js](macd_zero_cross/node/) |
+| [RSI 14 threshold](rsi_threshold/README.md) | Enter when RSI falls below 0.2; exit when RSI rises above 0.8 | [Python](rsi_threshold/python/), [Node.js](rsi_threshold/node/) |
 
-Both strategies share the same flags and environment variables, so the check
-command above works in either directory. The SMA rule is the simpler read; the
-MACD rule adds an asymmetric exit and the position tracking it needs.
+Every strategy shares the same flags and environment variables, so the check
+command above works in any of the directories. Read them in order of difficulty:
+the SMA rule is the simplest, a symmetric crossover; the MACD rule adds an
+asymmetric exit and the position tracking it needs; the RSI rule is built from
+two levels rather than crossings, so it depends on that position tracking for
+correctness rather than convenience. RSI is also the one mean-reversion rule
+here — it buys weakness where the other two follow strength.
 
 ## Layout and authoring conventions
 
