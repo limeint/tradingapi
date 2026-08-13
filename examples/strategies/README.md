@@ -33,6 +33,11 @@ execution.
 | Strategy | Rule | Languages |
 | --- | --- | --- |
 | [SMA 9/30 crossover](sma_crossover/README.md) | Enter when SMA 9 crosses above SMA 30; exit on the reverse crossover | [Python](sma_crossover/python/), [Node.js](sma_crossover/node/) |
+| [MACD 12/26/9 zero cross](macd_zero_cross/README.md) | Enter when the MACD line crosses zero upwards; exit after two consecutive declining MACD values | [Python](macd_zero_cross/python/), [Node.js](macd_zero_cross/node/) |
+
+Both strategies share the same flags and environment variables, so the check
+command above works in either directory. The SMA rule is the simpler read; the
+MACD rule adds an asymmetric exit and the position tracking it needs.
 
 ## Layout and authoring conventions
 

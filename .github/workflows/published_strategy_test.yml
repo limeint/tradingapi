@@ -5,12 +5,12 @@ on:
     branches: [ "main" ]
     paths:
       - 'examples/sdk/**'
-      - 'examples/strategies/sma_crossover/**'
+      - 'examples/strategies/**'
       - '.github/workflows/published_strategy_test.yml'
   pull_request:
     paths:
       - 'examples/sdk/**'
-      - 'examples/strategies/sma_crossover/**'
+      - 'examples/strategies/**'
       - '.github/workflows/published_strategy_test.yml'
   workflow_dispatch:
 
@@ -97,11 +97,15 @@ jobs:
         run: npm run check
 
   python:
-    name: Python strategy against TestPyPI SDK
+    name: Python ${{ matrix.example }} against TestPyPI SDK
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example: [sma_crossover, macd_zero_cross]
     defaults:
       run:
-        working-directory: examples/strategies/sma_crossover/python
+        working-directory: examples/strategies/${{ matrix.example }}/python
 
     steps:
       - uses: actions/checkout@v4
@@ -128,7 +132,7 @@ jobs:
           package_path = Path(trade_api.__file__).resolve()
           source_path = Path(os.environ['REPOSITORY_SDK_SOURCE']).resolve()
           assert not package_path.is_relative_to(source_path), package_path
-          print(f'Python strategy uses limeint-sdk {version(\"limeint-sdk\")} from {package_path}')
+          print(f'${{ matrix.example }} uses limeint-sdk {version(\"limeint-sdk\")} from {package_path}')
           "
 
       - name: Lint, type-check, and test
@@ -139,11 +143,15 @@ jobs:
           uv run pytest
 
   node:
-    name: Node strategy against npm SDK
+    name: Node ${{ matrix.example }} against npm SDK
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example: [sma_crossover, macd_zero_cross]
     defaults:
       run:
-        working-directory: examples/strategies/sma_crossover/node
+        working-directory: examples/strategies/${{ matrix.example }}/node
 
     steps:
       - uses: actions/checkout@v4
@@ -151,7 +159,7 @@ jobs:
         with:
           node-version: "20"
           cache: npm
-          cache-dependency-path: examples/strategies/sma_crossover/node/package-lock.json
+          cache-dependency-path: examples/strategies/${{ matrix.example }}/node/package-lock.json
 
       - name: Install published SDK and test tools
         run: npm ci

@@ -7,14 +7,14 @@ on:
       - 'sdk/python/**'
       - 'proto/**'
       - 'examples/sdk/python/**'
-      - 'examples/strategies/sma_crossover/python/**'
+      - 'examples/strategies/*/python/**'
       - '.github/workflows/python_test.yml'
   pull_request:
     paths:
       - 'sdk/python/**'
       - 'proto/**'
       - 'examples/sdk/python/**'
-      - 'examples/strategies/sma_crossover/python/**'
+      - 'examples/strategies/*/python/**'
       - '.github/workflows/python_test.yml'
   workflow_dispatch:
 
@@ -212,13 +212,18 @@ jobs:
           .venv/bin/mypy .
 
   strategy-test:
-    name: Strategy test against installed SDK wheel
+    name: ${{ matrix.example }} test against installed SDK wheel
     runs-on: ubuntu-latest
     needs: build
 
+    strategy:
+      fail-fast: false
+      matrix:
+        example: [sma_crossover, macd_zero_cross]
+
     defaults:
       run:
-        working-directory: examples/strategies/sma_crossover/python
+        working-directory: examples/strategies/${{ matrix.example }}/python
 
     steps:
       - name: Checkout repository
