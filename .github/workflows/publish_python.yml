@@ -115,14 +115,17 @@ jobs:
           "$RUNNER_TEMP/limeint-sdk-smoke/bin/python" -c \
             "from trade_api import TradeAPIClient; from trade_api.market_data import BarsRequest; print('wheel import passed')"
 
-      - name: Test strategy against the built wheel
-        working-directory: examples/strategies/sma_crossover/python
+      - name: Test strategies against the built wheel
+        working-directory: ${{ github.workspace }}
         env:
           REPOSITORY_SDK_SOURCE: ${{ github.workspace }}/sdk/python
         run: |
-          uv sync --locked --no-install-package limeint-sdk
-          uv pip install --python .venv/bin/python ../../../../sdk/python/dist/*.whl
-          .venv/bin/python -c "
+          for strategy in examples/strategies/*/python; do
+            echo "Testing $strategy"
+            cd "$GITHUB_WORKSPACE/$strategy"
+            uv sync --locked --no-install-package limeint-sdk
+            uv pip install --python .venv/bin/python "$GITHUB_WORKSPACE"/sdk/python/dist/*.whl
+            .venv/bin/python -c "
           import os
           from pathlib import Path
           import trade_api
@@ -133,7 +136,8 @@ jobs:
               raise SystemExit(f'strategy imported repository SDK source: {package_path}')
           print(f'strategy uses installed SDK: {package_path}')
           "
-          .venv/bin/python -m pytest
+            .venv/bin/python -m pytest
+          done
 
       - name: Upload distribution artifacts
         uses: actions/upload-artifact@v4

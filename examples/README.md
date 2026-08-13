@@ -23,8 +23,9 @@ npm ci
 TRADE_API_SECRET=... npm start -- --symbol AAPL@XNAS --check
 ```
 
-See [Trading strategies](strategies/) for the available strategies and shared
-safety conventions.
+The same command works in `examples/strategies/macd_zero_cross/`, the second
+strategy in this repository. See [Trading strategies](strategies/) for what each
+rule does and the shared safety conventions.
 
 ## Focused SDK examples
 

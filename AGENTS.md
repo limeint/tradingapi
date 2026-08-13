@@ -72,8 +72,9 @@ npm --prefix sdk/node run check
 # Node.js focused examples
 npm --prefix examples/sdk/node run check
 
-# Node.js strategy
+# Node.js strategies
 npm --prefix examples/strategies/sma_crossover/node run check
+npm --prefix examples/strategies/macd_zero_cross/node run check
 
 # Python SDK (generate bindings first when starting from a clean clone)
 (cd sdk/python && uv run ./scripts/generate_proto.sh)
@@ -87,11 +88,12 @@ npm --prefix examples/strategies/sma_crossover/node run check
 (cd examples/sdk/python && uv run ruff format --check .)
 (cd examples/sdk/python && uv run mypy .)
 
-# Python strategy
-(cd examples/strategies/sma_crossover/python && uv run ruff check .)
-(cd examples/strategies/sma_crossover/python && uv run ruff format --check .)
-(cd examples/strategies/sma_crossover/python && uv run mypy .)
-(cd examples/strategies/sma_crossover/python && uv run pytest)
+# Python strategies; STRATEGY is sma_crossover or macd_zero_cross
+STRATEGY=sma_crossover
+(cd examples/strategies/$STRATEGY/python && uv run ruff check .)
+(cd examples/strategies/$STRATEGY/python && uv run ruff format --check .)
+(cd examples/strategies/$STRATEGY/python && uv run mypy .)
+(cd examples/strategies/$STRATEGY/python && uv run pytest)
 ```
 
 Do not use `npm run format`, `ruff --fix`, or another modifying formatter during

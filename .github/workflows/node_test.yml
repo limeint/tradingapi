@@ -6,14 +6,14 @@ on:
     paths:
       - 'sdk/node/**'
       - 'examples/sdk/node/**'
-      - 'examples/strategies/sma_crossover/node/**'
+      - 'examples/strategies/*/node/**'
       - 'proto/**'
       - '.github/workflows/node_test.yml'
   pull_request:
     paths:
       - 'sdk/node/**'
       - 'examples/sdk/node/**'
-      - 'examples/strategies/sma_crossover/node/**'
+      - 'examples/strategies/*/node/**'
       - 'proto/**'
       - '.github/workflows/node_test.yml'
   workflow_dispatch:
@@ -68,10 +68,14 @@ jobs:
           npm install --no-save ../../../sdk/node
           npm run check
 
-      - name: Check strategy against this SDK
+      - name: Check strategies against this SDK
         if: matrix.node-version == 20
-        working-directory: examples/strategies/sma_crossover/node
+        working-directory: ${{ github.workspace }}
         run: |
-          npm ci
-          npm install --no-save ../../../../sdk/node
-          npm run check
+          for strategy in examples/strategies/*/node; do
+            echo "Checking $strategy"
+            cd "$GITHUB_WORKSPACE/$strategy"
+            npm ci
+            npm install --no-save "$GITHUB_WORKSPACE/sdk/node"
+            npm run check
+          done
