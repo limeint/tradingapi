@@ -124,7 +124,7 @@ service CorporateActionsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol format. Symbol must be in ticker@mic format. Where ticker is, for example, AAPL, and mic is, for example, XNAS"
+          description: "Invalid symbol format. Symbol must be in ticker@mic format. Where ticker is, for example, SBER, and mic is, for example, MISX"
         }
       }
     };
@@ -146,7 +146,7 @@ service CorporateActionsService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid symbol format. Symbol must be in ticker@mic format. Where ticker is, for example, AAPL, and mic is, for example, XNAS"
+          description: "Invalid symbol format. Symbol must be in ticker@mic format. Where ticker is, for example, SBER, and mic is, for example, MISX"
         }
       }
     };
@@ -313,3 +313,4 @@ enum SortDirection {
   // Descending
   DESC = 1;
 }
+

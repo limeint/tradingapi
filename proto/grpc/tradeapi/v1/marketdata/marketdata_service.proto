@@ -81,7 +81,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     {
       key: "400"
       value: {
-        description: "Invalid symbol passed. The symbol must be in the form ticker@mic. Where ticker is, for example, AAPL. And mic is, for example, XNAS."
+        description: "Invalid symbol passed. The symbol must be in the form ticker@mic. Where ticker is, for example, SBER. And mic is, for example, MISX."
       }
     }
   ]
@@ -91,7 +91,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 service MarketDataService {
   // Getting historical data on an asset (aggregated candlesticks)
   // HTTP request example:
-  // GET /v1/assets/AAPL@XNAS/bars?timeframe=TIME_FRAME_D&interval.start_time=2023-01-01T00:00:00Z&interval.end_time=2023-01-31T23:59:59Z
+  // GET /v1/assets/SBER@MISX/bars?timeframe=TIME_FRAME_D&interval.start_time=2023-01-01T00:00:00Z&interval.end_time=2023-01-31T23:59:59Z
   // Authorization: <token>
   //
   // Parameters:
@@ -112,13 +112,13 @@ service MarketDataService {
       responses: {
         key: "400"
         value: {
-          description: "Invalid character or interval passed. The character must be in the form ticker@mic. Where ticker is, for example, AAPL. And mic is, for example, XNAS."
+          description: "Invalid character or interval passed. The character must be in the form ticker@mic. Where ticker is, for example, SBER. And mic is, for example, MISX."
         }
       }
     };
   };
 
-  // Get the latest quote for an asset. HTTP request example: GET /v1/assets/AAPL@XNAS/quotes/latest. Authorization: <token>
+  // Get the latest quote for an asset. HTTP request example: GET /v1/assets/SBER@MISX/quotes/latest. Authorization: <token>
   rpc LastQuote(QuoteRequest) returns (QuoteResponse) {
     option (google.api.http) = {
       get: "/v1/instruments/{symbol}/quotes/latest"
@@ -136,7 +136,7 @@ service MarketDataService {
 
   // Getting the current order book for an asset
   // HTTP request example:
-  // GET /v1/assets/AAPL@XNAS/orderbook
+  // GET /v1/assets/SBER@MISX/orderbook
   // Authorization: <token>
   rpc OrderBook(OrderBookRequest) returns (OrderBookResponse) {
     option (google.api.http) = {
@@ -155,7 +155,7 @@ service MarketDataService {
 
   // Getting a list of the latest trades for an asset
   // HTTP request example:
-  // GET /v1/assets/AAPL@XNAS/trades/latest
+  // GET /v1/assets/SBER@MISX/trades/latest
   // Authorization: <token>
   rpc LatestTrades(LatestTradesRequest) returns (LatestTradesResponse) {
     option (google.api.http) = {
@@ -513,3 +513,4 @@ message SubscribeLatestTradesResponse {
   // List of Trades
   repeated Trade trades = 2;
 }
+
