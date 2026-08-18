@@ -605,3 +605,4 @@ enum TPSpreadMeasure {
   //  as a percentage with maximum accuracy to hundredths of a percent
   TP_SPREAD_MEASURE_PERCENT = 2;
 }
+
