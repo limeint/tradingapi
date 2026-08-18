@@ -738,7 +738,7 @@ wheels = [
 
 [[package]]
 name = "limeint-sdk"
-version = "2.18.2"
+version = "2.19.0"
 source = { editable = "." }
 dependencies = [
     { name = "googleapis-common-protos" },

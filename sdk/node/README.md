@@ -121,7 +121,6 @@ The returned object exposes generated methods directly:
 | `corporateActions` | `CorporateActionsService` | splits, bonds, dividends |
 | `marketData` | `MarketDataService` | `bars`, `lastQuote`, quote/book/bar streams |
 | `orders` | `OrdersService` | place, cancel, query, order/trade streams |
-| `reports` | `ReportsService` | create, query, and subscribe to reports |
 | `metrics` | `UsageMetricsService` | `getUsageMetrics` |
 
 Request fields use idiomatic lower camel case. TypeScript checks every plain
