@@ -639,3 +639,4 @@ message Constituents {
   // Weight of the instrument in the index
   google.type.Decimal weight = 7;
 }
+

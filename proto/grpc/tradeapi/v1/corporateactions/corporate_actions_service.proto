@@ -313,3 +313,4 @@ enum SortDirection {
   // Descending
   DESC = 1;
 }
+

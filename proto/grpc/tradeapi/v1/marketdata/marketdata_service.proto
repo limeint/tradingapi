@@ -513,3 +513,4 @@ message SubscribeLatestTradesResponse {
   // List of Trades
   repeated Trade trades = 2;
 }
+
