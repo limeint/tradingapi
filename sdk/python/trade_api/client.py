@@ -45,9 +45,6 @@ if TYPE_CHECKING:
     from .proto.grpc.tradeapi.v1.orders.orders_service_pb2_grpc import (
         OrdersServiceStub,
     )
-    from .proto.grpc.tradeapi.v1.reports.reports_service_pb2_grpc import (
-        ReportsServiceStub,
-    )
 
 logger = logging.getLogger(__name__)
 
@@ -124,7 +121,6 @@ class TradeAPIClient:
             self.assets: AssetsServiceStub = stubs["assets"](self._channel)
             self.market_data: MarketDataServiceStub = stubs["market_data"](self._channel)
             self.orders: OrdersServiceStub = stubs["orders"](self._channel)
-            self.reports: ReportsServiceStub = stubs["reports"](self._channel)
             self.metrics: UsageMetricsServiceStub = stubs["metrics"](self._channel)
         except BaseException:
             # Roll back any channels / background threads we opened so the

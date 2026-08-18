@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 # Distribution name on PyPI and its public Python import.
 # Install with ``pip install limeint-sdk`` and import with ``import trade_api``.
 name = "limeint-sdk"
-version = "2.18.2"
+version = "2.19.0"
 description = "Limeint Python SDK for the Trade API (gRPC)"
 readme = "README.md"
 requires-python = ">=3.10"

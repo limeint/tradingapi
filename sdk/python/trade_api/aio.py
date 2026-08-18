@@ -51,9 +51,6 @@ if TYPE_CHECKING:
     from .proto.grpc.tradeapi.v1.orders.orders_service_pb2_grpc import (
         OrdersServiceAsyncStub,
     )
-    from .proto.grpc.tradeapi.v1.reports.reports_service_pb2_grpc import (
-        ReportsServiceAsyncStub,
-    )
 
 logger = logging.getLogger(__name__)
 
@@ -132,7 +129,6 @@ class AsyncTradeAPIClient:
             self.assets: AssetsServiceAsyncStub = stubs["assets"](self._channel)
             self.market_data: MarketDataServiceAsyncStub = stubs["market_data"](self._channel)
             self.orders: OrdersServiceAsyncStub = stubs["orders"](self._channel)
-            self.reports: ReportsServiceAsyncStub = stubs["reports"](self._channel)
             self.metrics: UsageMetricsServiceAsyncStub = stubs["metrics"](self._channel)
             self._started = True
         except BaseException:

@@ -9,6 +9,19 @@ The PyPI distribution is `limeint-sdk`; the Python import name is
 
 ## [Unreleased]
 
+## [2.19.0] — 2026-08-18
+
+Protobuf contracts are re-synced with the Trade API `2.19.0` release line.
+
+### Removed
+
+- `ReportsService` and its `CreateAccountReport`, `GetAccountReportInfo`, and
+  `SubscribeAccountReportInfo` RPCs, dropped from the `2.19.0` contracts. The
+  `client.reports` sub-client and the `trade_api.reports` message module are
+  gone in Python; the `reports` client property and the `@limeint/trade-api/reports`
+  subpath export are gone in Node.js. Callers that generated account reports
+  must migrate off these RPCs.
+
 ## [2.18.2] — 2026-08-13
 
 First stable release of the shared Python and Node.js version line. `2.18.1`
@@ -105,7 +118,8 @@ Initial public release.
 - Distribution name on PyPI is `limeint-sdk`. The import name remains
   `trade_api`.
 
-[Unreleased]: https://github.com/limeint/tradingapi/compare/2.18.2...HEAD
+[Unreleased]: https://github.com/limeint/tradingapi/compare/2.19.0...HEAD
+[2.19.0]: https://github.com/limeint/tradingapi/releases/tag/2.19.0
 [2.18.2]: https://github.com/limeint/tradingapi/releases/tag/2.18.2
 [2.18.1-rc.1]: https://github.com/limeint/tradingapi/releases/tag/2.18.1-rc.1
 [2.18.0]: https://github.com/limeint/tradingapi/releases/tag/2.18.0

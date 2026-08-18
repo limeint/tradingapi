@@ -21,7 +21,6 @@ SHIM_MODULES = [
     "trade_api.auth_messages",
     "trade_api.market_data",
     "trade_api.orders",
-    "trade_api.reports",
     "trade_api.metrics",
 ]
 

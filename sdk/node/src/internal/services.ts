@@ -14,8 +14,6 @@ import type { UsageMetricsServiceClient } from "../generated/grpc/tradeapi/v1/me
 import { UsageMetricsServiceDefinition } from "../generated/grpc/tradeapi/v1/metrics/usage_metrics_service.js";
 import type { OrdersServiceClient } from "../generated/grpc/tradeapi/v1/orders/orders_service.js";
 import { OrdersServiceDefinition } from "../generated/grpc/tradeapi/v1/orders/orders_service.js";
-import type { ReportsServiceClient } from "../generated/grpc/tradeapi/v1/reports/reports_service.js";
-import { ReportsServiceDefinition } from "../generated/grpc/tradeapi/v1/reports/reports_service.js";
 
 export type ServiceClients = Readonly<{
   auth: AuthServiceClient<RetryOptions>;
@@ -24,7 +22,6 @@ export type ServiceClients = Readonly<{
   corporateActions: CorporateActionsServiceClient<RetryOptions>;
   marketData: MarketDataServiceClient<RetryOptions>;
   orders: OrdersServiceClient<RetryOptions>;
-  reports: ReportsServiceClient<RetryOptions>;
   metrics: UsageMetricsServiceClient<RetryOptions>;
 }>;
 
@@ -42,7 +39,6 @@ export const createServiceClients = (
     corporateActions: factory.create(CorporateActionsServiceDefinition, channel, defaults),
     marketData: factory.create(MarketDataServiceDefinition, channel, defaults),
     orders: factory.create(OrdersServiceDefinition, channel, defaults),
-    reports: factory.create(ReportsServiceDefinition, channel, defaults),
     metrics: factory.create(UsageMetricsServiceDefinition, channel, defaults),
   };
 };
