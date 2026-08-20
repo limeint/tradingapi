@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   python-sdk-example:
-    name: Python examples against TestPyPI SDK
+    name: Python examples against PyPI SDK
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -41,16 +41,20 @@ jobs:
           REPOSITORY_SDK_SOURCE: ${{ github.workspace }}/sdk/python
         run: |
           uv run python -c "
-          import os
+          import os, tomllib
           from importlib.metadata import version
           from pathlib import Path
           import trade_api
 
-          assert version('limeint-sdk') == '2.18.1rc1'
+          with open('pyproject.toml', 'rb') as manifest:
+              pins = tomllib.load(manifest)['project']['dependencies']
+          expected = next(p for p in pins if p.startswith('limeint-sdk')).split('==')[1]
+          installed = version('limeint-sdk')
+          assert installed == expected, f'installed {installed}, manifest pins {expected}'
           package_path = Path(trade_api.__file__).resolve()
           source_path = Path(os.environ['REPOSITORY_SDK_SOURCE']).resolve()
           assert not package_path.is_relative_to(source_path), package_path
-          print(f'Python example uses limeint-sdk {version(\"limeint-sdk\")} from {package_path}')
+          print(f'Python example uses limeint-sdk {installed} from {package_path}')
           "
 
       - name: Lint and type-check
@@ -81,7 +85,9 @@ jobs:
         env:
           REPOSITORY_SDK_SOURCE: ${{ github.workspace }}/sdk/node
         run: |
-          npm ls @limeint/trade-api@2.18.1-rc.1 --depth=0
+          expected="$(node -p "require('./package.json').dependencies['@limeint/trade-api']")"
+          echo "package.json pins @limeint/trade-api@${expected}"
+          npm ls "@limeint/trade-api@${expected}" --depth=0
           node --input-type=module -e '
             import { realpathSync } from "node:fs";
             import { fileURLToPath } from "node:url";
@@ -97,7 +103,7 @@ jobs:
         run: npm run check
 
   python:
-    name: Python ${{ matrix.example }} against TestPyPI SDK
+    name: Python ${{ matrix.example }} against PyPI SDK
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -123,16 +129,20 @@ jobs:
           REPOSITORY_SDK_SOURCE: ${{ github.workspace }}/sdk/python
         run: |
           uv run python -c "
-          import os
+          import os, tomllib
           from importlib.metadata import version
           from pathlib import Path
           import trade_api
 
-          assert version('limeint-sdk') == '2.18.1rc1'
+          with open('pyproject.toml', 'rb') as manifest:
+              pins = tomllib.load(manifest)['project']['dependencies']
+          expected = next(p for p in pins if p.startswith('limeint-sdk')).split('==')[1]
+          installed = version('limeint-sdk')
+          assert installed == expected, f'installed {installed}, manifest pins {expected}'
           package_path = Path(trade_api.__file__).resolve()
           source_path = Path(os.environ['REPOSITORY_SDK_SOURCE']).resolve()
           assert not package_path.is_relative_to(source_path), package_path
-          print(f'${{ matrix.example }} uses limeint-sdk {version(\"limeint-sdk\")} from {package_path}')
+          print(f'${{ matrix.example }} uses limeint-sdk {installed} from {package_path}')
           "
 
       - name: Lint, type-check, and test
@@ -166,7 +176,9 @@ jobs:
 
       - name: Verify published SDK identity
         run: |
-          npm ls @limeint/trade-api@2.18.1-rc.1 --depth=0
+          expected="$(node -p "require('./package.json').dependencies['@limeint/trade-api']")"
+          echo "package.json pins @limeint/trade-api@${expected}"
+          npm ls "@limeint/trade-api@${expected}" --depth=0
           node --input-type=module -e '
             const sdk = await import("@limeint/trade-api");
             if (typeof sdk.withTradeApi !== "function") process.exit(1);
