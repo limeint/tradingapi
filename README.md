@@ -24,7 +24,9 @@ The checkout currently targets the `2.19.1` release. The Node.js package
 You need a Trade API secret issued by Limeint. Ask your Limeint account
 administrator or support contact if you do not have one. Treat it like a
 password: keep it in your environment or a gitignored `.env` file, and never
-paste it into source code, chat, issues, or logs.
+paste it into source code, chat, issues, or logs. Contributors working in this
+checkout can put it in one root `.env`; see
+[One environment file for every example](#one-environment-file-for-every-example).
 
 Examples use symbols in `ticker@mic` form, such as `AAPL@XNGS`. The account and
 market-data permissions attached to your secret determine which operations and
@@ -115,9 +117,31 @@ just examples-status
 ```
 
 Use `just examples-use-published` to restore the locked packages. With
-`TRADE_API_SECRET` exported, `just smoke-examples-local` and
+`TRADE_API_SECRET` available, `just smoke-examples-local` and
 `just smoke-examples-published` run the bounded authentication and strategy
 checks in the requested mode. Neither command places orders.
+
+### One environment file for every example
+
+Every `just` recipe loads a single gitignored `.env` from the repository root,
+so the secret and the shared example settings are configured once:
+
+```sh
+cp .env.example .env
+# Edit .env, then:
+just env-status
+just run-strategy-python sma_crossover --check
+just run-strategy-node sma_crossover --check
+just run-sdk-python auth_and_account.py
+just run-sdk-node auth
+```
+
+`just env-status` prints the loaded settings and masks the secret. Variables
+already exported in your shell take precedence over the file, so
+`TRADE_API_SYMBOL=MSFT@XNGS just run-strategy-node sma_crossover --check` still
+works. The example programs themselves never read `.env`; they read the process
+environment, which keeps each directory runnable once copied out of this
+repository.
 
 ## Releases
 

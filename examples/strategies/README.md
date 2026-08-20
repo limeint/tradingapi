@@ -24,7 +24,14 @@ npm ci
 TRADE_API_SECRET=... npm start -- --symbol AAPL@XNGS --check
 ```
 
-Run these from the repository root. Continue with the
+Run these from the repository root. Contributors who would rather keep the
+secret in one place can copy `.env.example` to `.env` at the repository root and
+run any strategy through `just` instead, which loads that file:
+
+```sh
+just run-strategy-python sma_crossover --check
+just run-strategy-node sma_crossover --check
+``` Continue with the
 [SMA strategy guide](sma_crossover/) before opening a live stream or enabling
 execution.
 
@@ -54,7 +61,6 @@ examples/
   strategies/
     <strategy>/
       README.md          # the rule, candle handling, safety guards, configuration
-      .env.example       # settings shared by every implementation
       python/            # self-contained implementation + its own README
       node/              # self-contained implementation + its own README
 ```
@@ -80,7 +86,8 @@ Every implementation added here should:
 - evaluate completed candles rather than changing candles;
 - start in dry-run mode, and require an explicit flag before placing orders;
 - honor the safety guards described in the strategy README;
-- use the environment variables documented by the strategy;
+- use the environment variables documented by the strategy, reading them from
+  the process environment rather than from a file;
 - include focused unit tests that need no credentials or network access.
 
 These examples are learning material, not a production trading system.

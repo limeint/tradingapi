@@ -45,9 +45,9 @@ uv run python main.py \
 ```
 
 Flags can be replaced by the environment variables in the shared
-[configuration table](../README.md#configuration). Python does not load
-[`../.env.example`](../.env.example) automatically. Use
-`uv run python main.py --help` for all flags.
+[configuration table](../README.md#configuration). Python does not read the
+repository-root `.env` on its own; `just run-strategy-python macd_zero_cross` loads
+it for you. Use `uv run python main.py --help` for all flags.
 
 ## Enable real execution
 

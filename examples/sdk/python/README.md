@@ -17,6 +17,14 @@ TRADE_API_SECRET=... uv run python auth_and_account.py
 The bounded smoke test authenticates, prints the visible account IDs, and
 fetches the first account when one is available. It never places an order.
 
+To keep the secret in one place instead of on each command, fill in the
+repository-root `.env` (see [Configure a secret](../README.md#configure-a-secret))
+and run the same example through `just`, which loads it:
+
+```sh
+just run-sdk-python auth_and_account.py
+```
+
 ## Stream quotes with asyncio
 
 This read-only example streams until Ctrl-C:

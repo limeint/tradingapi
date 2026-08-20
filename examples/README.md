@@ -25,7 +25,27 @@ TRADE_API_SECRET=... npm start -- --symbol AAPL@XNGS --check
 
 The same command works in `examples/strategies/macd_zero_cross/` and
 `examples/strategies/rsi_threshold/`, the other two strategies in this
-repository. See [Trading strategies](strategies/) for what each rule does and the
+repository.
+
+## One environment file for every example
+
+Rather than repeating `TRADE_API_SECRET=...` on each command, copy the single
+`.env.example` at the repository root to `.env`, fill it in once, and run any
+example through `just`, which loads that file:
+
+```sh
+cp .env.example .env
+# Edit .env, then:
+just env-status
+just run-strategy-python sma_crossover --check
+just run-strategy-node sma_crossover --check
+just run-sdk-python auth_and_account.py
+just run-sdk-node auth
+```
+
+`.env` is gitignored, and values already exported in your shell take precedence
+over it. The example programs never read the file themselves, so each directory
+stays runnable once copied out of this repository. See [Trading strategies](strategies/) for what each rule does and the
 shared safety conventions.
 
 ## Focused SDK examples

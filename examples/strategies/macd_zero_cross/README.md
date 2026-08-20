@@ -142,19 +142,28 @@ opened by the strategy. Real market orders also carry price and liquidity risk.
 ## Configuration
 
 Every implementation reads the same settings from flags or environment
-variables. The programs do not load `.env` automatically. To use a local file,
-copy [`.env.example`](.env.example), edit it, and export its values in your shell
-before starting an implementation:
+variables. One shared file at the repository root supplies them, and every
+`just` recipe loads it automatically:
 
 ```sh
+# From the repository root
 cp .env.example .env
 # Edit .env, then:
+just run-strategy-python macd_zero_cross --check
+just run-strategy-node macd_zero_cross --check
+```
+
+The programs themselves never read `.env`. To start one directly from its
+language directory instead, export the file first:
+
+```sh
 set -a
-source .env
+source ../../../../.env
 set +a
 ```
 
-The repository ignores `.env`; never commit real secrets.
+The repository ignores `.env`; never commit real secrets. Values already
+exported in your shell win over the file.
 
 | Environment variable | Required | Default |
 | --- | --- | --- |

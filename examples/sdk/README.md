@@ -11,16 +11,20 @@ experience of an application outside this repository.
 
 ## Configure a secret
 
-Either export `TRADE_API_SECRET` directly or prepare the shared gitignored
-environment file from the repository root:
+One gitignored file at the repository root holds `TRADE_API_SECRET` and the
+other shared settings, and every `just` recipe loads it:
 
 ```sh
-cp examples/sdk/.env.example examples/sdk/.env
-# Edit examples/sdk/.env, then:
-set -a
-source examples/sdk/.env
-set +a
+# From the repository root
+cp .env.example .env
+# Edit .env, then:
+just env-status
+just run-sdk-python auth_and_account.py
+just run-sdk-node auth
 ```
+
+The examples themselves never read `.env`. To run one directly from its own
+directory instead, export `TRADE_API_SECRET` in your shell first.
 
 Start with each language's bounded authentication example. Order examples are
 separately guarded because they submit real orders.

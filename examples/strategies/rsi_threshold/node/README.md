@@ -42,7 +42,8 @@ npm start -- --symbol AAPL@XNGS --timeframe M5 --quantity 1
 
 Flags can be replaced by the environment variables in the shared
 [configuration table](../README.md#configuration). Neither Node.js nor this
-example loads `.env` automatically. Use `npm start -- --help` for all flags.
+example reads the repository-root `.env` on its own; `just run-strategy-node
+rsi_threshold` loads it for you. Use `npm start -- --help` for all flags.
 
 ## Enable real execution
 

@@ -1,5 +1,11 @@
 set shell := ["zsh", "-cu"]
 
+# Every recipe below loads the repository-root .env, so a single file supplies
+# TRADE_API_SECRET and the shared example settings. Copy .env.example to .env to
+# create it. Variables already exported in the shell take precedence.
+set dotenv-load := true
+set dotenv-path := "."
+
 default: check
 
 # Install every development dependency from its lockfile.
@@ -137,6 +143,34 @@ examples-status:
     uv run --project examples/strategies/sma_crossover/python --no-sync python -c 'import trade_api; print("Python SMA strategy:", trade_api.__file__)'
     uv run --project examples/strategies/macd_zero_cross/python --no-sync python -c 'import trade_api; print("Python MACD strategy:", trade_api.__file__)'
     uv run --project examples/strategies/rsi_threshold/python --no-sync python -c 'import trade_api; print("Python RSI strategy:", trade_api.__file__)'
+
+# Show the shared settings the root .env supplies. The secret is masked.
+env-status:
+    for name in TRADE_API_SECRET TRADE_API_SYMBOL TRADE_API_TIMEFRAME TRADE_API_QUANTITY TRADE_API_LOG_LEVEL TRADE_API_LIMIT_PRICE TRADE_API_EXECUTE; do value="${(P)name:-}"; if [ -z "$value" ]; then printf '%-22s unset\n' "$name"; elif [ "$name" = TRADE_API_SECRET ]; then printf '%-22s set (%d characters)\n' "$name" "${#value}"; else printf '%-22s %s\n' "$name" "$value"; fi; done
+
+# Run a strategy implementation with the settings from the root .env. STRATEGY
+# is sma_crossover, macd_zero_cross, or rsi_threshold, and trailing arguments
+# reach the program. Dry-run is the default; --check is bounded and read-only.
+#   just run-strategy-python sma_crossover --check
+run-strategy-python strategy *args:
+    uv run --project examples/strategies/{{strategy}}/python --no-sync python examples/strategies/{{strategy}}/python/main.py {{args}}
+
+# Node.js twin of run-strategy-python.
+#   just run-strategy-node sma_crossover --check
+run-strategy-node strategy *args:
+    npm --prefix examples/strategies/{{strategy}}/node start -- {{args}}
+
+# Run a focused SDK example with the settings from the root .env. SCRIPT is a
+# file name under examples/sdk/python/.
+#   just run-sdk-python auth_and_account.py
+run-sdk-python script *args:
+    uv run --project examples/sdk/python --no-sync python examples/sdk/python/{{script}} {{args}}
+
+# Node.js twin of run-sdk-python. SCRIPT is a package script: auth, quotes, or
+# order.
+#   just run-sdk-node auth
+run-sdk-node script *args:
+    npm --prefix examples/sdk/node run {{script}} -- {{args}}
 
 # Bounded, read-only live checks using whichever SDK mode is currently active.
 smoke-node-examples:

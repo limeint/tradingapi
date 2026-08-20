@@ -16,7 +16,11 @@ belong after user onboarding.
   the published SDKs by default.
 - `examples/strategies/` contains complete applications that depend on the
   published SDKs by default.
-- `justfile` is the repository-wide contributor command surface.
+- `.env.example` is the single template for the gitignored root `.env` that
+  every `just` recipe loads.
+- `justfile` is the repository-wide contributor command surface. Use
+  `just run-strategy-python`, `just run-strategy-node`, `just run-sdk-python`,
+  and `just run-sdk-node` to run an example with those shared settings.
 
 Read the closest README before changing a package or example. Keep language-
 specific instructions with that language and shared strategy behavior in the
@@ -31,6 +35,9 @@ strategy-level README.
   `--check` mode before dry-run streaming; it does not inspect accounts or place
   orders.
 - Keep `.env.example` values fake. Real `.env` files are gitignored.
+- There is exactly one `.env.example`, at the repository root. Every `just`
+  recipe loads the root `.env`, so example settings are configured once. Do not
+  reintroduce per-example environment files.
 
 ## Generated code and public boundaries
 
@@ -45,7 +52,9 @@ strategy-level README.
 - Handwritten SDK code must expose generated functionality through the existing
   public client and per-service module patterns.
 - Example implementations must remain copyable and import only the public
-  package for their language. Their committed manifests and lockfiles must
+  package for their language. They read configuration from the process
+  environment and must never load an environment file themselves, which would
+  tie them to this repository's layout. Their committed manifests and lockfiles must
   resolve published artifacts; contributor commands may override installed
   environments locally without editing those files.
 - Python and Node.js package versions move together. Python uses the normalized
