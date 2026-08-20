@@ -29,6 +29,7 @@ const fakeServer = async (options: FakeOptions = {}) => {
   let renewalStarted = false;
   let renewalCancelled = false;
   const authorization: Array<string | Uint8Array | undefined> = [];
+  const tokenDetailsAuthorization: Array<string | Uint8Array | undefined> = [];
   const renewalReady = new Promise<void>((resolve) => {
     releaseRenewal = resolve;
   });
@@ -40,7 +41,8 @@ const fakeServer = async (options: FakeOptions = {}) => {
       }
       return { token: options.initialToken ?? "jwt-1" };
     },
-    async tokenDetails() {
+    async tokenDetails(_request: unknown, context: CallContext) {
+      tokenDetailsAuthorization.push(context.metadata.get("authorization"));
       return { accountIds: ["A1"], readonly: false };
     },
     async *subscribeJwtRenewal(_request: unknown, context: CallContext) {
@@ -101,6 +103,7 @@ const fakeServer = async (options: FakeOptions = {}) => {
     pushRenewal: () => releaseRenewal?.(),
     accountCalls: () => accountCalls,
     authorization,
+    tokenDetailsAuthorization,
     renewalStarted: () => renewalStarted,
     renewalCancelled: () => renewalCancelled,
     close: () => server.shutdown(),
@@ -126,6 +129,31 @@ describe("createTradeApi", () => {
       await waitUntil(() => client.getToken() === "jwt-2");
       await client.accounts.getAccount({ accountId: "A2" });
       expect(fake.authorization.at(-1)).toBe("jwt-2");
+    } finally {
+      await client.close();
+      await fake.close();
+    }
+  });
+
+  it("reaches AuthService without an Authorization header", async () => {
+    const fake = await fakeServer();
+    const client = await createTradeApi({
+      secret: "secret",
+      endpoint: fake.endpoint,
+      insecure: true,
+    });
+
+    try {
+      // AuthService takes its token in the request body. The server rejects
+      // TokenDetails outright when an Authorization header is also present.
+      await expect(client.auth.tokenDetails({ token: client.getToken() })).resolves.toMatchObject({
+        accountIds: ["A1"],
+      });
+      expect(fake.tokenDetailsAuthorization).toEqual([undefined]);
+
+      // Every other service still receives the header.
+      await client.accounts.getAccount({ accountId: "A1" });
+      expect(fake.authorization.at(-1)).toBe("jwt-1");
     } finally {
       await client.close();
       await fake.close();

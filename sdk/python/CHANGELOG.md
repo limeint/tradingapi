@@ -9,6 +9,27 @@ The PyPI distribution is `limeint-sdk`; the Python import name is
 
 ## [Unreleased]
 
+## [2.19.1] — 2026-08-20
+
+### Fixed
+
+- `AuthService` is now reached without an `Authorization` header in both SDKs.
+  `TokenDetails` carries its token in the request body, and the server rejects
+  the call with `INVALID_ARGUMENT` ("Token is invalid or malformed") when a
+  header is also present. This made `client.auth.TokenDetails` (Python) and
+  `api.auth.tokenDetails` (Node.js) fail for every caller, including the
+  authentication examples, which use it to discover account IDs. The public
+  auth stub now sits on the credential-free channel that already served `Auth`
+  and `SubscribeJwtRenewal`. Every other service is unchanged and still sends
+  the header.
+
+### Changed
+
+- The asynchronous Python auth channel now carries the retry interceptors, so a
+  transient `UNAVAILABLE` on the initial `Auth` call is retried instead of
+  surfacing immediately. Streaming RPCs, including `SubscribeJwtRenewal`, are
+  unaffected — the stream interceptor is a pass-through.
+
 ## [2.19.0] — 2026-08-18
 
 Protobuf contracts are re-synced with the Trade API `2.19.0` release line.
@@ -118,7 +139,8 @@ Initial public release.
 - Distribution name on PyPI is `limeint-sdk`. The import name remains
   `trade_api`.
 
-[Unreleased]: https://github.com/limeint/tradingapi/compare/2.19.0...HEAD
+[Unreleased]: https://github.com/limeint/tradingapi/compare/2.19.1...HEAD
+[2.19.1]: https://github.com/limeint/tradingapi/releases/tag/2.19.1
 [2.19.0]: https://github.com/limeint/tradingapi/releases/tag/2.19.0
 [2.18.2]: https://github.com/limeint/tradingapi/releases/tag/2.18.2
 [2.18.1-rc.1]: https://github.com/limeint/tradingapi/releases/tag/2.18.1-rc.1

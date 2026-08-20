@@ -14,13 +14,13 @@ request or response translation layer.
 
 Python 3.10 or newer is required.
 
-This checkout currently targets `2.18.2`, which is on PyPI. Create and activate
+This checkout currently targets `2.19.1`, which is on PyPI. Create and activate
 a virtual environment, then install it:
 
 ```sh
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install limeint-sdk==2.18.2
+python -m pip install limeint-sdk==2.19.1
 ```
 
 > The PyPI distribution is `limeint-sdk`; the Python import name is `trade_api`.

@@ -77,6 +77,7 @@ class TradeAPIClient:
         self._secret = secret
         self._retry_policy = retry_policy
         self._auth_channel: grpc.Channel | None = None
+        self._auth_stub_channel: grpc.Channel | None = None
         self._channel: grpc.Channel | None = None
         self._token_manager: TokenManager | None = None
 
@@ -85,6 +86,9 @@ class TradeAPIClient:
                 self._auth_channel = grpc.insecure_channel(endpoint, options=channel_options)
                 self._token_manager = TokenManager(self._auth_channel, secret)
                 self._token_manager.start()
+                self._auth_stub_channel = grpc.intercept_channel(
+                    self._auth_channel, build_sync_interceptor(retry_policy)
+                )
                 app_channel = grpc.insecure_channel(endpoint, options=channel_options)
                 self._channel = grpc.intercept_channel(
                     app_channel,
@@ -101,6 +105,13 @@ class TradeAPIClient:
                 self._token_manager = TokenManager(self._auth_channel, secret)
                 self._token_manager.start()
 
+                # Public AuthService stub. It shares the auth channel's socket
+                # but adds retries, and deliberately carries no call
+                # credentials — see the self.auth assignment below.
+                self._auth_stub_channel = grpc.intercept_channel(
+                    self._auth_channel, build_sync_interceptor(retry_policy)
+                )
+
                 # Application channel layers the call credentials (Authorization
                 # header) on top of TLS and installs the retry interceptor.
                 call_creds = sync_call_credentials(self._token_manager)
@@ -116,7 +127,11 @@ class TradeAPIClient:
             # analysis. The stub classes' overloaded __new__ also lets a
             # checker discriminate sync vs. async based on the channel type.
             stubs = service_stubs()
-            self.auth: AuthServiceStub = stubs["auth"](self._channel)
+            # AuthService authenticates with the secret or with a token carried
+            # in the request body, never with an Authorization header.
+            # TokenDetails is rejected outright when one is present, so this
+            # stub must not sit on the credentialed application channel.
+            self.auth: AuthServiceStub = stubs["auth"](self._auth_stub_channel)
             self.accounts: AccountsServiceStub = stubs["accounts"](self._channel)
             self.assets: AssetsServiceStub = stubs["assets"](self._channel)
             self.market_data: MarketDataServiceStub = stubs["market_data"](self._channel)

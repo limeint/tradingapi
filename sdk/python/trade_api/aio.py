@@ -124,7 +124,11 @@ class AsyncTradeAPIClient:
             # these annotations match runtime behavior — RPC methods are typed
             # as returning awaitables / async iterators.
             stubs = service_stubs()
-            self.auth: AuthServiceAsyncStub = stubs["auth"](self._channel)
+            # AuthService authenticates with the secret or with a token carried
+            # in the request body, never with an Authorization header.
+            # TokenDetails is rejected outright when one is present, so this
+            # stub must not sit on the credentialed application channel.
+            self.auth: AuthServiceAsyncStub = stubs["auth"](self._auth_channel)
             self.accounts: AccountsServiceAsyncStub = stubs["accounts"](self._channel)
             self.assets: AssetsServiceAsyncStub = stubs["assets"](self._channel)
             self.market_data: MarketDataServiceAsyncStub = stubs["market_data"](self._channel)
@@ -138,8 +142,14 @@ class AsyncTradeAPIClient:
             raise
 
     async def _start_insecure(self) -> None:
+        # grpc.aio takes interceptors at construction time, so the auth channel
+        # is built with retries up front. It stays free of call credentials —
+        # AuthService must not receive an Authorization header.
+        auth_retry_unary, auth_retry_stream = build_async_interceptors(self._retry_policy)
         self._auth_channel = grpc.aio.insecure_channel(
-            self._endpoint, options=self._channel_options
+            self._endpoint,
+            options=self._channel_options,
+            interceptors=[auth_retry_unary, auth_retry_stream],
         )
         self._token_manager = AsyncTokenManager(self._auth_channel, self._secret)
         await self._token_manager.start()
@@ -157,8 +167,15 @@ class AsyncTradeAPIClient:
 
     async def _start_secure(self) -> None:  # pragma: no cover - real TLS endpoint
         transport = grpc.ssl_channel_credentials()
+        # Transport credentials only, plus retries: this channel carries both
+        # the JWT lifecycle RPCs and the public AuthService stub, neither of
+        # which may send an Authorization header.
+        auth_retry_unary, auth_retry_stream = build_async_interceptors(self._retry_policy)
         self._auth_channel = grpc.aio.secure_channel(
-            self._endpoint, transport, options=self._channel_options
+            self._endpoint,
+            transport,
+            options=self._channel_options,
+            interceptors=[auth_retry_unary, auth_retry_stream],
         )
         self._token_manager = AsyncTokenManager(self._auth_channel, self._secret)
         await self._token_manager.start()

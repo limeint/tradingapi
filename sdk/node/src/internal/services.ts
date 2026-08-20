@@ -15,6 +15,17 @@ import { UsageMetricsServiceDefinition } from "../generated/grpc/tradeapi/v1/met
 import type { OrdersServiceClient } from "../generated/grpc/tradeapi/v1/orders/orders_service.js";
 import { OrdersServiceDefinition } from "../generated/grpc/tradeapi/v1/orders/orders_service.js";
 
+/**
+ * The two client factories a Trade API client needs.
+ *
+ * `AuthService` must be reached without an Authorization header, so it cannot
+ * share the factory that every other service uses.
+ */
+export type ServiceClientFactories = Readonly<{
+  authorized: ClientFactory<RetryOptions>;
+  unauthenticated: ClientFactory<RetryOptions>;
+}>;
+
 export type ServiceClients = Readonly<{
   auth: AuthServiceClient<RetryOptions>;
   accounts: AccountsServiceClient<RetryOptions>;
@@ -26,19 +37,23 @@ export type ServiceClients = Readonly<{
 }>;
 
 export const createServiceClients = (
-  factory: ClientFactory<RetryOptions>,
+  factories: ServiceClientFactories,
   channel: Channel,
   retry: RetryOptions,
 ): ServiceClients => {
   const defaults = { "*": retry } as const;
+  const { authorized, unauthenticated } = factories;
 
   return {
-    auth: factory.create(AuthServiceDefinition, channel, defaults),
-    accounts: factory.create(AccountsServiceDefinition, channel, defaults),
-    assets: factory.create(AssetsServiceDefinition, channel, defaults),
-    corporateActions: factory.create(CorporateActionsServiceDefinition, channel, defaults),
-    marketData: factory.create(MarketDataServiceDefinition, channel, defaults),
-    orders: factory.create(OrdersServiceDefinition, channel, defaults),
-    metrics: factory.create(UsageMetricsServiceDefinition, channel, defaults),
+    // AuthService authenticates with the secret or with a token carried in the
+    // request body, never with an Authorization header. TokenDetails is
+    // rejected outright when one is present, so this client must not add it.
+    auth: unauthenticated.create(AuthServiceDefinition, channel, defaults),
+    accounts: authorized.create(AccountsServiceDefinition, channel, defaults),
+    assets: authorized.create(AssetsServiceDefinition, channel, defaults),
+    corporateActions: authorized.create(CorporateActionsServiceDefinition, channel, defaults),
+    marketData: authorized.create(MarketDataServiceDefinition, channel, defaults),
+    orders: authorized.create(OrdersServiceDefinition, channel, defaults),
+    metrics: authorized.create(UsageMetricsServiceDefinition, channel, defaults),
   };
 };

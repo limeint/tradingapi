@@ -60,6 +60,9 @@ class FakeAuthService(auth_service_pb2_grpc.AuthServiceServicer):
     def __init__(self, initial_token: str = "jwt-1") -> None:
         self._initial_token = initial_token
         self.auth_calls = 0
+        # Metadata seen by the most recent TokenDetails call, so tests can
+        # assert that no Authorization header reaches AuthService.
+        self.token_details_metadata: tuple[tuple[str, Any], ...] | None = None
         self._subscribe_calls = 0
         self._fail_subscribes = 0
         self._queue: Queue[str | None] = Queue()
@@ -77,6 +80,9 @@ class FakeAuthService(auth_service_pb2_grpc.AuthServiceServicer):
         request: auth_service_pb2.TokenDetailsRequest,
         context: grpc.ServicerContext,
     ) -> Any:
+        self.token_details_metadata = tuple(
+            (key, value) for key, value in context.invocation_metadata()
+        )
         return auth_service_pb2.TokenDetailsResponse(account_ids=["A12345"], readonly=False)
 
     def SubscribeJwtRenewal(

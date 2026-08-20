@@ -22,6 +22,9 @@ from trade_api import (
 from trade_api.proto.grpc.tradeapi.v1.accounts.accounts_service_pb2 import (
     GetAccountRequest,
 )
+from trade_api.proto.grpc.tradeapi.v1.auth.auth_service_pb2 import (
+    TokenDetailsRequest,
+)
 from trade_api.proto.grpc.tradeapi.v1.marketdata.marketdata_service_pb2 import (
     SubscribeQuoteRequest,
 )
@@ -270,6 +273,47 @@ async def test_async_streaming_subscription_yields_events_and_carries_auth() -> 
             assert len(received) == 3
             md = dict(market_data.last_metadata)
             assert md.get("authorization") == "async-stream-jwt"
+        auth.close_stream()
+
+
+def test_token_details_is_reached_without_an_authorization_header() -> None:
+    """AuthService takes its credential in the request body, never in a header.
+
+    The live server rejects TokenDetails with INVALID_ARGUMENT ("Token is
+    invalid or malformed") when an Authorization header is present, so the
+    public auth stub must not sit on the credentialed application channel.
+    """
+    auth = FakeAuthService()
+    accounts = FakeAccountsService()
+    with fake_server(auth=auth, accounts=accounts) as (endpoint, _):
+        with TradeAPIClient.for_testing(secret="s", endpoint=endpoint) as client:
+            details = client.auth.TokenDetails(TokenDetailsRequest(token="jwt-1"))
+            assert list(details.account_ids) == ["A12345"]
+
+            keys = {key for key, _ in auth.token_details_metadata or ()}
+            assert "authorization" not in keys
+
+            # Every other service still gets the header.
+            client.accounts.GetAccount(GetAccountRequest(account_id="A1"))
+            assert dict(accounts.last_metadata).get("authorization") == "jwt-1"
+        auth.close_stream()
+
+
+@pytest.mark.asyncio
+async def test_async_token_details_is_reached_without_an_authorization_header() -> None:
+    """Async mirror of the sync AuthService header test."""
+    auth = FakeAuthService()
+    accounts = FakeAccountsService()
+    with fake_server(auth=auth, accounts=accounts) as (endpoint, _):
+        async with AsyncTradeAPIClient.for_testing(secret="s", endpoint=endpoint) as client:
+            details = await client.auth.TokenDetails(TokenDetailsRequest(token="jwt-1"))
+            assert list(details.account_ids) == ["A12345"]
+
+            keys = {key for key, _ in auth.token_details_metadata or ()}
+            assert "authorization" not in keys
+
+            await client.accounts.GetAccount(GetAccountRequest(account_id="A1"))
+            assert dict(accounts.last_metadata).get("authorization") == "jwt-1"
         auth.close_stream()
 
 

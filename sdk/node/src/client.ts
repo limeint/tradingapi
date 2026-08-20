@@ -63,11 +63,18 @@ export const createTradeApi = async (options: TradeApiOptions): Promise<TradeApi
     throw toTradeApiError(error);
   }
 
-  const factory = createClientFactory()
+  const authorized = createClientFactory()
     .use(authorization(() => token))
     .use(retryMiddleware)
     .use(mapErrors);
-  const services = createServiceClients(factory, channel, resolveRetry(options.retry));
+  // AuthService takes its credential in the request body, so it is reached
+  // without the Authorization header that every other service requires.
+  const unauthenticated = createClientFactory().use(retryMiddleware).use(mapErrors);
+  const services = createServiceClients(
+    { authorized, unauthenticated },
+    channel,
+    resolveRetry(options.retry),
+  );
   const abort = new AbortController();
   const renewal = renewToken(
     rawAuth,
