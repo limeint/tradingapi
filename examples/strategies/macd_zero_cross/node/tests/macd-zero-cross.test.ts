@@ -22,7 +22,7 @@ const bar = (seconds: number, close = "0") =>
 
 const config = (overrides: Partial<Config> = {}): Config => ({
   secret: "secret",
-  symbol: "AAPL@XNAS",
+  symbol: "AAPL@XNGS",
   timeframe: "M5",
   quantity: 2,
   execute: false,
@@ -63,7 +63,7 @@ const fakeApi = (bars = historyBars(), accountIds = ["A1"], updates: Bar[][] = [
       },
     },
     marketData: {
-      bars: async () => ({ symbol: "AAPL@XNAS", bars }),
+      bars: async () => ({ symbol: "AAPL@XNGS", bars }),
       subscribeBars: async function* () {
         for (const update of updates) yield { bars: update };
       },
@@ -75,7 +75,7 @@ const fakeApi = (bars = historyBars(), accountIds = ["A1"], updates: Bar[][] = [
           positions:
             positionValue === "0"
               ? []
-              : [{ symbol: "AAPL@XNAS", quantity: { value: positionValue } }],
+              : [{ symbol: "AAPL@XNGS", quantity: { value: positionValue } }],
         };
       },
     },

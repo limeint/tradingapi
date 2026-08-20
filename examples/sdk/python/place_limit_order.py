@@ -32,7 +32,7 @@ def main() -> None:
     except KeyError as exc:
         raise RuntimeError("set TRADE_API_LIMIT_PRICE to the intended limit price") from exc
 
-    symbol = os.environ.get("TRADE_API_SYMBOL", "AAPL@XNAS")
+    symbol = os.environ.get("TRADE_API_SYMBOL", "AAPL@XNGS")
     quantity = os.environ.get("TRADE_API_QUANTITY", "1")
 
     with TradeAPIClient(secret=secret) as client:

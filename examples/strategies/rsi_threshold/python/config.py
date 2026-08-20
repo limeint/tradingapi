@@ -70,7 +70,7 @@ def parse_config(
     if not args.secret:
         parser.error("--secret or TRADE_API_SECRET is required")
     if not args.symbol or "@" not in args.symbol:
-        parser.error("--symbol must use ticker@mic format, for example AAPL@XNAS")
+        parser.error("--symbol must use ticker@mic format, for example AAPL@XNGS")
     if args.check and args.execute:
         parser.error("--check and --execute cannot be used together")
 

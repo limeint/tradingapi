@@ -14,14 +14,14 @@ authenticate, fetch historical candles, calculate the latest signal, and exit.
 # Python 3.10+ and uv
 cd examples/strategies/sma_crossover/python
 uv sync --locked
-TRADE_API_SECRET=... uv run python main.py --symbol AAPL@XNAS --check
+TRADE_API_SECRET=... uv run python main.py --symbol AAPL@XNGS --check
 ```
 
 ```sh
 # Node.js 20+
 cd examples/strategies/sma_crossover/node
 npm ci
-TRADE_API_SECRET=... npm start -- --symbol AAPL@XNAS --check
+TRADE_API_SECRET=... npm start -- --symbol AAPL@XNGS --check
 ```
 
 Run these from the repository root. Continue with the

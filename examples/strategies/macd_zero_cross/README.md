@@ -18,14 +18,14 @@ does not inspect an account, open a live subscription, or place an order.
 # Python 3.10+ and uv
 cd examples/strategies/macd_zero_cross/python
 uv sync --locked
-TRADE_API_SECRET=... uv run python main.py --symbol AAPL@XNAS --check
+TRADE_API_SECRET=... uv run python main.py --symbol AAPL@XNGS --check
 ```
 
 ```sh
 # Node.js 20+
 cd examples/strategies/macd_zero_cross/node
 npm ci
-TRADE_API_SECRET=... npm start -- --symbol AAPL@XNAS --check
+TRADE_API_SECRET=... npm start -- --symbol AAPL@XNGS --check
 ```
 
 Expected output starts with:
@@ -164,7 +164,7 @@ The repository ignores `.env`; never commit real secrets.
 | `TRADE_API_QUANTITY` | No | `1` |
 | `TRADE_API_LOG_LEVEL` | No | `INFO` |
 
-Symbols use `ticker@mic` format, for example `AAPL@XNAS`. Supported timeframes
+Symbols use `ticker@mic` format, for example `AAPL@XNGS`. Supported timeframes
 are `M1`, `M5`, `M15`, `M30`, `H1`, `H2`, `H4`, `H8`, `D`, `W`, `MN`, and `QR`.
 The MACD windows are part of the rule and are not configurable from the command
 line. `evaluate` takes them as arguments, so a copy of the example can run other
@@ -208,7 +208,7 @@ History ready: close=108.38596018061494 macd=-0.824422 macd_signal=-1.716780
 Closed bar: close=109.46749318524913 macd=-0.476849 macd_signal=-1.468793 histogram=0.991944 signal=none
 Closed bar: close=110.34030597120521 macd=-0.129474 macd_signal=-1.200930 histogram=1.071456 signal=none
 Closed bar: close=110.91996935976759 macd=0.190403 macd_signal=-0.922663 histogram=1.113066 signal=entry
-DRY RUN: entry 2 units of AAPL@XNAS
+DRY RUN: entry 2 units of AAPL@XNGS
 ```
 
 Both implementations emit the same message text. Python routes it through

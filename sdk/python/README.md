@@ -121,7 +121,7 @@ from trade_api.market_data import SubscribeQuoteRequest
 
 with TradeAPIClient(secret=os.environ["TRADE_API_SECRET"]) as client:
     for tick in client.market_data.SubscribeQuote(
-        SubscribeQuoteRequest(symbols=["AAPL@XNAS"])
+        SubscribeQuoteRequest(symbols=["AAPL@XNGS"])
     ):
         print(tick)
 ```

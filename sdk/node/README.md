@@ -94,7 +94,7 @@ process.once("SIGINT", () => abort.abort());
 
 await withTradeApi({ secret }, async (api) => {
   for await (const update of api.marketData.subscribeQuote(
-    { symbols: ["AAPL@XNAS"] },
+    { symbols: ["AAPL@XNGS"] },
     { signal: abort.signal },
   )) {
     console.log(update);
@@ -135,7 +135,7 @@ import { OrderType, Side, TimeInForce } from "@limeint/trade-api/orders";
 
 const order = await api.orders.placeOrder({
   accountId: "A12345",
-  symbol: "AAPL@XNAS",
+  symbol: "AAPL@XNGS",
   quantity: { value: "1" },
   side: Side.SIDE_BUY,
   type: OrderType.ORDER_TYPE_LIMIT,
@@ -166,7 +166,7 @@ const abort = new AbortController();
 process.once("SIGINT", () => abort.abort());
 
 for await (const update of api.marketData.subscribeQuote(
-  { symbols: ["AAPL@XNAS"] },
+  { symbols: ["AAPL@XNGS"] },
   { signal: abort.signal },
 )) {
   console.log(update);

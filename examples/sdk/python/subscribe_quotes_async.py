@@ -18,5 +18,5 @@ async def main(symbols: list[str]) -> None:
 
 
 if __name__ == "__main__":
-    selected_symbols = sys.argv[1:] or ["AAPL@XNAS"]
+    selected_symbols = sys.argv[1:] or ["AAPL@XNGS"]
     asyncio.run(main(selected_symbols))

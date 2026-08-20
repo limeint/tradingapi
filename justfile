@@ -141,15 +141,15 @@ examples-status:
 # Bounded, read-only live checks using whichever SDK mode is currently active.
 smoke-node-examples:
     npm --prefix examples/sdk/node run smoke
-    npm --prefix examples/strategies/sma_crossover/node start -- --symbol "${TRADE_API_SYMBOL:-AAPL@XNAS}" --check
-    npm --prefix examples/strategies/macd_zero_cross/node start -- --symbol "${TRADE_API_SYMBOL:-AAPL@XNAS}" --check
-    npm --prefix examples/strategies/rsi_threshold/node start -- --symbol "${TRADE_API_SYMBOL:-AAPL@XNAS}" --check
+    npm --prefix examples/strategies/sma_crossover/node start -- --symbol "${TRADE_API_SYMBOL:-AAPL@XNGS}" --check
+    npm --prefix examples/strategies/macd_zero_cross/node start -- --symbol "${TRADE_API_SYMBOL:-AAPL@XNGS}" --check
+    npm --prefix examples/strategies/rsi_threshold/node start -- --symbol "${TRADE_API_SYMBOL:-AAPL@XNGS}" --check
 
 smoke-python-examples:
     uv run --project examples/sdk/python --no-sync python examples/sdk/python/auth_and_account.py
-    uv run --project examples/strategies/sma_crossover/python --no-sync python examples/strategies/sma_crossover/python/main.py --symbol "${TRADE_API_SYMBOL:-AAPL@XNAS}" --check
-    uv run --project examples/strategies/macd_zero_cross/python --no-sync python examples/strategies/macd_zero_cross/python/main.py --symbol "${TRADE_API_SYMBOL:-AAPL@XNAS}" --check
-    uv run --project examples/strategies/rsi_threshold/python --no-sync python examples/strategies/rsi_threshold/python/main.py --symbol "${TRADE_API_SYMBOL:-AAPL@XNAS}" --check
+    uv run --project examples/strategies/sma_crossover/python --no-sync python examples/strategies/sma_crossover/python/main.py --symbol "${TRADE_API_SYMBOL:-AAPL@XNGS}" --check
+    uv run --project examples/strategies/macd_zero_cross/python --no-sync python examples/strategies/macd_zero_cross/python/main.py --symbol "${TRADE_API_SYMBOL:-AAPL@XNGS}" --check
+    uv run --project examples/strategies/rsi_threshold/python --no-sync python examples/strategies/rsi_threshold/python/main.py --symbol "${TRADE_API_SYMBOL:-AAPL@XNGS}" --check
 
 smoke-examples: smoke-node-examples smoke-python-examples
 

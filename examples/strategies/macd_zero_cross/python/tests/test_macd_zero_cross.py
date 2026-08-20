@@ -29,7 +29,7 @@ def make_bar(seconds: int, close: str = "0") -> Bar:
 def config(**overrides: Any) -> Config:
     values = {
         "secret": "secret",
-        "symbol": "AAPL@XNAS",
+        "symbol": "AAPL@XNGS",
         "timeframe": "M5",
         "quantity": Decimal(2),
         "execute": False,
@@ -73,10 +73,10 @@ class FakeClient:
         self.auth = SimpleNamespace(TokenDetails=token_details)
         self.get_token = lambda: "jwt"
         self.market_data = SimpleNamespace(
-            Bars=lambda request: BarsResponse(symbol="AAPL@XNAS", bars=bars),
+            Bars=lambda request: BarsResponse(symbol="AAPL@XNGS", bars=bars),
             SubscribeBars=lambda request: iter(updates or []),
         )
-        positions = [] if position == "0" else [Position(symbol="AAPL@XNAS")]
+        positions = [] if position == "0" else [Position(symbol="AAPL@XNGS")]
         if positions:
             positions[0].quantity.value = position
         self.account_calls = 0

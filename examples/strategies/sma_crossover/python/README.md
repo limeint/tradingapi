@@ -11,7 +11,7 @@ repository root:
 ```sh
 cd examples/strategies/sma_crossover/python
 uv sync --locked
-TRADE_API_SECRET=... uv run python main.py --symbol AAPL@XNAS --check
+TRADE_API_SECRET=... uv run python main.py --symbol AAPL@XNGS --check
 ```
 
 Check mode authenticates, fetches historical bars, calculates the latest
@@ -37,7 +37,7 @@ Ctrl-C.
 ```sh
 TRADE_API_SECRET=... \
 uv run python main.py \
-  --symbol AAPL@XNAS \
+  --symbol AAPL@XNGS \
   --timeframe M5 \
   --quantity 1
 ```
@@ -55,7 +55,7 @@ Flags can be replaced by the environment variables in the shared
 
 ```sh
 TRADE_API_SECRET=... \
-uv run python main.py --symbol AAPL@XNAS --quantity 1 --execute
+uv run python main.py --symbol AAPL@XNGS --quantity 1 --execute
 ```
 
 At startup, the strategy discovers account IDs through

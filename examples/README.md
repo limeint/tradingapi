@@ -12,7 +12,7 @@ exits after one result:
 ```sh
 cd examples/strategies/sma_crossover/python
 uv sync --locked
-TRADE_API_SECRET=... uv run python main.py --symbol AAPL@XNAS --check
+TRADE_API_SECRET=... uv run python main.py --symbol AAPL@XNGS --check
 ```
 
 Node.js users can run the equivalent implementation:
@@ -20,7 +20,7 @@ Node.js users can run the equivalent implementation:
 ```sh
 cd examples/strategies/sma_crossover/node
 npm ci
-TRADE_API_SECRET=... npm start -- --symbol AAPL@XNAS --check
+TRADE_API_SECRET=... npm start -- --symbol AAPL@XNGS --check
 ```
 
 The same command works in `examples/strategies/macd_zero_cross/` and

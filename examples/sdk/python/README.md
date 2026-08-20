@@ -23,7 +23,7 @@ This read-only example streams until Ctrl-C:
 
 ```sh
 TRADE_API_SECRET=... \
-uv run python subscribe_quotes_async.py AAPL@XNAS MSFT@XNAS
+uv run python subscribe_quotes_async.py AAPL@XNGS MSFT@XNGS
 ```
 
 ## Place and attempt to cancel a real limit order
@@ -33,7 +33,7 @@ uv run python subscribe_quotes_async.py AAPL@XNAS MSFT@XNAS
 
 ```sh
 TRADE_API_SECRET=... \
-TRADE_API_SYMBOL=AAPL@XNAS \
+TRADE_API_SYMBOL=AAPL@XNGS \
 TRADE_API_QUANTITY=1 \
 TRADE_API_LIMIT_PRICE=REPLACE_WITH_LIMIT_PRICE \
 TRADE_API_EXECUTE=1 \

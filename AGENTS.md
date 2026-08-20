@@ -9,7 +9,7 @@ belong after user onboarding.
 
 ## Repository map
 
-- `proto/` contains the source protobuf contracts.
+- `proto/` contains the source protobuf contracts and is managed externally.
 - `sdk/python/` contains the `limeint-sdk` package, imported as `trade_api`.
 - `sdk/node/` contains the `@limeint/trade-api` package.
 - `examples/sdk/` contains focused, self-contained applications that depend on
@@ -34,9 +34,14 @@ strategy-level README.
 
 ## Generated code and public boundaries
 
-- Edit contracts under `proto/`; do not hand-edit generated bindings under
-  `sdk/node/src/generated/` or `sdk/python/trade_api/proto/`.
-- Run `just generate` after changing protobuf contracts.
+- `proto/` is managed externally and is not editable from this repository. Do
+  not add, remove, reformat, or otherwise modify anything under `proto/`,
+  including comments and the doc examples inside them. A needed contract change
+  belongs upstream; surface it there and wait for the synced contracts.
+- Do not hand-edit generated bindings under `sdk/node/src/generated/` or
+  `sdk/python/trade_api/proto/`. They inherit upstream comments verbatim, so
+  they can legitimately disagree with this repository's own documentation.
+- Run `just generate` after `proto/` is re-synced from upstream.
 - Handwritten SDK code must expose generated functionality through the existing
   public client and per-service module patterns.
 - Example implementations must remain copyable and import only the public
@@ -57,6 +62,10 @@ strategy-level README.
   behind an explicit warning.
 - Show where to run a command from, required tools, expected first output, and
   the next relevant README.
+- Use `AAPL@XNGS` in symbol examples. The Trade API resolves `ticker@mic`
+  against segment MICs, so the Nasdaq operating MIC `XNAS` does not match a
+  listing. `proto/` and the generated bindings still show `AAPL@XNAS`; that
+  is upstream text and stays as it is.
 - Avoid copying long API catalogs into agent instructions; link to the package
   README or source of truth instead.
 

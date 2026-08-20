@@ -18,14 +18,14 @@ does not inspect an account, open a live subscription, or place an order.
 # Python 3.10+ and uv
 cd examples/strategies/sma_crossover/python
 uv sync --locked
-TRADE_API_SECRET=... uv run python main.py --symbol AAPL@XNAS --check
+TRADE_API_SECRET=... uv run python main.py --symbol AAPL@XNGS --check
 ```
 
 ```sh
 # Node.js 20+
 cd examples/strategies/sma_crossover/node
 npm ci
-TRADE_API_SECRET=... npm start -- --symbol AAPL@XNAS --check
+TRADE_API_SECRET=... npm start -- --symbol AAPL@XNGS --check
 ```
 
 Expected output starts with:
@@ -118,7 +118,7 @@ The repository ignores `.env`; never commit real secrets.
 | `TRADE_API_QUANTITY` | No | `1` |
 | `TRADE_API_LOG_LEVEL` | No | `INFO` |
 
-Symbols use `ticker@mic` format, for example `AAPL@XNAS`. Supported timeframes
+Symbols use `ticker@mic` format, for example `AAPL@XNGS`. Supported timeframes
 are `M1`, `M5`, `M15`, `M30`, `H1`, `H2`, `H4`, `H8`, `D`, `W`, `MN`, and `QR`.
 
 ## Read-only smoke test

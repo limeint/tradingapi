@@ -18,14 +18,14 @@ inspect an account, open a live subscription, or place an order.
 # Python 3.10+ and uv
 cd examples/strategies/rsi_threshold/python
 uv sync --locked
-TRADE_API_SECRET=... uv run python main.py --symbol AAPL@XNAS --check
+TRADE_API_SECRET=... uv run python main.py --symbol AAPL@XNGS --check
 ```
 
 ```sh
 # Node.js 20+
 cd examples/strategies/rsi_threshold/node
 npm ci
-TRADE_API_SECRET=... npm start -- --symbol AAPL@XNAS --check
+TRADE_API_SECRET=... npm start -- --symbol AAPL@XNGS --check
 ```
 
 Expected output starts with:
@@ -190,7 +190,7 @@ The repository ignores `.env`; never commit real secrets.
 | `TRADE_API_QUANTITY` | No | `1` |
 | `TRADE_API_LOG_LEVEL` | No | `INFO` |
 
-Symbols use `ticker@mic` format, for example `AAPL@XNAS`. Supported timeframes
+Symbols use `ticker@mic` format, for example `AAPL@XNGS`. Supported timeframes
 are `M1`, `M5`, `M15`, `M30`, `H1`, `H2`, `H4`, `H8`, `D`, `W`, `MN`, and `QR`.
 The period and both levels are part of the rule and are not configurable from
 the command line. `evaluate` takes them as arguments, so a copy of the example
@@ -236,7 +236,7 @@ Closed bar: close=99.35551757554535 rsi=0.409960 average_gain=0.099908 average_l
 Closed bar: close=98.27792419044236 rsi=0.305910 average_gain=0.092772 average_loss=0.210494 signal=none
 Closed bar: close=97.14548127769474 rsi=0.237647 average_gain=0.086146 average_loss=0.276348 signal=none
 Closed bar: close=96.10407145930658 rsi=0.194634 average_gain=0.079992 average_loss=0.330995 signal=entry
-DRY RUN: entry 2 units of AAPL@XNAS
+DRY RUN: entry 2 units of AAPL@XNGS
 ```
 
 Both implementations emit the same message text. Python routes it through

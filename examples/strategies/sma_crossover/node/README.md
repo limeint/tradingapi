@@ -10,7 +10,7 @@ Requires Node.js 20 or newer. From the repository root:
 ```sh
 cd examples/strategies/sma_crossover/node
 npm ci
-TRADE_API_SECRET=... npm start -- --symbol AAPL@XNAS --check
+TRADE_API_SECRET=... npm start -- --symbol AAPL@XNGS --check
 ```
 
 Check mode authenticates, fetches historical bars, calculates the latest
@@ -32,7 +32,7 @@ Ctrl-C.
 
 ```sh
 TRADE_API_SECRET=... \
-npm start -- --symbol AAPL@XNAS --timeframe M5 --quantity 1
+npm start -- --symbol AAPL@XNGS --timeframe M5 --quantity 1
 ```
 
 Flags can be replaced by the environment variables in the shared
@@ -47,7 +47,7 @@ example loads `.env` automatically. Use `npm start -- --help` for all flags.
 
 ```sh
 TRADE_API_SECRET=... \
-npm start -- --symbol AAPL@XNAS --quantity 1 --execute
+npm start -- --symbol AAPL@XNGS --quantity 1 --execute
 ```
 
 At startup, the strategy discovers account IDs through

@@ -4,7 +4,7 @@ import { withTradeApi } from "@limeint/trade-api";
 import { OrderType, Side, TimeInForce } from "@limeint/trade-api/orders";
 
 const secret = process.env.TRADE_API_SECRET;
-const symbol = process.env.TRADE_API_SYMBOL ?? "AAPL@XNAS";
+const symbol = process.env.TRADE_API_SYMBOL ?? "AAPL@XNGS";
 const quantity = process.env.TRADE_API_QUANTITY ?? "1";
 const limitPrice = process.env.TRADE_API_LIMIT_PRICE;
 

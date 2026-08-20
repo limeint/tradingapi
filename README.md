@@ -26,7 +26,7 @@ administrator or support contact if you do not have one. Treat it like a
 password: keep it in your environment or a gitignored `.env` file, and never
 paste it into source code, chat, issues, or logs.
 
-Examples use symbols in `ticker@mic` form, such as `AAPL@XNAS`. The account and
+Examples use symbols in `ticker@mic` form, such as `AAPL@XNGS`. The account and
 market-data permissions attached to your secret determine which operations and
 symbols are available.
 
@@ -43,7 +43,7 @@ Requires Python 3.10 or newer and [uv](https://docs.astral.sh/uv/).
 ```sh
 cd examples/strategies/sma_crossover/python
 uv sync --locked
-TRADE_API_SECRET=... uv run python main.py --symbol AAPL@XNAS --check
+TRADE_API_SECRET=... uv run python main.py --symbol AAPL@XNGS --check
 ```
 
 ### Node.js
@@ -53,7 +53,7 @@ Requires Node.js 20 or newer.
 ```sh
 cd examples/strategies/sma_crossover/node
 npm ci
-TRADE_API_SECRET=... npm start -- --symbol AAPL@XNAS --check
+TRADE_API_SECRET=... npm start -- --symbol AAPL@XNGS --check
 ```
 
 Expected output starts with:

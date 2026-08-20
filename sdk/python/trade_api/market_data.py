@@ -5,7 +5,7 @@ Re-exports the proto request/response messages used with
 
     from trade_api.market_data import SubscribeQuoteRequest
     for tick in client.market_data.SubscribeQuote(
-        SubscribeQuoteRequest(symbol="AAPL@XNAS")
+        SubscribeQuoteRequest(symbol="AAPL@XNGS")
     ):
         ...
 """
