@@ -6,8 +6,8 @@ experience of an application outside this repository.
 
 | Language | Package | Examples |
 | --- | --- | --- |
-| [Node.js](node/) | `@limeint/trade-api@2.18.1-rc.1` from npm | authentication, quotes, limit order |
-| [Python](python/) | `limeint-sdk==2.18.1rc1` from TestPyPI | authentication, async quotes, limit order |
+| [Node.js](node/) | `@limeint/trade-api@2.19.1` from npm | authentication, quotes, limit order |
+| [Python](python/) | `limeint-sdk==2.19.1` from PyPI | authentication, async quotes, limit order |
 
 ## Configure a secret
 

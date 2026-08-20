@@ -1,7 +1,7 @@
 # Limeint MACD 12/26/9 zero cross — Node.js
 
 TypeScript implementation of the [MACD zero-cross strategy](../README.md), using
-the published `@limeint/trade-api@2.18.1-rc.1` package.
+the published `@limeint/trade-api@2.19.1` package.
 
 ## Quick start
 

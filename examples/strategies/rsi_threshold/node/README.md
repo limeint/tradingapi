@@ -1,7 +1,7 @@
 # Limeint RSI 14 threshold — Node.js
 
 TypeScript implementation of the [RSI threshold strategy](../README.md), using
-the published `@limeint/trade-api@2.18.1-rc.1` package.
+the published `@limeint/trade-api@2.19.1` package.
 
 ## Quick start
 

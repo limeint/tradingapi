@@ -16,9 +16,8 @@ and streaming so applications can focus on trading logic.
 | See a mean-reversion rule | [RSI 14 threshold](examples/strategies/rsi_threshold/) |
 | Work on this repository | [Repository development](#repository-development) |
 
-The checkout currently targets the `2.18.1-rc.1` prerelease. The Node.js
-package is on npm. The Python prerelease is on TestPyPI; it is not yet available
-from the main PyPI index.
+The checkout currently targets the `2.19.1` release. The Node.js package
+`@limeint/trade-api` is on npm, and the Python package `limeint-sdk` is on PyPI.
 
 ## Before you begin
 

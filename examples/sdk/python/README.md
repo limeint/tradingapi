@@ -1,7 +1,7 @@
 # Python SDK examples
 
 These are standalone application examples for the published `limeint-sdk`
-`2.18.1rc1` package. They do not import SDK source or generated protobuf files
+`2.19.1` package. They do not import SDK source or generated protobuf files
 from this repository.
 
 ## Install and authenticate

@@ -1,7 +1,7 @@
 # Limeint RSI 14 threshold — Python
 
 Python implementation of the [RSI threshold strategy](../README.md), using the
-published Limeint SDK (`limeint-sdk==2.18.1rc1`, imported as `trade_api`).
+published Limeint SDK (`limeint-sdk==2.19.1`, imported as `trade_api`).
 
 ## Quick start
 
@@ -115,6 +115,6 @@ Restore the published wheel with `just examples-use-published-python`.
 This directory is self-contained and can be copied out of the repository. For
 Trade API functionality it imports only public `trade_api` modules. It does not
 import from `sdk/python`, generated modules under `trade_api.proto`, or the raw
-repository `proto/` directory. The lockfile pins the TestPyPI wheel and its
+repository `proto/` directory. The lockfile pins the PyPI wheel and its
 SHA-256 digest, and consumer CI verifies that imports resolve from that installed
 distribution.

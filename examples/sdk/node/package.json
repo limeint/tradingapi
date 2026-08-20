@@ -18,7 +18,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@limeint/trade-api": "2.18.1-rc.1"
+    "@limeint/trade-api": "2.19.1"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.5",

@@ -1,7 +1,7 @@
 # Limeint SMA 9/30 crossover — Node.js
 
 TypeScript implementation of the [SMA 9/30 crossover strategy](../README.md),
-using the published `@limeint/trade-api@2.18.1-rc.1` package.
+using the published `@limeint/trade-api@2.19.1` package.
 
 ## Quick start
 

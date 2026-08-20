@@ -239,31 +239,17 @@ wheels = [
 
 [[package]]
 name = "limeint-sdk"
-version = "2.18.1rc1"
-source = { url = "https://test-files.pythonhosted.org/packages/2a/8a/6bd3032d3d9fad37890765d878e3c52f88a309ce120a65226e678d1dd2aa/limeint_sdk-2.18.1rc1-py3-none-any.whl" }
+version = "2.19.1"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "googleapis-common-protos" },
     { name = "grpcio" },
     { name = "protobuf" },
 ]
+sdist = { url = "https://files.pythonhosted.org/packages/3f/98/7a600a1d69f205fe5e739d81d0ff03f96b34cbaec6dc255121589f73d956/limeint_sdk-2.19.1.tar.gz", hash = "sha256:af14749f588d8f1f4bb175b2534afe345a9daa7eea76993577181b4926548d4a", size = 109168, upload-time = "2026-08-20T09:25:22.117Z" }
 wheels = [
-    { url = "https://test-files.pythonhosted.org/packages/2a/8a/6bd3032d3d9fad37890765d878e3c52f88a309ce120a65226e678d1dd2aa/limeint_sdk-2.18.1rc1-py3-none-any.whl", hash = "sha256:22214756066b8b02ae43ec22798f6cf923508c367a0ab24534d20592b57021d1" },
+    { url = "https://files.pythonhosted.org/packages/01/8f/0a63fc393858fe9134cea732f08f50a909e93699890438013edbc58d39d2/limeint_sdk-2.19.1-py3-none-any.whl", hash = "sha256:061a6b5a7d564a294591c8c18451c1c26ef1f1d530ca8fbd7760869b859a6414", size = 127786, upload-time = "2026-08-20T09:25:20.579Z" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "googleapis-common-protos", specifier = ">=1.62" },
-    { name = "grpcio", specifier = ">=1.83.0" },
-    { name = "grpcio-tools", marker = "extra == 'dev'", specifier = "==1.83.0" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
-    { name = "mypy-protobuf", marker = "extra == 'dev'", specifier = "==5.1.0" },
-    { name = "protobuf", specifier = ">=7.35.1" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.23" },
-    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.3" },
-]
-provides-extras = ["dev"]
 
 [[package]]
 name = "limeint-sma-crossover-example"
@@ -285,7 +271,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "googleapis-common-protos", specifier = ">=1.62" },
-    { name = "limeint-sdk", url = "https://test-files.pythonhosted.org/packages/2a/8a/6bd3032d3d9fad37890765d878e3c52f88a309ce120a65226e678d1dd2aa/limeint_sdk-2.18.1rc1-py3-none-any.whl" },
+    { name = "limeint-sdk", specifier = "==2.19.1" },
     { name = "protobuf", specifier = ">=7.35" },
 ]
 
