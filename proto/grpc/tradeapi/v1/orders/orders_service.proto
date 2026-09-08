@@ -8,6 +8,7 @@ import "google/type/decimal.proto";
 import "grpc/tradeapi/v1/side.proto";
 import "grpc/tradeapi/v1/trade.proto";
 import "grpc/gateway/protoc_gen_openapiv2/options/annotations.proto";
+import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/limeint/tradingapi/go/grpc/tradeapi/v1/orders";
 option java_multiple_files = true;
@@ -530,6 +531,8 @@ message OrderState {
   SLTPOrder sltp_order = 11;
   // ID of the exchange order generated as a result of a met condition or stop price trigger.
   string triggered_order_id = 12;
+  // Order status description
+  google.protobuf.StringValue status_description = 13;
 }
 
 // Request to receive a list of trade orders
@@ -594,6 +597,12 @@ message SLTPOrder {
   google.protobuf.Timestamp valid_expiry_time = 22;
   // Order label. (maximum 128 characters)
   string comment = 23;
+  // Volume unit of measurement for the Stop Loss part.
+  // If SLTP_QTY_MEASURE_PERCENT — quantity_sl is treated as a percentage (0–100) of the position at the time of execution.
+  SLTPQtyMeasure sl_qty_measure = 24;
+  // Volume unit of measurement for the Take Profit part.
+  // If SLTP_QTY_MEASURE_PERCENT — quantity_tp is treated as a percentage (0–100) of the position at the time of execution.
+  SLTPQtyMeasure tp_qty_measure = 25;
 }
 
 // Unit of measurement of the protective spread for the TP execution price
@@ -604,5 +613,15 @@ enum TPSpreadMeasure {
   TP_SPREAD_MEASURE_VALUE = 1;
   //  as a percentage with maximum accuracy to hundredths of a percent
   TP_SPREAD_MEASURE_PERCENT = 2;
+}
+
+// Volume unit of measurement for SL/TP orders
+enum SLTPQtyMeasure {
+  // Not defined
+  SLTP_QTY_MEASURE_UNDEFINED = 0;
+  // Quantity in units (pieces). Default value.
+  SLTP_QTY_MEASURE_VALUE = 1;
+  // Percentage of the position at the time of execution, accurate to hundredths of a percent
+  SLTP_QTY_MEASURE_PERCENT = 2;
 }
 
