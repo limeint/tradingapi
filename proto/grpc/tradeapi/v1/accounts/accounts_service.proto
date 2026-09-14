@@ -324,5 +324,7 @@ message Transaction {
   string transaction_name = 9;
   // Change in qty only for securities transfers (for TransactionCategory = TRANSFER)
   google.type.Decimal change_qty = 10;
+  // Full list of tickers (symbols) included in the transaction. The symbol field is retained and populated with the first element for backward compatibility.
+  repeated string symbols = 12;
 }
 
