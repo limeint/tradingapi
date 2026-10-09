@@ -9,6 +9,29 @@ The PyPI distribution is `limeint-sdk`; the Python import name is
 
 ## [Unreleased]
 
+## [2.23.0] — 2026-10-09
+
+Protobuf contracts are re-synced with the Trade API `2.23.0` release line.
+
+### Added
+
+- `Position.current_price_currency` and `Position.average_price_currency`.
+- `Transaction.symbols`, the full list of tickers in a transaction. `symbol`
+  is kept and holds the first element.
+- `AccountTrade.commission` (`AccountTrade.Commission` with `value` and
+  `currency`), filled in for historical trades.
+- `OrderState.status_description`.
+- SL/TP volume in percent of the position: `SLTPOrder.sl_qty_measure` and
+  `SLTPOrder.tp_qty_measure` take the new `SLTPQtyMeasure` enum.
+- `SLTPOrder.sl_guard_time` and `SLTPOrder.tp_guard_time`, in seconds.
+
+### Removed
+
+- The `FORTS` portfolio message and `GetAccountResponse.portfolio_forts`,
+  which belong to the Moscow Exchange derivatives market and are not part of
+  this API's contracts. `trade_api.accounts.FORTS` is gone in Python and the
+  `FORTS` export is gone in Node.js.
+
 ## [2.19.1] — 2026-08-20
 
 ### Fixed

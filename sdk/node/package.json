@@ -1,6 +1,6 @@
 {
   "name": "@limeint/trade-api",
-  "version": "2.19.1",
+  "version": "2.23.0",
   "description": "Functional TypeScript SDK for the Limeint gRPC Trade API",
   "type": "module",
   "main": "./dist/index.js",
