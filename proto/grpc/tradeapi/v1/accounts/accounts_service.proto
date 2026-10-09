@@ -193,8 +193,6 @@ message GetAccountResponse {
   oneof portfolio {
     // Portfolio type for accounts in US markets.
     MCT portfolio_mct = 9;
-    // Portfolio type for trading on the Moscow Exchange derivatives market.
-    FORTS portfolio_forts = 10;
   }
   // Account opening date
   google.protobuf.Timestamp open_account_date = 11;
@@ -207,15 +205,6 @@ message GetAccountResponse {
 // Portfolio type for accounts on US markets.
 // Provides access to US exchanges: NYSE NASDAQ CBOE CME, trades in US stocks, futures, and options.
 message MCT {
-}
-
-// Portfolio type for trading on the Moscow Exchange derivatives market.
-// Designed for working with derivative financial instruments: futures and options.
-message FORTS {
-  // The amount of equity in the account available for trading. Includes margin funds.
-  google.type.Decimal available_cash = 1;
-  // Minimum margin (required collateral amount for open positions)
-  google.type.Decimal money_reserved = 2;
 }
 
 // Request to receive trade history
@@ -256,16 +245,20 @@ message Position {
   string symbol = 1;
   // Quantity in units. Signed value defining (long-short)
   google.type.Decimal quantity = 2;
-  // Average price. Not populated for FORTS positions.
+  // Average price.
   google.type.Decimal average_price = 3;
   // Current price
   google.type.Decimal current_price = 4;
-  // Maintenance margin. Only completed for FORTS positions.
+  // Maintenance margin.
   google.type.Decimal maintenance_margin = 5;
-  // Profit or loss for the current day (PnL). Not populated for FORTS positions.
+  // Profit or loss for the current day (PnL).
   google.type.Decimal daily_pnl = 6;
   // Total unrealized profit or loss (PnL) of the current position
   google.type.Decimal unrealized_pnl = 7;
+  // Currency code of the current price.
+  string current_price_currency = 8;
+  // Currency code of the average price.
+  string average_price_currency = 9;
 }
 
 // Transaction Information
@@ -276,7 +269,7 @@ message Transaction {
     google.type.Decimal size = 1;
     // Trade price per unit. Strike price/Option premium. This is the execution price; the value is taken from the trade.
     google.type.Decimal price = 2;
-    // NKD. Completed if the transaction includes NKD.
+    // Accrued interest. Completed if the transaction includes accrued interest.
     google.type.Decimal accrued_interest = 3;
   }
   // Transaction categories.
@@ -324,5 +317,7 @@ message Transaction {
   string transaction_name = 9;
   // Change in qty only for securities transfers (for TransactionCategory = TRANSFER)
   google.type.Decimal change_qty = 10;
+  // Full list of tickers (symbols) included in the transaction. The symbol field is retained and populated with the first element for backward compatibility.
+  repeated string symbols = 12;
 }
 
