@@ -11,6 +11,13 @@ option java_multiple_files = true;
 
 // Trade Information
 message AccountTrade {
+  // Trade commission
+  message Commission {
+    // Commission value
+    google.type.Decimal value = 1;
+    // Commission currency
+    string currency = 2;
+  }
   // Trade ID
   string trade_id = 1;
   // Asset symbol
@@ -35,5 +42,7 @@ message AccountTrade {
   // Note: The field is filled in only when using the Trades method
   // For SubscribeTrades, this field may be empty due to differences in data sources. When processing trades from a subscription, it is recommended to consider the possibility of an empty value.
   string currency = 11;
+  // Commission. Filled in for historical trades
+  Commission commission = 12;
 }
 

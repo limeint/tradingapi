@@ -362,7 +362,7 @@ message GetAssetResponse {
   message BondDetails {
     // Current face value of one bond.
     google.type.Decimal bond_face_value = 1;
-    // Symbolic currency code of the bond denomination (e.g., RUB, USD).
+    // Symbolic currency code of the bond denomination (e.g., USD).
     string currency = 2;
   }
   // Trading mode code
@@ -430,9 +430,9 @@ message GetAssetParamsResponse {
   google.type.Decimal short_risk_rate = 8;
   // Collateral amount to maintain a Short position
   google.type.Money short_collateral = 9 [deprecated = true];
-  // Initial requirements for how much free cash must be in the account to open a long position for FORTS accounts is equal to the exchange GO
+  // Initial requirements for how much free cash must be in the account to open a long position
   google.type.Money long_initial_margin = 10;
-  // Initial requirements for how much free cash in the account must be available to open a short position for FORTS accounts equal to the exchange GO
+  // Initial requirements for how much free cash in the account must be available to open a short position
   google.type.Money short_initial_margin = 11;
   // Are trading operations available? New field. Allows you to distinguish between false and "not set".
   google.protobuf.BoolValue is_tradable = 12;
