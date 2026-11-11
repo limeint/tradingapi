@@ -365,6 +365,15 @@ message GetAssetResponse {
     // Symbolic currency code of the bond denomination (e.g., USD).
     string currency = 2;
   }
+  // Price step that depends on the order price (e.g., US options). All three fields are always set when the object is present
+  message PriceStep {
+    // Price step when the order price is below threshold_price
+    google.type.Decimal step = 1;
+    // Order price threshold from which step_from_threshold applies
+    google.type.Decimal threshold_price = 2;
+    // Price step when the order price is equal to or above threshold_price
+    google.type.Decimal step_from_threshold = 3;
+  }
   // Trading mode code
   string board = 1;
   // Asset ID
@@ -381,7 +390,7 @@ message GetAssetResponse {
   string name = 7;
   // Number of decimal places in the price
   int32 decimals = 10;
-  // Minimum price step. To calculate the final price step: min_step/(10 decimals)
+  // Minimum price step. To calculate the final price step: min_step/(10 decimals). 0 together with a populated price_step means the price step is not constant — see price_step
   int64 min_step = 11;
   // Number of pieces per lot
   google.type.Decimal lot_size = 9;
@@ -389,6 +398,8 @@ message GetAssetResponse {
   google.type.Date expiration_date = 12 [deprecated = true];
   // The quote currency may not match the asset's trading mode currency.
   string quote_currency = 13;
+  // Price step that depends on the order price. Set only when min_step = 0: use step if the order price is below threshold_price, and step_from_threshold if it is equal to or above
+  PriceStep price_step = 17;
 
   oneof asset_details {
     // Specific parameters for instrument type "Futures"
