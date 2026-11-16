@@ -1,0 +1,66 @@
+name: Build proto descriptor
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing SDK version tag to build (for example 2.24.0)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v3
+
+      - name: Get and verify SDK version
+        id: sdk
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: |
+          TAG_VERSION="${RELEASE_TAG#v}"
+          PYPROJECT_VERSION=$(python3 -c "import tomllib; print(tomllib.load(open('sdk/python/pyproject.toml', 'rb'))['project']['version'])")
+          if [ "$TAG_VERSION" != "$PYPROJECT_VERSION" ]; then
+            echo "::error::Tag $RELEASE_TAG does not match pyproject.toml version $PYPROJECT_VERSION"
+            exit 1
+          fi
+          echo "version=$TAG_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Generate descriptor from proto/grpc
+        env:
+          VERSION: ${{ steps.sdk.outputs.version }}
+        run: |
+          set -euo pipefail
+          mapfile -t PROTOS < <(find proto/grpc -type f -name "*.proto" | sort)
+          if [ ${#PROTOS[@]} -eq 0 ]; then
+            echo "No .proto files found under proto/grpc."
+            exit 1
+          fi
+
+          mkdir -p build/descriptor
+          protoc \
+            --proto_path=proto \
+            --descriptor_set_out="build/descriptor/tradeapi-${VERSION}.pb" \
+            --include_imports \
+            --include_source_info \
+            "${PROTOS[@]}"
+
+      - name: Upload descriptor artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tradeapi_proto_descriptor
+          path: build/descriptor/*.pb
+          if-no-files-found: error
