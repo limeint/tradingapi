@@ -46,6 +46,7 @@ jobs:
 
           # Run protoc with protoc-gen-openapiv2, merging all services into
           # a single docs/swagger/api.swagger.json
+          mkdir -p docs/swagger
           protoc \
             --proto_path=proto \
             --openapiv2_out=docs/swagger \
