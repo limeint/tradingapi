@@ -1,0 +1,4471 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "REST",
+    "description": "Trading API",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "AccountsService"
+    },
+    {
+      "name": "AssetsService"
+    },
+    {
+      "name": "AuthService"
+    },
+    {
+      "name": "CorporateActionsService"
+    },
+    {
+      "name": "MarketDataService"
+    },
+    {
+      "name": "UsageMetricsService"
+    },
+    {
+      "name": "OrdersService"
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/accounts/{account_id}": {
+      "get": {
+        "summary": "Get information on a specific account\nHTTP request example:\nGET /v1/accounts/A12345\nAuthorization: \u003ctoken\u003e",
+        "operationId": "AccountsService_GetAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/accountsGetAccountResponse"
+            }
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "account_id",
+            "description": "Account ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AccountsService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/accounts/{account_id}/orders": {
+      "get": {
+        "summary": "Getting a list of requests for an account\nHTTP request example:\nGET /v1/accounts/A12345/orders\nAuthorization: \u003ctoken\u003e",
+        "operationId": "OrdersService_GetOrders",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ordersOrdersResponse"
+            }
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Invoice not found",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "account_id",
+            "description": "Account ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OrdersService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Placing an exchange order\nHTTP request example:\nPOST /v1/accounts/A12345/orders\nContent-Type: application/json\nAuthorization: \u003ctoken\u003e",
+        "description": "{\n \"symbol\": \"AAPL@XNAS\"\n \"quantity\": {\n \"value\": \"10\"\n }\"\n \"side\": \"SIDE_BUY\"\n \"type\": \"ORDER_TYPE_LIMIT\"\n \"time_in_force\": \"TIME_IN_FORCE_DAY\"\n \"limit_price\": {\n \"value\": \"150.50\"\n }\n}\n\nThe account_id field is taken from URL-paths\" the remaining fields are passed in the request body",
+        "operationId": "OrdersService_PlaceOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ordersOrderState"
+            }
+          },
+          "400": {
+            "description": "Incorrectly passed trade parameters",
+            "schema": {}
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "The account or asset was not found",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "account_id",
+            "description": "Account ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrdersServicePlaceOrderBody"
+            }
+          }
+        ],
+        "tags": [
+          "OrdersService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/accounts/{account_id}/orders/{order_id}": {
+      "get": {
+        "summary": "Get information about a specific order\nHTTP request example:\nGET /v1/accounts/A12345/orders/ORD789012\nAuthorization: \u003ctoken\u003e",
+        "operationId": "OrdersService_GetOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ordersOrderState"
+            }
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Invoice or order not found",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "account_id",
+            "description": "Account ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "order_id",
+            "description": "Order ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OrdersService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Cancel exchange order\nHTTP request example:\nDELETE /v1/accounts/A12345/orders/ORD789012\nAuthorization: \u003ctoken\u003e",
+        "operationId": "OrdersService_CancelOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ordersOrderState"
+            }
+          },
+          "400": {
+            "description": "The request cannot be canceled because it has already been executed.",
+            "schema": {}
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Invoice or order not found",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "account_id",
+            "description": "Account ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "order_id",
+            "description": "Order ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OrdersService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/accounts/{account_id}/sltp-orders": {
+      "post": {
+        "summary": "Issuing an SL/TP order\nExample HTTP request:\nPOST /v1/accounts/A12345/sltp-orders\nContent-Type: application/json\nAuthorization: \u003ctoken\u003e",
+        "description": "{\n \"symbol\": \"AAPL@XNAS\"\n \"side\": \"SIDE_BUY\"\n \"quantity_sl\": {\n \"value\": \"10\"\n }\"\n \"sl_price\": {\n \"value\": \"270.00\"\n }\"\n \"limit_price\": {\n \"value\": \"269.50\"\n }\"\n \"quantity_tp\": {\n \"value\": \"10\"\n }\"\n \"tp_price\": {\n \"value\": \"295.50\"\n }\"\n \"tp_guard_spread\": {\n \"value\": \"0.5\" }\"\n \"tp_spread_measure\": \"TP_SPREAD_MEASURE_VALUE\"\n \"valid_before\": \"VALID_BEFORE_GOOD_TILL_DATE\"\n \"valid_expiry_time\": \"2026-12-31T23:59:59Z\"\n \"comment\": \"my SL/TP order\"\n }\n\n The account_id field is taken from the URL path, the remaining fields are passed in the request body",
+        "operationId": "OrdersService_PlaceSLTPOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ordersOrderState"
+            }
+          },
+          "400": {
+            "description": "Incorrectly transmitted trade parameters",
+            "schema": {}
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account or asset was not found",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "account_id",
+            "description": "Account ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrdersServicePlaceSLTPOrderBody"
+            }
+          }
+        ],
+        "tags": [
+          "OrdersService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/accounts/{account_id}/trades": {
+      "get": {
+        "summary": "Getting account trade history\nHTTP request example:\nGET /v1/accounts/A12345/trades?limit=50\u0026interval.start_time=2023-01-01T00:00:00Z\u0026interval.end_time=2023-01-31T23:59:59Z\nAuthorization: \u003ctoken\u003e",
+        "description": "Parameters:\n- account_id - passed in the URL path\n- limit and interval - passed as query parameters",
+        "operationId": "AccountsService_Trades",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/accountsTradesResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid interval passed",
+            "schema": {}
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "account_id",
+            "description": "Account ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Trade limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "interval.start_time",
+            "description": "Optional. Inclusive start of the interval.\n\nIf specified, a Timestamp matching this interval will have to be the same\nor after the start.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "interval.end_time",
+            "description": "Optional. Exclusive end of the interval.\n\nIf specified, a Timestamp matching this interval will have to be before the\nend.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "tags": [
+          "AccountsService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/accounts/{account_id}/transactions": {
+      "get": {
+        "summary": "Getting a list of account transactions\nHTTP request example:\nGET /v1/accounts/A12345/transactions?limit=50\u0026interval.start_time=2023-01-01T00:00:00Z\u0026interval.end_time=2023-01-31T23:59:59Z\nAuthorization: \u003ctoken\u003e",
+        "description": "Parameters:\n- account_id - passed in the URL path\n- limit and interval - passed as query parameters",
+        "operationId": "AccountsService_Transactions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/accountsTransactionsResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid interval passed",
+            "schema": {}
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "account_id",
+            "description": "Account ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Transaction limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "interval.start_time",
+            "description": "Optional. Inclusive start of the interval.\n\nIf specified, a Timestamp matching this interval will have to be the same\nor after the start.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "interval.end_time",
+            "description": "Optional. Exclusive end of the interval.\n\nIf specified, a Timestamp matching this interval will have to be before the\nend.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "tags": [
+          "AccountsService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/assets": {
+      "get": {
+        "summary": "Get the list of instruments available for trading, along with their descriptions\nHTTP request example:\nGET /v1/assets\nAuthorization: \u003ctoken\u003e",
+        "operationId": "AssetsService_Assets",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/assetsAssetsResponse"
+            }
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "AssetsService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/assets/all": {
+      "get": {
+        "summary": "Get the list of all instruments, including indicative and archived ones, along with their descriptions\nExample HTTP request:\nGET /v1/assets/all?cursor=56658\u0026only_disabled=true\nAuthorization: \u003ctoken\u003e",
+        "operationId": "AssetsService_AllAssets",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/assetsAllAssetsResponse"
+            }
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "cursor",
+            "description": "Cursor for pagination. Specifies the sec_id of the asset with which the list should begin.\nFor the first request, leave this field blank (value 0).\nFor subsequent requests, use the next_cursor value from the previous response.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "only_active",
+            "description": "Filtering by asset status: only active (non-archived) assets are selected\nDefault: false.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "only_disabled",
+            "description": "Filtering by asset status: only inactive (archived) assets are selected\nDefault: false.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "AssetsService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/assets/clock": {
+      "get": {
+        "summary": "Getting the time on the server\nHTTP request example:\nGET /v1/assets/clock\nAuthorization: \u003ctoken\u003e",
+        "operationId": "AssetsService_Clock",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/assetsClockResponse"
+            }
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "AssetsService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/assets/{symbol}": {
+      "get": {
+        "summary": "Getting information on a specific asset\nHTTP request example:\nGET /v1/assets/AAPL@XNAS?account_id=1440399\nAuthorization: \u003ctoken\u003e",
+        "description": "Parameters:\n- symbol - passed in the URL path\n- account_id - passed as a query parameter",
+        "operationId": "AssetsService_GetAsset",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/assetsGetAssetResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid symbol or account passed. The symbol must be in the form ticker@mic. Where ticker is, for example, AAPL. And mic is, for example, XNAS.",
+            "schema": {}
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "symbol",
+            "description": "Symbol",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "account_id",
+            "description": "The account ID for which the asset information will be retrieved.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AssetsService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/assets/{symbol}/constituents": {
+      "get": {
+        "summary": "Get the composition of a stock market index by its symbol.",
+        "operationId": "AssetsService_GetConstituents",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/assetsGetConstituentsResponse"
+            }
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "symbol",
+            "description": "Symbol code of the index (e.g.,\"SPX@_SP\", \"NDX@_SCI\")",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "cursor",
+            "description": "Cursor for pagination. Specifies the sec_id of the asset with which the list should begin.\nFor the first request, leave this field blank (value 0).\nFor subsequent requests, use the next_cursor value from the previous response.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "AssetsService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/assets/{symbol}/params": {
+      "get": {
+        "summary": "Getting trading parameters for an asset\nHTTP request example:\nGET /v1/assets/AAPL@XNAS/params?account_id=1440399\nAuthorization: \u003ctoken\u003e",
+        "description": "Parameters:\n- symbol - passed in the URL path\n- account_id - passed as a query parameter",
+        "operationId": "AssetsService_GetAssetParams",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/assetsGetAssetParamsResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid symbol or account passed. The symbol must be in the form ticker@mic. Where ticker is, for example, AAPL. And mic is, for example, XNAS.",
+            "schema": {}
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "symbol",
+            "description": "Symbol",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "account_id",
+            "description": "ID of the account for which trading parameters will be selected",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AssetsService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/assets/{symbol}/schedule": {
+      "get": {
+        "summary": "Getting a trading schedule for an asset\nHTTP request example:\nGET /v1/assets/AAPL@XNAS/schedule\nAuthorization: \u003ctoken\u003e",
+        "operationId": "AssetsService_Schedule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/assetsScheduleResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid symbol passed. The symbol must be in the form ticker@mic. Where ticker is, for example, AAPL. And mic is, for example, XNAS.",
+            "schema": {}
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "symbol",
+            "description": "Symbol",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AssetsService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/assets/{underlying_symbol}/options": {
+      "get": {
+        "summary": "Getting the options chain for the underlying asset\nHTTP request example:\nGET /v1/assets/AAPL@XNAS/options\nAuthorization: \u003ctoken\u003e",
+        "operationId": "AssetsService_OptionsChain",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/assetsOptionsChainResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid symbol passed. The symbol must be in the form ticker@mic. Where ticker is, for example, AAPL. And mic is, for example, XNAS.",
+            "schema": {}
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "underlying_symbol",
+            "description": "The symbol of the option's underlying asset",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "root",
+            "description": "Optional parameter. Relevant for options on futures by type (weekly, monthly).\nIf this parameter is not specified, options with the closest expiration date will be returned.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "expiration_date.year",
+            "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without\na year.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "expiration_date.month",
+            "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a\nmonth and day.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "expiration_date.day",
+            "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0\nto specify a year by itself or a year and month where the day isn't\nsignificant.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "AssetsService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/exchanges": {
+      "get": {
+        "summary": "Getting a list of available exchange names and MIC codes\nHTTP request example:\nGET /v1/exchanges\nAuthorization: \u003ctoken\u003e",
+        "operationId": "AssetsService_Exchanges",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/assetsExchangesResponse"
+            }
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "AssetsService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/future-dividends": {
+      "get": {
+        "summary": "Get a list of upcoming (future) dividend payments for an instrument",
+        "operationId": "CorporateActionsService_GetFutureDividends",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/corporateactionsGetFutureDividendsResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid symbol format. Symbol must be in ticker@mic format. Where ticker is, for example, AAPL, and mic is, for example, XNAS",
+            "schema": {}
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "symbol",
+            "description": "Instrument symbol",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_direction",
+            "description": "Date sorting direction: asc — from old to new, desc — from new to old\n\n - ASC: Ascending\n - DESC: Descending",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ASC",
+              "DESC"
+            ],
+            "default": "ASC"
+          },
+          {
+            "name": "limit",
+            "description": "Limits the number of elements returned.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "offset",
+            "description": "Specifies the number of elements to skip before returning the result",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "CorporateActionsService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/instruments/{symbol}/bars": {
+      "get": {
+        "summary": "Getting historical data on an asset (aggregated candlesticks)\nHTTP request example:\nGET /v1/assets/AAPL@XNAS/bars?timeframe=TIME_FRAME_D\u0026interval.start_time=2023-01-01T00:00:00Z\u0026interval.end_time=2023-01-31T23:59:59Z\nAuthorization: \u003ctoken\u003e",
+        "description": "Parameters:\n- symbol - passed in the URL path\n- timeframe and interval - passed as query parameters",
+        "operationId": "MarketDataService_Bars",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/marketdataBarsResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid character or interval passed. The character must be in the form ticker@mic. Where ticker is, for example, AAPL. And mic is, for example, XNAS.",
+            "schema": {}
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "symbol",
+            "description": "Asset symbol",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "timeframe",
+            "description": "Required timeframe\n\n - TIME_FRAME_UNSPECIFIED: Timeframe not specified\n - TIME_FRAME_M1: 1 minute. Data depth: 7 days.\n - TIME_FRAME_M5: 5 minutes. Data depth: 30 days.\n - TIME_FRAME_M15: 15 minutes. Data depth: 30 days.\n - TIME_FRAME_M30: 30 minutes. Data depth is 30 days.\n - TIME_FRAME_H1: 1 hour. Data depth: 30 days.\n - TIME_FRAME_H2: 2 hours. Data depth: 30 days.\n - TIME_FRAME_H4: 4 hours. Data depth: 30 days.\n - TIME_FRAME_H8: 8 hours. Data depth: 30 days.\n - TIME_FRAME_D: Day. Data depth is 365 days.\n - TIME_FRAME_W: Week. Data depth 365*5 days.\n - TIME_FRAME_MN: Month. Data depth 365*5 days.\n - TIME_FRAME_QR: Quarter. Data depth 365*5 days.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "TIME_FRAME_UNSPECIFIED",
+              "TIME_FRAME_M1",
+              "TIME_FRAME_M5",
+              "TIME_FRAME_M15",
+              "TIME_FRAME_M30",
+              "TIME_FRAME_H1",
+              "TIME_FRAME_H2",
+              "TIME_FRAME_H4",
+              "TIME_FRAME_H8",
+              "TIME_FRAME_D",
+              "TIME_FRAME_W",
+              "TIME_FRAME_MN",
+              "TIME_FRAME_QR"
+            ],
+            "default": "TIME_FRAME_UNSPECIFIED"
+          },
+          {
+            "name": "interval.start_time",
+            "description": "Optional. Inclusive start of the interval.\n\nIf specified, a Timestamp matching this interval will have to be the same\nor after the start.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "interval.end_time",
+            "description": "Optional. Exclusive end of the interval.\n\nIf specified, a Timestamp matching this interval will have to be before the\nend.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "tags": [
+          "MarketDataService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/instruments/{symbol}/orderbook": {
+      "get": {
+        "summary": "Getting the current order book for an asset\nHTTP request example:\nGET /v1/assets/AAPL@XNAS/orderbook\nAuthorization: \u003ctoken\u003e",
+        "operationId": "MarketDataService_OrderBook",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/marketdataOrderBookResponse"
+            }
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "symbol",
+            "description": "Asset Symbol",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MarketDataService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/instruments/{symbol}/quotes/latest": {
+      "get": {
+        "summary": "Get the latest quote for an asset. HTTP request example: GET /v1/assets/AAPL@XNAS/quotes/latest. Authorization: \u003ctoken\u003e",
+        "operationId": "MarketDataService_LastQuote",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/marketdataQuoteResponse"
+            }
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "symbol",
+            "description": "Asset symbol",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MarketDataService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/instruments/{symbol}/trades/latest": {
+      "get": {
+        "summary": "Getting a list of the latest trades for an asset\nHTTP request example:\nGET /v1/assets/AAPL@XNAS/trades/latest\nAuthorization: \u003ctoken\u003e",
+        "operationId": "MarketDataService_LatestTrades",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/marketdataLatestTradesResponse"
+            }
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "symbol",
+            "description": "Asset symbol",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MarketDataService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/past-dividends": {
+      "get": {
+        "summary": "Get historical data on paid dividends for an instrument",
+        "operationId": "CorporateActionsService_GetPastDividends",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/corporateactionsGetPastDividendsResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid symbol format. Symbol must be in ticker@mic format. Where ticker is, for example, AAPL, and mic is, for example, XNAS",
+            "schema": {}
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "symbol",
+            "description": "Instrument symbol",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_direction",
+            "description": "Date sorting direction: asc — from old to new, desc — from new to old\n\n - ASC: Ascending\n - DESC: Descending",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ASC",
+              "DESC"
+            ],
+            "default": "ASC"
+          },
+          {
+            "name": "date_from.year",
+            "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without\na year.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "date_from.month",
+            "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a\nmonth and day.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "date_from.day",
+            "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0\nto specify a year by itself or a year and month where the day isn't\nsignificant.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "date_to.year",
+            "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without\na year.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "date_to.month",
+            "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a\nmonth and day.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "date_to.day",
+            "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0\nto specify a year by itself or a year and month where the day isn't\nsignificant.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "limit",
+            "description": "Limits the number of elements returned.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "offset",
+            "description": "Specifies the number of elements to skip before returning the result",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "CorporateActionsService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/sessions": {
+      "post": {
+        "summary": "Getting a JWT token from the token API\nHTTP request example:\nPOST /v1/sessions\nContent-Type: application/json",
+        "description": "{\n\"secret\":\"your-api-secret-key\"\n}\n\nAll fields are passed in the request body",
+        "operationId": "AuthService_Auth",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authAuthResponse"
+            }
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authAuthRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/v1/sessions/details": {
+      "post": {
+        "summary": "Get session token information\nHTTP request example:\nPOST /v1/sessions/details\nContent-Type: application/json",
+        "description": "{\n \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n}\n\nThe token is passed in the request body for security.\nGet token information. Also includes a list of available accounts.",
+        "operationId": "AuthService_TokenDetails",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authTokenDetailsResponse"
+            }
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authTokenDetailsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/v1/splits/future": {
+      "get": {
+        "summary": "Get upcoming split events for an instrument",
+        "operationId": "CorporateActionsService_GetFutureSplits",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/corporateactionsGetFutureSplitsResponse"
+            }
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "symbol",
+            "description": "Symbol",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_direction",
+            "description": "Sorting direction by date: asc - from oldest to newest, desc - from newest to oldest\n\n - ASC: Ascending\n - DESC: Descending",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ASC",
+              "DESC"
+            ],
+            "default": "ASC"
+          },
+          {
+            "name": "limit",
+            "description": "Limits the number of splits returned in the list",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "offset",
+            "description": "Specifies the number of splits to skip before returning the result",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "CorporateActionsService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/splits/past": {
+      "get": {
+        "summary": "Get the history split events for an instrument",
+        "operationId": "CorporateActionsService_GetPastSplits",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/corporateactionsGetPastSplitsResponse"
+            }
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "symbol",
+            "description": "Symbol",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "date_from.year",
+            "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without\na year.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "date_from.month",
+            "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a\nmonth and day.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "date_from.day",
+            "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0\nto specify a year by itself or a year and month where the day isn't\nsignificant.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "date_to.year",
+            "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without\na year.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "date_to.month",
+            "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a\nmonth and day.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "date_to.day",
+            "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0\nto specify a year by itself or a year and month where the day isn't\nsignificant.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "sort_direction",
+            "description": "Sorting direction by date: asc - from oldest to newest, desc - from newest to oldest\n\n - ASC: Ascending\n - DESC: Descending",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ASC",
+              "DESC"
+            ],
+            "default": "ASC"
+          },
+          {
+            "name": "limit",
+            "description": "Limits the number of splits returned in the list",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "offset",
+            "description": "Specifies the number of splits to skip before returning the result",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "CorporateActionsService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/v1/usage": {
+      "get": {
+        "summary": "Get current usage metrics for a user. HTTP request example: GET /v1/usage Authorization: \u003ctoken\u003e",
+        "operationId": "UsageMetricsService_GetUsageMetrics",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/metricsGetUsageMetricsResponse"
+            }
+          },
+          "401": {
+            "description": "Token has expired or the token is invalid",
+            "schema": {}
+          },
+          "404": {
+            "description": "Account not found in token",
+            "schema": {}
+          },
+          "429": {
+            "description": "Too many requests. The available limit is 200 requests per minute.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Internal service error. Please try again later.",
+            "schema": {}
+          },
+          "503": {
+            "description": "The service is currently unavailable. Please try again later.",
+            "schema": {}
+          },
+          "504": {
+            "description": "The deadline expired before the operation could be completed",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "UsageMetricsService"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "AccountTradeCommission": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Commission value"
+        },
+        "currency": {
+          "type": "string",
+          "title": "Commission currency"
+        }
+      },
+      "title": "Trade commission"
+    },
+    "GetAssetResponseBondDetails": {
+      "type": "object",
+      "properties": {
+        "bond_face_value": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "Current face value of one bond."
+        },
+        "currency": {
+          "type": "string",
+          "description": "Symbolic currency code of the bond denomination (e.g., USD)."
+        }
+      },
+      "title": "Specific parameters for instrument type \"Bond\""
+    },
+    "GetAssetResponseFutureDetails": {
+      "type": "object",
+      "properties": {
+        "expiration_date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Futures contract expiration date and time."
+        },
+        "contract_size": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "Contract size (multiplier) — the number of units of the underlying asset in one contract."
+        }
+      },
+      "title": "Specific parameters for instrument type \"Futures\""
+    },
+    "GetAssetResponseOptionDetails": {
+      "type": "object",
+      "properties": {
+        "expiration_date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Option contract expiration date and time."
+        },
+        "contract_size": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "Contract size (multiplier) — the number of units of the underlying asset in one contract."
+        },
+        "strike": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "Option strike price."
+        }
+      },
+      "title": "Specific parameters for instrument type \"Option\""
+    },
+    "GetAssetResponsePriceStep": {
+      "type": "object",
+      "properties": {
+        "step": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Price step when the order price is below threshold_price"
+        },
+        "threshold_price": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Order price threshold from which step_from_threshold applies"
+        },
+        "step_from_threshold": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Price step when the order price is equal to or above threshold_price"
+        }
+      },
+      "title": "Price step that depends on the order price (e.g., US options). All three fields are always set when the object is present"
+    },
+    "GetUsageMetricsResponseQuotaUsage": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Method name"
+        },
+        "limit": {
+          "type": "string",
+          "format": "int64",
+          "description": "Total limit for this quota."
+        },
+        "remaining": {
+          "type": "string",
+          "format": "int64",
+          "description": "How many units remain available in the current window."
+        },
+        "reset_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time when the quota counter will be reset (start of a new window)."
+        }
+      },
+      "title": "Quota"
+    },
+    "MDPermissionQuoteLevel": {
+      "type": "string",
+      "enum": [
+        "QUOTE_LEVEL_UNSPECIFIED",
+        "QUOTE_LEVEL_LAST_PRICE",
+        "QUOTE_LEVEL_BEST_BID_OFFER",
+        "QUOTE_LEVEL_DEPTH_OF_MARKET",
+        "QUOTE_LEVEL_DEPTH_OF_BOOK",
+        "QUOTE_LEVEL_ACCESS_FORBIDDEN"
+      ],
+      "default": "QUOTE_LEVEL_UNSPECIFIED",
+      "description": "- QUOTE_LEVEL_UNSPECIFIED: Value not specified\n - QUOTE_LEVEL_LAST_PRICE: Last price\n - QUOTE_LEVEL_BEST_BID_OFFER: Bid ask\n - QUOTE_LEVEL_DEPTH_OF_MARKET: Aggregated Order Book\n - QUOTE_LEVEL_DEPTH_OF_BOOK: Full glass\n - QUOTE_LEVEL_ACCESS_FORBIDDEN: Access denied",
+      "title": "Quote Level"
+    },
+    "OrderTradeRequestDataType": {
+      "type": "string",
+      "enum": [
+        "DATA_TYPE_ALL",
+        "DATA_TYPE_ORDERS",
+        "DATA_TYPE_TRADES"
+      ],
+      "default": "DATA_TYPE_ALL",
+      "description": "- DATA_TYPE_ALL: All: orders and trades\n - DATA_TYPE_ORDERS: Orders\n - DATA_TYPE_TRADES: Trades",
+      "title": "Subscription type"
+    },
+    "OrdersServicePlaceOrderBody": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Symbol"
+        },
+        "quantity": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "Quantity in pcs."
+        },
+        "side": {
+          "$ref": "#/definitions/v1Side",
+          "title": "Side (long or short)"
+        },
+        "type": {
+          "$ref": "#/definitions/ordersOrderType",
+          "title": "Order type"
+        },
+        "time_in_force": {
+          "$ref": "#/definitions/ordersTimeInForce",
+          "title": "Order validity period"
+        },
+        "limit_price": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Required for limit and stop-limit orders"
+        },
+        "stop_price": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Required for stop market and stop limit orders"
+        },
+        "stop_condition": {
+          "$ref": "#/definitions/ordersStopCondition",
+          "title": "Required for stop market and stop limit orders"
+        },
+        "legs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ordersLeg"
+          },
+          "title": "Required for multi-leg orders"
+        },
+        "client_order_id": {
+          "type": "string",
+          "title": "Unique request ID. Automatically generated if not submitted. (Maximum 20 characters)"
+        },
+        "valid_before": {
+          "$ref": "#/definitions/ordersValidBefore",
+          "description": "The validity period of a conditional order. This is populated for orders with the ORDER_TYPE_STOP ORDER_TYPE_STOP_LIMIT type."
+        },
+        "comment": {
+          "type": "string",
+          "title": "Order label. (maximum 128 characters)"
+        }
+      },
+      "title": "Order Information"
+    },
+    "OrdersServicePlaceSLTPOrderBody": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Symbol"
+        },
+        "side": {
+          "$ref": "#/definitions/v1Side",
+          "title": "Side for both orders"
+        },
+        "quantity_sl": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Quantity in units for SL"
+        },
+        "sl_price": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Price condition parameter for the SL part"
+        },
+        "limit_price": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "If specified, after SL activation a limit order will be placed with this price."
+        },
+        "quantity_tp": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Quantity in pieces for TP"
+        },
+        "tp_price": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Price condition parameter for the TP part"
+        },
+        "tp_guard_spread": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "If specified, after TP activation, a limit order will be placed taking into account the protective spread."
+        },
+        "tp_spread_measure": {
+          "$ref": "#/definitions/ordersTPSpreadMeasure",
+          "title": "Unit of measurement of the protective spread"
+        },
+        "client_order_id": {
+          "type": "string",
+          "title": "Unique request identifier. Automatically generated if not submitted. (Maximum 20 characters)"
+        },
+        "valid_before": {
+          "$ref": "#/definitions/ordersValidBefore",
+          "description": "Conditional order validity period. If left blank, VALID_BEFORE_GOOD_TILL_CANCEL is set by default."
+        },
+        "valid_expiry_time": {
+          "type": "string",
+          "format": "date-time",
+          "title": "SL/TP order expiration timestamp"
+        },
+        "comment": {
+          "type": "string",
+          "title": "Order label. (maximum 128 characters)"
+        },
+        "sl_qty_measure": {
+          "$ref": "#/definitions/ordersSLTPQtyMeasure",
+          "description": "Volume unit of measurement for the Stop Loss part.\nIf SLTP_QTY_MEASURE_PERCENT — quantity_sl is treated as a percentage (0–100) of the position at the time of execution."
+        },
+        "tp_qty_measure": {
+          "$ref": "#/definitions/ordersSLTPQtyMeasure",
+          "description": "Volume unit of measurement for the Take Profit part.\nIf SLTP_QTY_MEASURE_PERCENT — quantity_tp is treated as a percentage (0–100) of the position at the time of execution."
+        },
+        "sl_guard_time": {
+          "type": "integer",
+          "format": "int32",
+          "description": "StopLoss guard time, in seconds. Only non-negative integer values are allowed. If the field is not specified, the value is assumed to be zero."
+        },
+        "tp_guard_time": {
+          "type": "integer",
+          "format": "int32",
+          "description": "TakeProfit guard time, in seconds. Only non-negative integer values are allowed. If the field is not specified, the value is assumed to be zero."
+        }
+      },
+      "title": "SL/TP Order Information"
+    },
+    "ScheduleResponseSessions": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "Session type"
+        },
+        "interval": {
+          "$ref": "#/definitions/typeInterval",
+          "title": "Session interval"
+        }
+      },
+      "title": "Sessions"
+    },
+    "TransactionTransactionCategory": {
+      "type": "string",
+      "enum": [
+        "OTHERS",
+        "DEPOSIT",
+        "WITHDRAW",
+        "INCOME",
+        "COMMISSION",
+        "TAX",
+        "INHERITANCE",
+        "TRANSFER",
+        "CONTRACT_TERMINATION",
+        "OUTCOMES",
+        "FINE",
+        "LOAN"
+      ],
+      "default": "OTHERS",
+      "description": "Transaction categories.\n\n - OTHERS: Other\n - DEPOSIT: Money deposit\n - WITHDRAW: Money withdraw\n - INCOME: Income\n - COMMISSION: Commission\n - TAX: Tax\n - INHERITANCE: Inheritance\n - TRANSFER: Money transfer\n - CONTRACT_TERMINATION: Contract Termination\n - OUTCOMES: Expenses\n - FINE: Fine\n - LOAN: Loan"
+    },
+    "accountsGetAccountResponse": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "type": "string",
+          "title": "Account ID"
+        },
+        "type": {
+          "type": "string",
+          "title": "Account type"
+        },
+        "status": {
+          "type": "string",
+          "title": "Account Status"
+        },
+        "equity": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Available funds plus the value of open positions"
+        },
+        "unrealized_profit": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Unrealized profit"
+        },
+        "positions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/accountsPosition"
+          },
+          "title": "Positions. Open plus theoretical (for unfilled active orders)"
+        },
+        "cash": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/typeMoney"
+          },
+          "description": "The amount of equity in the account available for trading. Does not include margin funds."
+        },
+        "portfolio_mct": {
+          "$ref": "#/definitions/accountsMCT",
+          "description": "Portfolio type for accounts in US markets."
+        },
+        "open_account_date": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Account opening date"
+        },
+        "first_trade_date": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Date of the first trade transaction"
+        },
+        "first_non_trade_date": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Date of the first non-trade transaction"
+        }
+      },
+      "title": "Information about a specific account"
+    },
+    "accountsMCT": {
+      "type": "object",
+      "description": "Portfolio type for accounts on US markets.\nProvides access to US exchanges: NYSE NASDAQ CBOE CME, trades in US stocks, futures, and options."
+    },
+    "accountsPosition": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Symbol"
+        },
+        "quantity": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Quantity in units. Signed value defining (long-short)"
+        },
+        "average_price": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "Average price."
+        },
+        "current_price": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Current price"
+        },
+        "maintenance_margin": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "Maintenance margin."
+        },
+        "daily_pnl": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "Profit or loss for the current day (PnL)."
+        },
+        "unrealized_pnl": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Total unrealized profit or loss (PnL) of the current position"
+        },
+        "current_price_currency": {
+          "type": "string",
+          "description": "Currency code of the current price."
+        },
+        "average_price_currency": {
+          "type": "string",
+          "description": "Currency code of the average price."
+        }
+      },
+      "title": "Position Information"
+    },
+    "accountsTradesResponse": {
+      "type": "object",
+      "properties": {
+        "trades": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AccountTrade"
+          },
+          "title": "Account Transactions"
+        }
+      },
+      "title": "Trade History"
+    },
+    "accountsTransaction": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Transaction ID"
+        },
+        "category": {
+          "type": "string",
+          "title": "Transaction type from TransactionCategory"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp"
+        },
+        "symbol": {
+          "type": "string",
+          "title": "Symbol"
+        },
+        "change": {
+          "$ref": "#/definitions/typeMoney",
+          "title": "Change in money"
+        },
+        "trade": {
+          "$ref": "#/definitions/accountsTransactionTrade",
+          "title": "Transaction Information"
+        },
+        "transaction_category": {
+          "$ref": "#/definitions/TransactionTransactionCategory",
+          "description": "Transaction category from TransactionCategory."
+        },
+        "transaction_name": {
+          "type": "string",
+          "title": "Transaction name"
+        },
+        "change_qty": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Change in qty only for securities transfers (for TransactionCategory = TRANSFER)"
+        },
+        "symbols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Full list of tickers (symbols) included in the transaction. The symbol field is retained and populated with the first element for backward compatibility."
+        }
+      },
+      "title": "Transaction Information"
+    },
+    "accountsTransactionTrade": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "Quantity in pcs."
+        },
+        "price": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "Trade price per unit. Strike price/Option premium. This is the execution price; the value is taken from the trade."
+        },
+        "accrued_interest": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "Accrued interest. Completed if the transaction includes accrued interest."
+        }
+      },
+      "title": "Object populated for trade transaction types"
+    },
+    "accountsTransactionsResponse": {
+      "type": "object",
+      "properties": {
+        "transactions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/accountsTransaction"
+          },
+          "title": "Account transactions"
+        }
+      },
+      "title": "List of transactions"
+    },
+    "assetsAllAssetsResponse": {
+      "type": "object",
+      "properties": {
+        "assets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/assetsAsset"
+          },
+          "title": "Part of the list of assets"
+        },
+        "next_cursor": {
+          "type": "string",
+          "format": "int64",
+          "description": "Cursor for retrieving the next page. Contains the sec_id of the last asset in the current list.\nPass this value into the cursor field of the next request to retrieve the next piece of data.\nIf the value is 0 or missing, this is the last page."
+        }
+      },
+      "description": "Response containing some of the available assets."
+    },
+    "assetsAsset": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Ticker@mic symbol"
+        },
+        "id": {
+          "type": "string",
+          "title": "Asset ID"
+        },
+        "ticker": {
+          "type": "string",
+          "title": "Asset ticker"
+        },
+        "mic": {
+          "type": "string",
+          "title": "mic exchange ID"
+        },
+        "isin": {
+          "type": "string",
+          "title": "Isin asset identifier"
+        },
+        "type": {
+          "type": "string",
+          "title": "Asset type"
+        },
+        "name": {
+          "type": "string",
+          "title": "Asset name"
+        },
+        "is_archived": {
+          "type": "boolean",
+          "title": "Is the asset archived or not?"
+        }
+      },
+      "title": "Asset Information"
+    },
+    "assetsAssetsResponse": {
+      "type": "object",
+      "properties": {
+        "assets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/assetsAsset"
+          },
+          "title": "Asset information"
+        }
+      },
+      "title": "List of available assets"
+    },
+    "assetsClockResponse": {
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp"
+        }
+      },
+      "title": "Server Time"
+    },
+    "assetsConstituents": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Symbol code of the instrument"
+        },
+        "name": {
+          "type": "string",
+          "title": "Full name of the issuing company"
+        },
+        "sector": {
+          "type": "string",
+          "title": "Global economic sector the company belongs to (e.g., \"Technology\", \"Healthcare\")"
+        },
+        "sub_sector": {
+          "type": "string",
+          "title": "Industry (sub-sector) of the company's activity (e.g., \"Software - Application\")"
+        },
+        "cik": {
+          "type": "string",
+          "title": "Unique company identifier in the US SEC database (Central Index Key)"
+        },
+        "index_inclusion_date": {
+          "$ref": "#/definitions/typeDate",
+          "title": "Index inclusion date"
+        },
+        "weight": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Weight of the instrument in the index"
+        }
+      },
+      "title": "Information about a constituent (security) included in the index"
+    },
+    "assetsExchange": {
+      "type": "object",
+      "properties": {
+        "mic": {
+          "type": "string",
+          "title": "MIC Exchange ID"
+        },
+        "name": {
+          "type": "string",
+          "title": "Exchange Name"
+        }
+      },
+      "title": "Exchange Information"
+    },
+    "assetsExchangesResponse": {
+      "type": "object",
+      "properties": {
+        "exchanges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/assetsExchange"
+          },
+          "title": "Exchange Information"
+        }
+      },
+      "title": "List of available exchanges"
+    },
+    "assetsGetAssetParamsResponse": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Symbol"
+        },
+        "account_id": {
+          "type": "string",
+          "title": "Account ID for which trading parameters are selected"
+        },
+        "tradeable": {
+          "type": "boolean",
+          "description": "Are trading operations available?\nThe old field is marked as deprecated.\nClients should migrate to is_tradeable."
+        },
+        "longable": {
+          "$ref": "#/definitions/assetsLongable",
+          "title": "Are operations available in Long?"
+        },
+        "shortable": {
+          "$ref": "#/definitions/assetsShortable",
+          "title": "Are short operations available?"
+        },
+        "long_risk_rate": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Risk rate for the Long operation"
+        },
+        "long_collateral": {
+          "$ref": "#/definitions/typeMoney",
+          "title": "Amount of collateral to maintain a Long position"
+        },
+        "short_risk_rate": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Risk rate for a short transaction"
+        },
+        "short_collateral": {
+          "$ref": "#/definitions/typeMoney",
+          "title": "Collateral amount to maintain a Short position"
+        },
+        "long_initial_margin": {
+          "$ref": "#/definitions/typeMoney",
+          "title": "Initial requirements for how much free cash must be in the account to open a long position"
+        },
+        "short_initial_margin": {
+          "$ref": "#/definitions/typeMoney",
+          "title": "Initial requirements for how much free cash in the account must be available to open a short position"
+        },
+        "is_tradable": {
+          "type": "boolean",
+          "description": "Are trading operations available? New field. Allows you to distinguish between false and \"not set\"."
+        },
+        "price_type": {
+          "$ref": "#/definitions/assetsPriceType",
+          "description": "Acceptable price. Helps determine whether orders with a negative price can be placed for a financial asset."
+        },
+        "trade_lot_size": {
+          "type": "string",
+          "format": "int64",
+          "description": "Lot size of the instrument for trading operations. If the field is 0, the value is absent."
+        }
+      },
+      "title": "Asset trading parameters"
+    },
+    "assetsGetAssetResponse": {
+      "type": "object",
+      "properties": {
+        "board": {
+          "type": "string",
+          "title": "Trading mode code"
+        },
+        "id": {
+          "type": "string",
+          "title": "Asset ID"
+        },
+        "ticker": {
+          "type": "string",
+          "title": "Asset ticker"
+        },
+        "mic": {
+          "type": "string",
+          "title": "mic exchange ID"
+        },
+        "isin": {
+          "type": "string",
+          "title": "Isin asset identifier"
+        },
+        "type": {
+          "type": "string",
+          "title": "Asset type"
+        },
+        "name": {
+          "type": "string",
+          "title": "Asset name"
+        },
+        "decimals": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of decimal places in the price"
+        },
+        "min_step": {
+          "type": "string",
+          "format": "int64",
+          "title": "Minimum price step. To calculate the final price step: min_step/(10 decimals). 0 together with a populated price_step means the price step is not constant — see price_step"
+        },
+        "lot_size": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Number of pieces per lot"
+        },
+        "expiration_date": {
+          "$ref": "#/definitions/typeDate",
+          "title": "Futures expiration date"
+        },
+        "quote_currency": {
+          "type": "string",
+          "description": "The quote currency may not match the asset's trading mode currency."
+        },
+        "price_step": {
+          "$ref": "#/definitions/GetAssetResponsePriceStep",
+          "title": "Price step that depends on the order price. Set only when min_step = 0: use step if the order price is below threshold_price, and step_from_threshold if it is equal to or above"
+        },
+        "future_details": {
+          "$ref": "#/definitions/GetAssetResponseFutureDetails",
+          "title": "Specific parameters for instrument type \"Futures\""
+        },
+        "option_details": {
+          "$ref": "#/definitions/GetAssetResponseOptionDetails",
+          "title": "Specific parameters for instrument type \"Option\""
+        },
+        "bond_details": {
+          "$ref": "#/definitions/GetAssetResponseBondDetails",
+          "title": "Specific parameters for instrument type \"Bond\""
+        }
+      },
+      "title": "List of information about a specific asset"
+    },
+    "assetsGetConstituentsResponse": {
+      "type": "object",
+      "properties": {
+        "constituents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/assetsConstituents"
+          },
+          "description": "List of constituents (securities) included in the calculation base of the requested index."
+        },
+        "next_cursor": {
+          "type": "string",
+          "format": "int64",
+          "title": "Cursor for retrieving the next page. Contains the sec_id of the last asset in the current list.\nPass this value into the cursor field of the next request to retrieve the next piece of data.\nIf the value is 0 or missing, this is the last page"
+        }
+      },
+      "description": "Result of the index composition request."
+    },
+    "assetsLongable": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/assetsLongableStatus",
+          "title": "Asset status"
+        },
+        "halted_days": {
+          "type": "integer",
+          "format": "int32",
+          "title": "How many days is the ban on Long transactions valid (if any)?"
+        }
+      },
+      "title": "Are operations available in Long?"
+    },
+    "assetsLongableStatus": {
+      "type": "string",
+      "enum": [
+        "NOT_AVAILABLE",
+        "AVAILABLE",
+        "ACCOUNT_NOT_APPROVED"
+      ],
+      "default": "NOT_AVAILABLE",
+      "description": "- NOT_AVAILABLE: Not available\n - AVAILABLE: Available\n - ACCOUNT_NOT_APPROVED: Forbidden at the account level",
+      "title": "Status"
+    },
+    "assetsOptionType": {
+      "type": "string",
+      "enum": [
+        "TYPE_UNSPECIFIED",
+        "TYPE_CALL",
+        "TYPE_PUT"
+      ],
+      "default": "TYPE_UNSPECIFIED",
+      "description": "- TYPE_UNSPECIFIED: Unspecified value\n - TYPE_CALL: Call\n - TYPE_PUT: Put",
+      "title": "Option Type"
+    },
+    "assetsOptionsChainResponse": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "The symbol of the option's underlying asset"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1assetsOption"
+          },
+          "title": "Option information"
+        }
+      },
+      "title": "Options Chain Information"
+    },
+    "assetsPriceType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "POSITIVE",
+        "NON_NEGATIVE",
+        "ANY"
+      ],
+      "default": "UNKNOWN",
+      "description": "- UNKNOWN: Unknown\n - POSITIVE: Positive. Greater than zero\n - NON_NEGATIVE: Non-negative. Greater than or equal to zero\n - ANY: Any",
+      "title": "Available price"
+    },
+    "assetsScheduleResponse": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Symbol"
+        },
+        "sessions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ScheduleResponseSessions"
+          },
+          "title": "Asset Sessions"
+        }
+      },
+      "title": "Asset Schedule"
+    },
+    "assetsShortable": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/assetsShortableStatus",
+          "title": "Asset status"
+        },
+        "halted_days": {
+          "type": "integer",
+          "format": "int32",
+          "title": "How many days is the ban on short transactions valid (if any)?"
+        }
+      },
+      "title": "Are short operations available?"
+    },
+    "assetsShortableStatus": {
+      "type": "string",
+      "enum": [
+        "NOT_AVAILABLE",
+        "AVAILABLE",
+        "HTB",
+        "ACCOUNT_NOT_APPROVED",
+        "AVAILABLE_STRATEGY"
+      ],
+      "default": "NOT_AVAILABLE",
+      "description": "- NOT_AVAILABLE: Not available\n - AVAILABLE: Available\n - HTB: Indication that the paper is Hard To Borrow (if any)\n - ACCOUNT_NOT_APPROVED: Forbidden at the account level\n - AVAILABLE_STRATEGY: Allowed in strategy",
+      "title": "Status"
+    },
+    "authAuthRequest": {
+      "type": "object",
+      "properties": {
+        "secret": {
+          "type": "string",
+          "title": "API token (secret key)"
+        },
+        "source_app_id": {
+          "type": "string",
+          "title": "ID of the source application sending the request"
+        }
+      },
+      "title": "Authorization Request"
+    },
+    "authAuthResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "title": "Received JWT token"
+        }
+      },
+      "title": "Authorization Information"
+    },
+    "authMDPermission": {
+      "type": "object",
+      "properties": {
+        "quote_level": {
+          "$ref": "#/definitions/MDPermissionQuoteLevel",
+          "title": "Quote Level"
+        },
+        "delay_minutes": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Delay in minutes"
+        },
+        "mic": {
+          "type": "string",
+          "title": "MIC Exchange ID"
+        },
+        "country": {
+          "type": "string",
+          "title": "Country"
+        },
+        "continent": {
+          "type": "string",
+          "title": "Continent"
+        },
+        "worldwide": {
+          "type": "boolean",
+          "title": "The whole world"
+        }
+      },
+      "title": "Market Data Access Information"
+    },
+    "authSubscribeJwtRenewalResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "title": "Received JWT token"
+        }
+      },
+      "title": "Renewed token. Stream"
+    },
+    "authTokenDetailsRequest": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "title": "JWT token"
+        }
+      },
+      "title": "Request token details"
+    },
+    "authTokenDetailsResponse": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Creation date and time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Expiration date and time"
+        },
+        "md_permissions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/authMDPermission"
+          },
+          "title": "Market Data Access Details"
+        },
+        "account_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Account IDs"
+        },
+        "readonly": {
+          "type": "boolean",
+          "title": "The session and trading accounts in the token will be marked readonly"
+        }
+      },
+      "title": "Token Details"
+    },
+    "corporateactionsConvertationType": {
+      "type": "string",
+      "enum": [
+        "CONVTYPE_UNKNOWN",
+        "BUYBACK",
+        "CALL_OPTION_EXERCISED",
+        "DRAWINGS",
+        "DRAWINGS_BY_LOTTERY",
+        "EARLY_CONVERSION",
+        "MATURITY",
+        "ORDINARY",
+        "PUT_OPTION_EXERCISED",
+        "TENDER_OFFER"
+      ],
+      "default": "CONVTYPE_UNKNOWN",
+      "description": "- CONVTYPE_UNKNOWN: Unknown event/conversion type. Used by default\n - BUYBACK: Stock buyback. The purchase of its own shares by the issuing company\n - CALL_OPTION_EXERCISED: Call option exercised. Early redemption (recall) of a security initiated by the issuer\n - DRAWINGS: Partial repayment of the face value (amortization) or scheduled drawing without a lottery\n - DRAWINGS_BY_LOTTERY: Redemption by drawing (lottery). Early redemption of a part of a bond issue, where the bonds to be redeemed are selected by lottery\n - EARLY_CONVERSION: Early conversion. Exchange of one type of security for another before the scheduled date (e.g., convertible bonds to shares)\n - MATURITY: Maturity. Scheduled full repayment of a security at the end of its circulation period\n - ORDINARY: Ordinary (scheduled) conversion. A standard corporate action: split, consolidation, or scheduled exchange of securities\n - PUT_OPTION_EXERCISED: Put option exercised. Early repurchase of a security by the issuer at the request of the investor (holder)\n - TENDER_OFFER: Tender offer. A public offer to shareholders to buy their securities (often during mergers/acquisitions)",
+      "title": "Possible conversion types"
+    },
+    "corporateactionsDividend": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "$ref": "#/definitions/typeDate",
+          "title": "Record date (registry closure date)"
+        },
+        "amount": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Dividend amount per share"
+        },
+        "currency": {
+          "type": "string",
+          "title": "Dividend payment currency"
+        }
+      },
+      "title": "Information about a dividend payment"
+    },
+    "corporateactionsGetFutureDividendsResponse": {
+      "type": "object",
+      "properties": {
+        "pagination": {
+          "$ref": "#/definitions/corporateactionsPagination",
+          "title": "Pagination information"
+        },
+        "dividends": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/corporateactionsDividend"
+          },
+          "title": "List of dividends"
+        }
+      },
+      "title": "List of upcoming dividend payments for an instrument with pagination"
+    },
+    "corporateactionsGetFutureSplitsResponse": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Symbol"
+        },
+        "pagination": {
+          "$ref": "#/definitions/corporateactionsPagination",
+          "title": "Pagination parameters"
+        },
+        "splits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/corporateactionsSplitInfo"
+          },
+          "title": "Information about splits"
+        }
+      },
+      "title": "Upcoming split events for an instrument"
+    },
+    "corporateactionsGetPastDividendsResponse": {
+      "type": "object",
+      "properties": {
+        "pagination": {
+          "$ref": "#/definitions/corporateactionsPagination",
+          "title": "Pagination information"
+        },
+        "dividends": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/corporateactionsDividend"
+          },
+          "title": "List of dividends"
+        }
+      },
+      "title": "Historical data on paid dividends for an instrument with pagination"
+    },
+    "corporateactionsGetPastSplitsResponse": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Symbol"
+        },
+        "pagination": {
+          "$ref": "#/definitions/corporateactionsPagination",
+          "title": "Pagination parameters"
+        },
+        "splits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/corporateactionsSplitInfo"
+          },
+          "title": "Information about splits"
+        }
+      },
+      "title": "The history split events for an instrument"
+    },
+    "corporateactionsPagination": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Total number of elements"
+        },
+        "limit": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Limits the number of elements returned."
+        },
+        "offset": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Specifies the number of elements to skip before returning the result"
+        },
+        "has_next": {
+          "type": "boolean",
+          "description": "Indicates whether a next data page exists."
+        }
+      },
+      "title": "Pagination parameters"
+    },
+    "corporateactionsSortDirection": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC",
+      "description": "- ASC: Ascending\n - DESC: Descending",
+      "title": "Sort order"
+    },
+    "corporateactionsSplitInfo": {
+      "type": "object",
+      "properties": {
+        "exec_date": {
+          "$ref": "#/definitions/typeDate",
+          "title": "Effective date of the corporate action (execution date)"
+        },
+        "old_ratio": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Number of securities before the conversion (numerator of the ratio)"
+        },
+        "new_ratio": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Number of securities after the conversion (denominator of the ratio)"
+        },
+        "new_lot": {
+          "type": "integer",
+          "format": "int32",
+          "title": "New lot size of the instrument after the execution of the corporate action"
+        },
+        "convertation_type": {
+          "$ref": "#/definitions/corporateactionsConvertationType",
+          "title": "Conversion type (split / consolidation, etc.)"
+        }
+      },
+      "title": "Information about a corporate action"
+    },
+    "googlerpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "marketdataBar": {
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp"
+        },
+        "open": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Candlestick opening price"
+        },
+        "high": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Maximum candle price"
+        },
+        "low": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Minimum candle price"
+        },
+        "close": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Candlestick closing price"
+        },
+        "volume": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "Trading volume per candle in units."
+        },
+        "is_data_snapshot": {
+          "type": "boolean",
+          "title": "Indicates whether the data is a snapshot"
+        }
+      },
+      "title": "Aggregated Candle Information"
+    },
+    "marketdataBarsResponse": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Asset symbol"
+        },
+        "bars": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/marketdataBar"
+          },
+          "title": "Aggregated Candle"
+        }
+      },
+      "title": "List of aggregated candles"
+    },
+    "marketdataLatestTradesResponse": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Asset symbol"
+        },
+        "trades": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1marketdataTrade"
+          },
+          "title": "List of latest trades"
+        }
+      },
+      "title": "List of latest trades for an asset"
+    },
+    "marketdataOrderBookResponse": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Asset Symbol"
+        },
+        "orderbook": {
+          "$ref": "#/definitions/v1marketdataOrderBook",
+          "title": "Orderbook"
+        }
+      },
+      "title": "Current order book by asset"
+    },
+    "marketdataOrderBookRow": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Price"
+        },
+        "sell_size": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Sell size"
+        },
+        "buy_size": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Buy size"
+        },
+        "action": {
+          "$ref": "#/definitions/marketdataOrderBookRowAction",
+          "title": "Command"
+        },
+        "mpid": {
+          "type": "string",
+          "title": "Market Participant ID"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp"
+        }
+      },
+      "title": "Information about the order book level (row)"
+    },
+    "marketdataOrderBookRowAction": {
+      "type": "string",
+      "enum": [
+        "ACTION_UNSPECIFIED",
+        "ACTION_REMOVE",
+        "ACTION_ADD",
+        "ACTION_UPDATE"
+      ],
+      "default": "ACTION_UNSPECIFIED",
+      "description": "- ACTION_UNSPECIFIED: Action unspecified\n - ACTION_REMOVE: Delete\n - ACTION_ADD: Add\n - ACTION_UPDATE: Update",
+      "title": "Command"
+    },
+    "marketdataQuote": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Asset symbol"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp"
+        },
+        "ask": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Ask. 0 if there is no active ask"
+        },
+        "ask_size": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Ask size"
+        },
+        "bid": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Bid. 0 if there is no active bid"
+        },
+        "bid_size": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Bid size"
+        },
+        "last": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Last trade price"
+        },
+        "last_size": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Last trade size"
+        },
+        "volume": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Daily trade volume"
+        },
+        "turnover": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Daily turnover"
+        },
+        "open": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Opening price. Daily"
+        },
+        "high": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Maximum price. Daily"
+        },
+        "low": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Minimum price. Daily"
+        },
+        "close": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Closing price. Daily"
+        },
+        "change": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Price change (last minus close)"
+        },
+        "open_interest": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "Open Interest. The total number of outstanding (active) derivative contracts."
+        },
+        "is_data_snapshot": {
+          "type": "boolean",
+          "title": "Indicates whether the data is a snapshot"
+        },
+        "option": {
+          "$ref": "#/definitions/marketdataQuoteOption",
+          "title": "Option Information"
+        }
+      },
+      "title": "Quote Information"
+    },
+    "marketdataQuoteOption": {
+      "type": "object",
+      "properties": {
+        "open_interest": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Open Interest"
+        },
+        "implied_volatility": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Implied Volatility"
+        },
+        "theoretical_price": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Theoretical Price"
+        },
+        "delta": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Delta"
+        },
+        "gamma": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Gamma"
+        },
+        "theta": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Theta"
+        },
+        "vega": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Vega"
+        },
+        "rho": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Rho"
+        }
+      },
+      "title": "Option information"
+    },
+    "marketdataQuoteResponse": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Asset symbol"
+        },
+        "quote": {
+          "$ref": "#/definitions/marketdataQuote",
+          "title": "Last trade price"
+        }
+      },
+      "title": "Last quote for the asset"
+    },
+    "marketdataStreamError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Error code"
+        },
+        "description": {
+          "type": "string",
+          "title": "Error Description"
+        }
+      },
+      "title": "Stream service error"
+    },
+    "marketdataStreamOrderBook": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Asset symbol"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/marketdataStreamOrderBookRow"
+          },
+          "title": "Orderbook Levels"
+        },
+        "is_data_snapshot": {
+          "type": "boolean",
+          "title": "Indicates whether the data is a snapshot"
+        }
+      },
+      "title": "Orderbook by asset. Stream"
+    },
+    "marketdataStreamOrderBookRow": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Price"
+        },
+        "sell_size": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Sell size"
+        },
+        "buy_size": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Buy size"
+        },
+        "action": {
+          "$ref": "#/definitions/marketdataStreamOrderBookRowAction",
+          "title": "Command"
+        },
+        "mpid": {
+          "type": "string",
+          "title": "Market Participant ID"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp"
+        }
+      },
+      "title": "Information about the order book level (row)"
+    },
+    "marketdataStreamOrderBookRowAction": {
+      "type": "string",
+      "enum": [
+        "ACTION_UNSPECIFIED",
+        "ACTION_REMOVE",
+        "ACTION_ADD",
+        "ACTION_UPDATE"
+      ],
+      "default": "ACTION_UNSPECIFIED",
+      "description": "- ACTION_UNSPECIFIED: Action not specified\n - ACTION_REMOVE: Delete\n - ACTION_ADD: Add\n - ACTION_UPDATE: Update",
+      "title": "Command"
+    },
+    "marketdataSubscribeBarsResponse": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Asset Symbol"
+        },
+        "bars": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/marketdataBar"
+          },
+          "title": "Aggregated Candle"
+        }
+      },
+      "title": "List of aggregated candles. Stream"
+    },
+    "marketdataSubscribeLatestTradesResponse": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Asset symbol"
+        },
+        "trades": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1marketdataTrade"
+          },
+          "title": "List of Trades"
+        }
+      },
+      "title": "List of latest trades for this asset. Stream"
+    },
+    "marketdataSubscribeOrderBookResponse": {
+      "type": "object",
+      "properties": {
+        "order_book": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/marketdataStreamOrderBook"
+          },
+          "title": "List of orderbook streams"
+        }
+      },
+      "title": "Order Book by Asset. Stream"
+    },
+    "marketdataSubscribeQuoteResponse": {
+      "type": "object",
+      "properties": {
+        "quote": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/marketdataQuote"
+          },
+          "title": "List of quotes"
+        },
+        "error": {
+          "$ref": "#/definitions/marketdataStreamError",
+          "title": "Stream service error"
+        }
+      },
+      "title": "Asset Quotes. Stream"
+    },
+    "marketdataTimeFrame": {
+      "type": "string",
+      "enum": [
+        "TIME_FRAME_UNSPECIFIED",
+        "TIME_FRAME_M1",
+        "TIME_FRAME_M5",
+        "TIME_FRAME_M15",
+        "TIME_FRAME_M30",
+        "TIME_FRAME_H1",
+        "TIME_FRAME_H2",
+        "TIME_FRAME_H4",
+        "TIME_FRAME_H8",
+        "TIME_FRAME_D",
+        "TIME_FRAME_W",
+        "TIME_FRAME_MN",
+        "TIME_FRAME_QR"
+      ],
+      "default": "TIME_FRAME_UNSPECIFIED",
+      "description": "- TIME_FRAME_UNSPECIFIED: Timeframe not specified\n - TIME_FRAME_M1: 1 minute. Data depth: 7 days.\n - TIME_FRAME_M5: 5 minutes. Data depth: 30 days.\n - TIME_FRAME_M15: 15 minutes. Data depth: 30 days.\n - TIME_FRAME_M30: 30 minutes. Data depth is 30 days.\n - TIME_FRAME_H1: 1 hour. Data depth: 30 days.\n - TIME_FRAME_H2: 2 hours. Data depth: 30 days.\n - TIME_FRAME_H4: 4 hours. Data depth: 30 days.\n - TIME_FRAME_H8: 8 hours. Data depth: 30 days.\n - TIME_FRAME_D: Day. Data depth is 365 days.\n - TIME_FRAME_W: Week. Data depth 365*5 days.\n - TIME_FRAME_MN: Month. Data depth 365*5 days.\n - TIME_FRAME_QR: Quarter. Data depth 365*5 days.",
+      "title": "Available timeframes for candlesticks"
+    },
+    "metricsGetUsageMetricsResponse": {
+      "type": "object",
+      "properties": {
+        "quotas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/GetUsageMetricsResponseQuotaUsage"
+          },
+          "description": "List of current quotas and their usage."
+        }
+      },
+      "title": "Information about current usage metrics"
+    },
+    "ordersLeg": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Symbol"
+        },
+        "quantity": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Quantity"
+        },
+        "side": {
+          "$ref": "#/definitions/v1Side",
+          "title": "Side"
+        }
+      },
+      "title": "Leg"
+    },
+    "ordersOrder": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "type": "string",
+          "title": "Account ID"
+        },
+        "symbol": {
+          "type": "string",
+          "title": "Symbol"
+        },
+        "quantity": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "Quantity in pcs."
+        },
+        "side": {
+          "$ref": "#/definitions/v1Side",
+          "title": "Side (long or short)"
+        },
+        "type": {
+          "$ref": "#/definitions/ordersOrderType",
+          "title": "Order type"
+        },
+        "time_in_force": {
+          "$ref": "#/definitions/ordersTimeInForce",
+          "title": "Order validity period"
+        },
+        "limit_price": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Required for limit and stop-limit orders"
+        },
+        "stop_price": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Required for stop market and stop limit orders"
+        },
+        "stop_condition": {
+          "$ref": "#/definitions/ordersStopCondition",
+          "title": "Required for stop market and stop limit orders"
+        },
+        "legs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ordersLeg"
+          },
+          "title": "Required for multi-leg orders"
+        },
+        "client_order_id": {
+          "type": "string",
+          "title": "Unique request ID. Automatically generated if not submitted. (Maximum 20 characters)"
+        },
+        "valid_before": {
+          "$ref": "#/definitions/ordersValidBefore",
+          "description": "The validity period of a conditional order. This is populated for orders with the ORDER_TYPE_STOP ORDER_TYPE_STOP_LIMIT type."
+        },
+        "comment": {
+          "type": "string",
+          "title": "Order label. (maximum 128 characters)"
+        }
+      },
+      "title": "Order Information"
+    },
+    "ordersOrderState": {
+      "type": "object",
+      "properties": {
+        "order_id": {
+          "type": "string",
+          "title": "Order ID"
+        },
+        "exec_id": {
+          "type": "string",
+          "title": "Execution ID"
+        },
+        "status": {
+          "$ref": "#/definitions/ordersOrderStatus",
+          "title": "Order Status"
+        },
+        "order": {
+          "$ref": "#/definitions/ordersOrder",
+          "title": "Request"
+        },
+        "transact_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Date and time of order submission"
+        },
+        "accept_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Date and time of order acceptance"
+        },
+        "withdraw_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Date and time of order cancellation"
+        },
+        "initial_quantity": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Initial quantity (filled only for exchange orders)"
+        },
+        "executed_quantity": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Executed volume (filled only for exchange orders)"
+        },
+        "remaining_quantity": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Remaining quantity (only filled in for exchange orders)"
+        },
+        "sltp_order": {
+          "$ref": "#/definitions/ordersSLTPOrder",
+          "title": "SL/TP Order Information"
+        },
+        "triggered_order_id": {
+          "type": "string",
+          "description": "ID of the exchange order generated as a result of a met condition or stop price trigger."
+        },
+        "status_description": {
+          "type": "string",
+          "title": "Order status description"
+        }
+      },
+      "title": "Order status"
+    },
+    "ordersOrderStatus": {
+      "type": "string",
+      "enum": [
+        "ORDER_STATUS_UNSPECIFIED",
+        "ORDER_STATUS_NEW",
+        "ORDER_STATUS_PARTIALLY_FILLED",
+        "ORDER_STATUS_FILLED",
+        "ORDER_STATUS_DONE_FOR_DAY",
+        "ORDER_STATUS_CANCELED",
+        "ORDER_STATUS_REPLACED",
+        "ORDER_STATUS_PENDING_CANCEL",
+        "ORDER_STATUS_REJECTED",
+        "ORDER_STATUS_SUSPENDED",
+        "ORDER_STATUS_PENDING_NEW",
+        "ORDER_STATUS_EXPIRED",
+        "ORDER_STATUS_FAILED",
+        "ORDER_STATUS_FORWARDING",
+        "ORDER_STATUS_WAIT",
+        "ORDER_STATUS_DENIED_BY_BROKER",
+        "ORDER_STATUS_REJECTED_BY_EXCHANGE",
+        "ORDER_STATUS_WATCHING",
+        "ORDER_STATUS_EXECUTED",
+        "ORDER_STATUS_DISABLED",
+        "ORDER_STATUS_LINK_WAIT",
+        "ORDER_STATUS_SL_GUARD_TIME",
+        "ORDER_STATUS_SL_EXECUTED",
+        "ORDER_STATUS_SL_FORWARDING",
+        "ORDER_STATUS_TP_GUARD_TIME",
+        "ORDER_STATUS_TP_EXECUTED",
+        "ORDER_STATUS_TP_CORRECTION",
+        "ORDER_STATUS_TP_FORWARDING",
+        "ORDER_STATUS_TP_CORR_GUARD_TIME"
+      ],
+      "default": "ORDER_STATUS_UNSPECIFIED",
+      "description": "- ORDER_STATUS_UNSPECIFIED: Unspecified value\n - ORDER_STATUS_NEW: New Request\n - ORDER_STATUS_PARTIALLY_FILLED: Partially filled\n - ORDER_STATUS_FILLED: Fulfilled\n - ORDER_STATUS_DONE_FOR_DAY: Valid for the day\n - ORDER_STATUS_CANCELED: Cancelled\n - ORDER_STATUS_REPLACED: Replaced with another\n - ORDER_STATUS_PENDING_CANCEL: Pending Cancel\n - ORDER_STATUS_REJECTED: Rejected\n - ORDER_STATUS_SUSPENDED: Suspended\n - ORDER_STATUS_PENDING_NEW: Pending new\n - ORDER_STATUS_EXPIRED: Expired\n - ORDER_STATUS_FAILED: Error\n - ORDER_STATUS_FORWARDING: Forwarding\n - ORDER_STATUS_WAIT: Waiting\n - ORDER_STATUS_DENIED_BY_BROKER: Rejected by broker\n - ORDER_STATUS_REJECTED_BY_EXCHANGE: Rejected by the exchange\n - ORDER_STATUS_WATCHING: Watching\n - ORDER_STATUS_EXECUTED: Executed\n - ORDER_STATUS_DISABLED: Disabled\n - ORDER_STATUS_LINK_WAIT: Waiting for link\n - ORDER_STATUS_SL_GUARD_TIME: SL Guard Time\n - ORDER_STATUS_SL_EXECUTED: Executed by SL\n - ORDER_STATUS_SL_FORWARDING: SL Forwarding\n - ORDER_STATUS_TP_GUARD_TIME: TP Guard Time\n - ORDER_STATUS_TP_EXECUTED: Executed by TP\n - ORDER_STATUS_TP_CORRECTION: TP correction\n - ORDER_STATUS_TP_FORWARDING: TP Forwarding\n - ORDER_STATUS_TP_CORR_GUARD_TIME: TP correction during guard time",
+      "title": "Order Status"
+    },
+    "ordersOrderTradeRequestAction": {
+      "type": "string",
+      "enum": [
+        "ACTION_SUBSCRIBE",
+        "ACTION_UNSUBSCRIBE"
+      ],
+      "default": "ACTION_SUBSCRIBE",
+      "description": "- ACTION_SUBSCRIBE: Subscribe\n - ACTION_UNSUBSCRIBE: Unsubscribe",
+      "title": "Available actions"
+    },
+    "ordersOrderTradeResponse": {
+      "type": "object",
+      "properties": {
+        "orders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ordersOrderState"
+          },
+          "title": "Orders"
+        },
+        "trades": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AccountTrade"
+          },
+          "title": "Trades"
+        }
+      },
+      "title": "List of your own orders and trades"
+    },
+    "ordersOrderType": {
+      "type": "string",
+      "enum": [
+        "ORDER_TYPE_UNSPECIFIED",
+        "ORDER_TYPE_MARKET",
+        "ORDER_TYPE_LIMIT",
+        "ORDER_TYPE_STOP",
+        "ORDER_TYPE_STOP_LIMIT",
+        "ORDER_TYPE_MULTI_LEG"
+      ],
+      "default": "ORDER_TYPE_UNSPECIFIED",
+      "description": "- ORDER_TYPE_UNSPECIFIED: Value not specified\n - ORDER_TYPE_MARKET: Market\n - ORDER_TYPE_LIMIT: Limit\n - ORDER_TYPE_STOP: Market Stop Order\n - ORDER_TYPE_STOP_LIMIT: Stop order limit\n - ORDER_TYPE_MULTI_LEG: Multi-leg request",
+      "title": "Order Type"
+    },
+    "ordersOrdersResponse": {
+      "type": "object",
+      "properties": {
+        "orders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ordersOrderState"
+          },
+          "title": "Orders"
+        }
+      },
+      "title": "List of trade requests"
+    },
+    "ordersSLTPOrder": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "type": "string",
+          "title": "Account ID"
+        },
+        "symbol": {
+          "type": "string",
+          "title": "Symbol"
+        },
+        "side": {
+          "$ref": "#/definitions/v1Side",
+          "title": "Side for both orders"
+        },
+        "quantity_sl": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Quantity in units for SL"
+        },
+        "sl_price": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Price condition parameter for the SL part"
+        },
+        "limit_price": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "If specified, after SL activation a limit order will be placed with this price."
+        },
+        "quantity_tp": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Quantity in pieces for TP"
+        },
+        "tp_price": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Price condition parameter for the TP part"
+        },
+        "tp_guard_spread": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "If specified, after TP activation, a limit order will be placed taking into account the protective spread."
+        },
+        "tp_spread_measure": {
+          "$ref": "#/definitions/ordersTPSpreadMeasure",
+          "title": "Unit of measurement of the protective spread"
+        },
+        "client_order_id": {
+          "type": "string",
+          "title": "Unique request identifier. Automatically generated if not submitted. (Maximum 20 characters)"
+        },
+        "valid_before": {
+          "$ref": "#/definitions/ordersValidBefore",
+          "description": "Conditional order validity period. If left blank, VALID_BEFORE_GOOD_TILL_CANCEL is set by default."
+        },
+        "valid_expiry_time": {
+          "type": "string",
+          "format": "date-time",
+          "title": "SL/TP order expiration timestamp"
+        },
+        "comment": {
+          "type": "string",
+          "title": "Order label. (maximum 128 characters)"
+        },
+        "sl_qty_measure": {
+          "$ref": "#/definitions/ordersSLTPQtyMeasure",
+          "description": "Volume unit of measurement for the Stop Loss part.\nIf SLTP_QTY_MEASURE_PERCENT — quantity_sl is treated as a percentage (0–100) of the position at the time of execution."
+        },
+        "tp_qty_measure": {
+          "$ref": "#/definitions/ordersSLTPQtyMeasure",
+          "description": "Volume unit of measurement for the Take Profit part.\nIf SLTP_QTY_MEASURE_PERCENT — quantity_tp is treated as a percentage (0–100) of the position at the time of execution."
+        },
+        "sl_guard_time": {
+          "type": "integer",
+          "format": "int32",
+          "description": "StopLoss guard time, in seconds. Only non-negative integer values are allowed. If the field is not specified, the value is assumed to be zero."
+        },
+        "tp_guard_time": {
+          "type": "integer",
+          "format": "int32",
+          "description": "TakeProfit guard time, in seconds. Only non-negative integer values are allowed. If the field is not specified, the value is assumed to be zero."
+        }
+      },
+      "title": "SL/TP Order Information"
+    },
+    "ordersSLTPQtyMeasure": {
+      "type": "string",
+      "enum": [
+        "SLTP_QTY_MEASURE_UNDEFINED",
+        "SLTP_QTY_MEASURE_VALUE",
+        "SLTP_QTY_MEASURE_PERCENT"
+      ],
+      "default": "SLTP_QTY_MEASURE_UNDEFINED",
+      "description": "- SLTP_QTY_MEASURE_UNDEFINED: Not defined\n - SLTP_QTY_MEASURE_VALUE: Quantity in units (pieces). Default value.\n - SLTP_QTY_MEASURE_PERCENT: Percentage of the position at the time of execution, accurate to hundredths of a percent",
+      "title": "Volume unit of measurement for SL/TP orders"
+    },
+    "ordersStopCondition": {
+      "type": "string",
+      "enum": [
+        "STOP_CONDITION_UNSPECIFIED",
+        "STOP_CONDITION_LAST_UP",
+        "STOP_CONDITION_LAST_DOWN"
+      ],
+      "default": "STOP_CONDITION_UNSPECIFIED",
+      "description": "- STOP_CONDITION_UNSPECIFIED: Value not specified\n - STOP_CONDITION_LAST_UP: Trigger price is greater than the current price\n - STOP_CONDITION_LAST_DOWN: Trigger price is less than the current price",
+      "title": "Stop order trigger condition"
+    },
+    "ordersSubscribeOrdersResponse": {
+      "type": "object",
+      "properties": {
+        "orders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ordersOrderState"
+          },
+          "title": "Orders"
+        }
+      },
+      "title": "List of your own requests"
+    },
+    "ordersSubscribeTradesResponse": {
+      "type": "object",
+      "properties": {
+        "trades": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AccountTrade"
+          },
+          "title": "Trades"
+        }
+      },
+      "title": "List of your own trades"
+    },
+    "ordersTPSpreadMeasure": {
+      "type": "string",
+      "enum": [
+        "TP_SPREAD_MEASURE_UNDEFINED",
+        "TP_SPREAD_MEASURE_VALUE",
+        "TP_SPREAD_MEASURE_PERCENT"
+      ],
+      "default": "TP_SPREAD_MEASURE_UNDEFINED",
+      "description": "- TP_SPREAD_MEASURE_UNDEFINED: Value not specified\n - TP_SPREAD_MEASURE_VALUE: in price units\n - TP_SPREAD_MEASURE_PERCENT: as a percentage with maximum accuracy to hundredths of a percent",
+      "title": "Unit of measurement of the protective spread for the TP execution price"
+    },
+    "ordersTimeInForce": {
+      "type": "string",
+      "enum": [
+        "TIME_IN_FORCE_UNSPECIFIED",
+        "TIME_IN_FORCE_DAY",
+        "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "TIME_IN_FORCE_GOOD_TILL_CROSSING",
+        "TIME_IN_FORCE_EXT",
+        "TIME_IN_FORCE_ON_OPEN",
+        "TIME_IN_FORCE_ON_CLOSE",
+        "TIME_IN_FORCE_IOC",
+        "TIME_IN_FORCE_FOK"
+      ],
+      "default": "TIME_IN_FORCE_UNSPECIFIED",
+      "description": "- TIME_IN_FORCE_UNSPECIFIED: Value not specified\n - TIME_IN_FORCE_DAY: Until the end of the day\n - TIME_IN_FORCE_GOOD_TILL_CANCEL: Good until canceled\n - TIME_IN_FORCE_GOOD_TILL_CROSSING: Valid until crossing\n - TIME_IN_FORCE_EXT: Over-the-counter trading\n - TIME_IN_FORCE_ON_OPEN: At the opening of the exchange\n - TIME_IN_FORCE_ON_CLOSE: At the close of the exchange\n - TIME_IN_FORCE_IOC: Fulfill immediately or cancel\n - TIME_IN_FORCE_FOK: Fully fulfill or cancel",
+      "title": "Order validity period"
+    },
+    "ordersValidBefore": {
+      "type": "string",
+      "enum": [
+        "VALID_BEFORE_UNSPECIFIED",
+        "VALID_BEFORE_END_OF_DAY",
+        "VALID_BEFORE_GOOD_TILL_CANCEL",
+        "VALID_BEFORE_GOOD_TILL_DATE"
+      ],
+      "default": "VALID_BEFORE_UNSPECIFIED",
+      "description": "- VALID_BEFORE_UNSPECIFIED: Value not specified\n - VALID_BEFORE_END_OF_DAY: Until the end of the trading day\n - VALID_BEFORE_GOOD_TILL_CANCEL: Until cancellation\n - VALID_BEFORE_GOOD_TILL_DATE: Before the specified date and time. This type is only supported when placing SL/TP orders.",
+      "title": "Conditional order validity period"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "typeDate": {
+      "type": "object",
+      "properties": {
+        "year": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without\na year."
+        },
+        "month": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a\nmonth and day."
+        },
+        "day": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0\nto specify a year by itself or a year and month where the day isn't\nsignificant."
+        }
+      },
+      "description": "* A full date, with non-zero year, month, and day values\n* A month and day value, with a zero year, such as an anniversary\n* A year on its own, with zero month and day values\n* A year and month value, with a zero day, such as a credit card expiration\ndate\n\nRelated types are [google.type.TimeOfDay][google.type.TimeOfDay] and\n`google.protobuf.Timestamp`.",
+      "title": "Represents a whole or partial calendar date, such as a birthday. The time of\nday and time zone are either specified elsewhere or are insignificant. The\ndate is relative to the Gregorian Calendar. This can represent one of the\nfollowing:"
+    },
+    "typeDecimal": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "description": "The decimal value, as a string.\n\nThe string representation consists of an optional sign, `+` (`U+002B`)\nor `-` (`U+002D`), followed by a sequence of zero or more decimal digits\n(\"the integer\"), optionally followed by a fraction, optionally followed\nby an exponent.\n\nThe fraction consists of a decimal point followed by zero or more decimal\ndigits. The string must contain at least one digit in either the integer\nor the fraction. The number formed by the sign, the integer and the\nfraction is referred to as the significand.\n\nThe exponent consists of the character `e` (`U+0065`) or `E` (`U+0045`)\nfollowed by one or more decimal digits.\n\nServices **should** normalize decimal values before storing them by:\n\n  - Removing an explicitly-provided `+` sign (`+2.5` -\u003e `2.5`).\n  - Replacing a zero-length integer value with `0` (`.5` -\u003e `0.5`).\n  - Coercing the exponent character to lower-case (`2.5E8` -\u003e `2.5e8`).\n  - Removing an explicitly-provided zero exponent (`2.5e0` -\u003e `2.5`).\n\nServices **may** perform additional normalization based on its own needs\nand the internal decimal implementation selected, such as shifting the\ndecimal point and exponent value together (example: `2.5e-1` \u003c-\u003e `0.25`).\nAdditionally, services **may** preserve trailing zeroes in the fraction\nto indicate increased precision, but are not required to do so.\n\nNote that only the `.` character is supported to divide the integer\nand the fraction; `,` **should not** be supported regardless of locale.\nAdditionally, thousand separators **should not** be supported. If a\nservice does support them, values **must** be normalized.\n\nThe ENBF grammar is:\n\n    DecimalString =\n      [Sign] Significand [Exponent];\n\n    Sign = '+' | '-';\n\n    Significand =\n      Digits ['.'] [Digits] | [Digits] '.' Digits;\n\n    Exponent = ('e' | 'E') [Sign] Digits;\n\n    Digits = { '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' };\n\nServices **should** clearly document the range of supported values, the\nmaximum supported precision (total number of digits), and, if applicable,\nthe scale (number of digits after the decimal point), as well as how it\nbehaves when receiving out-of-bounds values.\n\nServices **may** choose to accept values passed as input even when the\nvalue has a higher precision or scale than the service supports, and\n**should** round the value to fit the supported scale. Alternatively, the\nservice **may** error with `400 Bad Request` (`INVALID_ARGUMENT` in gRPC)\nif precision would be lost.\n\nServices **should** error with `400 Bad Request` (`INVALID_ARGUMENT` in\ngRPC) if the service receives a value outside of the supported range."
+        }
+      },
+      "description": "A representation of a decimal value, such as 2.5. Clients may convert values\ninto language-native decimal formats, such as Java's [BigDecimal][] or\nPython's [decimal.Decimal][].\n\n[BigDecimal]:\nhttps://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/math/BigDecimal.html\n[decimal.Decimal]: https://docs.python.org/3/library/decimal.html"
+    },
+    "typeInterval": {
+      "type": "object",
+      "properties": {
+        "start_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Optional. Inclusive start of the interval.\n\nIf specified, a Timestamp matching this interval will have to be the same\nor after the start."
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Optional. Exclusive end of the interval.\n\nIf specified, a Timestamp matching this interval will have to be before the\nend."
+        }
+      },
+      "description": "Represents a time interval, encoded as a Timestamp start (inclusive) and a\nTimestamp end (exclusive).\n\nThe start must be less than or equal to the end.\nWhen the start equals the end, the interval is empty (matches no time).\nWhen both start and end are unspecified, the interval matches any time."
+    },
+    "typeMoney": {
+      "type": "object",
+      "properties": {
+        "currency_code": {
+          "type": "string",
+          "description": "The three-letter currency code defined in ISO 4217."
+        },
+        "units": {
+          "type": "string",
+          "format": "int64",
+          "description": "The whole units of the amount.\nFor example if `currencyCode` is `\"USD\"`, then 1 unit is one US dollar."
+        },
+        "nanos": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of nano (10^-9) units of the amount.\nThe value must be between -999,999,999 and +999,999,999 inclusive.\nIf `units` is positive, `nanos` must be positive or zero.\nIf `units` is zero, `nanos` can be positive, zero, or negative.\nIf `units` is negative, `nanos` must be negative or zero.\nFor example $-1.75 is represented as `units`=-1 and `nanos`=-750,000,000."
+        }
+      },
+      "description": "Represents an amount of money with its currency type."
+    },
+    "v1AccountTrade": {
+      "type": "object",
+      "properties": {
+        "trade_id": {
+          "type": "string",
+          "title": "Trade ID"
+        },
+        "symbol": {
+          "type": "string",
+          "title": "Asset symbol"
+        },
+        "price": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Trade Price"
+        },
+        "size": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "Size in pcs."
+        },
+        "side": {
+          "$ref": "#/definitions/v1Side",
+          "title": "Trading side (long or short)"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp"
+        },
+        "order_id": {
+          "type": "string",
+          "title": "Order ID"
+        },
+        "account_id": {
+          "type": "string",
+          "title": "Account ID"
+        },
+        "comment": {
+          "type": "string",
+          "title": "Order Label (maximum 128 characters)"
+        },
+        "accrued_interest": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Accrued interest (filled the next day after the trade date)"
+        },
+        "currency": {
+          "type": "string",
+          "description": "Price currency (for example, USD, EUR)\nNote: The field is filled in only when using the Trades method\nFor SubscribeTrades, this field may be empty due to differences in data sources. When processing trades from a subscription, it is recommended to consider the possibility of an empty value."
+        },
+        "commission": {
+          "$ref": "#/definitions/AccountTradeCommission",
+          "title": "Commission. Filled in for historical trades"
+        }
+      },
+      "title": "Trade Information"
+    },
+    "v1Side": {
+      "type": "string",
+      "enum": [
+        "SIDE_UNSPECIFIED",
+        "SIDE_BUY",
+        "SIDE_SELL"
+      ],
+      "default": "SIDE_UNSPECIFIED",
+      "description": "- SIDE_UNSPECIFIED: Transaction side is not specified\n - SIDE_BUY: Buy\n - SIDE_SELL: Sell",
+      "title": "Transaction side"
+    },
+    "v1assetsOption": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "title": "Symbol"
+        },
+        "type": {
+          "$ref": "#/definitions/assetsOptionType",
+          "title": "Asset type"
+        },
+        "contract_size": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Lot quantity of the underlying asset"
+        },
+        "trade_first_day": {
+          "$ref": "#/definitions/typeDate",
+          "title": "Trading start date"
+        },
+        "trade_last_day": {
+          "$ref": "#/definitions/typeDate",
+          "title": "Trading end date"
+        },
+        "strike": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Option strike price"
+        },
+        "multiplier": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Option multiplier"
+        },
+        "expiration_first_day": {
+          "$ref": "#/definitions/typeDate",
+          "title": "Expiration start date"
+        },
+        "expiration_last_day": {
+          "$ref": "#/definitions/typeDate",
+          "title": "Expiration date"
+        }
+      },
+      "title": "Option Information"
+    },
+    "v1marketdataOrderBook": {
+      "type": "object",
+      "properties": {
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/marketdataOrderBookRow"
+          },
+          "title": "Orderbook Levels"
+        }
+      },
+      "title": "Order Book Information"
+    },
+    "v1marketdataTrade": {
+      "type": "object",
+      "properties": {
+        "trade_id": {
+          "type": "string",
+          "title": "Trade ID sent by the exchange"
+        },
+        "mpid": {
+          "type": "string",
+          "title": "Market Participant ID"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp"
+        },
+        "price": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Trade Price"
+        },
+        "size": {
+          "$ref": "#/definitions/typeDecimal",
+          "title": "Trade size"
+        },
+        "side": {
+          "$ref": "#/definitions/v1Side",
+          "title": "Trade side (buy or sell)"
+        },
+        "open_interest": {
+          "$ref": "#/definitions/typeDecimal",
+          "description": "Open interest at the time of the transaction."
+        },
+        "is_data_snapshot": {
+          "type": "boolean",
+          "title": "Indicates whether the data is a snapshot"
+        }
+      },
+      "title": "Trade Information"
+    }
+  },
+  "securityDefinitions": {
+    "Authorization": {
+      "type": "apiKey",
+      "description": "JWT authorization token",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
+}
