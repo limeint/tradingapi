@@ -9,6 +9,17 @@ The PyPI distribution is `limeint-sdk`; the Python import name is
 
 ## [Unreleased]
 
+## [2.24.0] — 2026-11-16
+
+Protobuf contracts are re-synced with the Trade API `2.24.0` release line.
+
+### Added
+
+- `GetAssetResponse.price_step` (`GetAssetResponse.PriceStep`) describes a
+  price step that depends on the order price. It is set when `min_step = 0`:
+  `step` applies below `threshold_price`, and `step_from_threshold` applies at
+  or above it.
+
 ## [2.23.0] — 2026-10-09
 
 Protobuf contracts are re-synced with the Trade API `2.23.0` release line.
