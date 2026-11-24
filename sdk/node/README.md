@@ -118,7 +118,7 @@ The returned object exposes generated methods directly:
 | `auth` | `AuthService` | `tokenDetails` |
 | `accounts` | `AccountsService` | `getAccount`, `trades`, `subscribeAccount` |
 | `assets` | `AssetsService` | `allAssets`, `getAsset`, `schedule` |
-| `corporateActions` | `CorporateActionsService` | splits, bonds, dividends |
+| `corporateActions` | `CorporateActionsService` | splits, dividends |
 | `marketData` | `MarketDataService` | `bars`, `lastQuote`, quote/book/bar streams |
 | `orders` | `OrdersService` | place, cancel, query, order/trade streams |
 | `metrics` | `UsageMetricsService` | `getUsageMetrics` |

@@ -144,10 +144,8 @@ The client currently exposes these Trade API services as sub-clients:
 | `client.assets`      | `AssetsService`       | Instruments, exchanges, schedules, options.   |
 | `client.market_data` | `MarketDataService`   | Bars, quotes, order book, trade streams.      |
 | `client.orders`      | `OrdersService`       | Place / cancel orders, order + trade streams. |
+| `client.corporate_actions` | `CorporateActionsService` | Upcoming and past splits and dividends. |
 | `client.metrics`     | `UsageMetricsService` | API usage / quota metrics.                    |
-
-The protobuf contracts also contain `CorporateActionsService`, but the current
-Python client does not yet expose it as a sub-client. The Node.js SDK does.
 
 ## API reference
 
@@ -162,6 +160,7 @@ per-service modules:
 | `trade_api.market_data`   | `client.market_data.*`                                      |
 | `trade_api.orders`        | `client.orders.*` (includes `Side`)                         |
 | `trade_api.metrics`       | `client.metrics.*`                                          |
+| `trade_api.corporate_actions` | `client.corporate_actions.*`                            |
 | `trade_api.auth_messages` | `client.auth.*` (rarely needed — JWT handled automatically) |
 
 The original deeply-nested paths
@@ -233,6 +232,15 @@ Legend: ▶ unary · ⇉ server-stream · ⇄ bidi-stream
 | ----------------------------------------- | :--: | ---------------------------------------------- |
 | `GetUsageMetrics(GetUsageMetricsRequest)` |  ▶   | API usage / quota stats for the current token. |
 
+### `client.corporate_actions` — `CorporateActionsService`
+
+| Method                                          | Kind | Purpose                                      |
+| ----------------------------------------------- | :--: | -------------------------------------------- |
+| `GetFutureSplits(GetFutureSplitsRequest)`       |  ▶   | Upcoming splits for a symbol.                |
+| `GetPastSplits(GetPastSplitsRequest)`           |  ▶   | Historical splits for a symbol and date range. |
+| `GetFutureDividends(GetFutureDividendsRequest)` |  ▶   | Upcoming dividends for a symbol.             |
+| `GetPastDividends(GetPastDividendsRequest)`     |  ▶   | Historical dividends for a symbol and date range. |
+
 ### Client lifecycle
 
 | Operation        | Sync                                                                                                      | Async                                                                 |
@@ -254,6 +262,7 @@ application benefits from the SDK's typed `TradeAPIError` hierarchy:
 ```python
 import grpc
 from trade_api import TradeAPIClient, RateLimitError, from_rpc_error
+from trade_api.accounts import GetAccountRequest
 
 with TradeAPIClient(secret="...") as client:
     try:

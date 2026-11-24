@@ -32,6 +32,10 @@ from trade_api.proto.grpc.tradeapi.v1.auth import (
     auth_service_pb2,
     auth_service_pb2_grpc,
 )
+from trade_api.proto.grpc.tradeapi.v1.corporateactions import (
+    corporate_actions_service_pb2,
+    corporate_actions_service_pb2_grpc,
+)
 from trade_api.proto.grpc.tradeapi.v1.marketdata import (
     marketdata_service_pb2,
     marketdata_service_pb2_grpc,
@@ -228,6 +232,25 @@ class FakeAssetsService(assets_service_pb2_grpc.AssetsServiceServicer):
         return assets_service_pb2.AssetsResponse()
 
 
+class FakeCorporateActionsService(
+    corporate_actions_service_pb2_grpc.CorporateActionsServiceServicer
+):
+    """Echoes the requested symbol back with one split and records metadata."""
+
+    def __init__(self) -> None:
+        self.last_metadata: tuple[tuple[str, str], ...] = ()
+
+    def GetFutureSplits(
+        self,
+        request: corporate_actions_service_pb2.GetFutureSplitsRequest,
+        context: grpc.ServicerContext,
+    ) -> Any:
+        self.last_metadata = tuple(context.invocation_metadata())
+        return corporate_actions_service_pb2.GetFutureSplitsResponse(
+            symbol=request.symbol, splits=[corporate_actions_service_pb2.SplitInfo()]
+        )
+
+
 # ---------------------------------------------------------------------------
 # Server harness
 # ---------------------------------------------------------------------------
@@ -241,6 +264,7 @@ def fake_server(
     orders: FakeOrdersService | None = None,
     market_data: FakeMarketDataService | None = None,
     assets: FakeAssetsService | None = None,
+    corporate_actions: FakeCorporateActionsService | None = None,
 ) -> Iterator[tuple[str, dict[str, Any]]]:
     """Spin up a real gRPC server on localhost:<random> with the requested
     servicers attached. Yields (endpoint, registry-of-installed-services)."""
@@ -262,6 +286,11 @@ def fake_server(
     if assets is not None:
         assets_service_pb2_grpc.add_AssetsServiceServicer_to_server(assets, server)
         installed["assets"] = assets
+    if corporate_actions is not None:
+        corporate_actions_service_pb2_grpc.add_CorporateActionsServiceServicer_to_server(
+            corporate_actions, server
+        )
+        installed["corporate_actions"] = corporate_actions
 
     port = server.add_insecure_port("localhost:0")
     server.start()

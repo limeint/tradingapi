@@ -1,0 +1,56 @@
+# Limeint Trade API SDKs
+
+> Official Python (`limeint-sdk`, imported as `trade_api`) and Node.js (`@limeint/trade-api`) clients for the Limeint Trade API, a gRPC API for accounts, instruments, market data, corporate actions, and order placement. Both packages share one version (currently 2.24.0).
+
+## Install
+
+- Python 3.10+: `python -m pip install limeint-sdk==2.24.0`, then `import trade_api`.
+- Node.js 20+: `npm install @limeint/trade-api@2.24.0`.
+
+## Connect
+
+- Python: `from trade_api import TradeAPIClient` (sync, context manager) or `AsyncTradeAPIClient` (asyncio). `TradeAPIClient(secret, *, endpoint=DEFAULT_ENDPOINT, retry_policy=DEFAULT_POLICY, channel_options=None)`.
+- Node.js: `createTradeApi({ secret })` returns a client; `withTradeApi(options, fn)` closes it for you.
+- Authentication: pass the API secret, conventionally read from the `TRADE_API_SECRET` environment variable. The SDK exchanges it for a JWT and renews the JWT in the background. Never hard-code or log the secret.
+- Default endpoint: `api.limeint.eu:443` (TLS). `for_testing(...)` (Python) and `insecure: true` (Node.js) are plaintext and only for local fake servers.
+
+## Services (sub-clients)
+
+Python attribute / Node.js property:
+
+- `auth` / `auth`: AuthService (token details; JWT handling is automatic).
+- `accounts` / `accounts`: AccountsService (account, positions, trades, transactions, account stream).
+- `assets` / `assets`: AssetsService (instruments, exchanges, schedules, options).
+- `market_data` / `marketData`: MarketDataService (bars, quotes, order book, trade streams).
+- `orders` / `orders`: OrdersService (place, cancel, query orders; order and trade streams).
+- `corporate_actions` / `corporateActions`: CorporateActionsService (future and past splits and dividends).
+- `metrics` / `metrics`: UsageMetricsService (API usage metrics).
+
+There is no ReportsService in these SDKs. Message types are re-exported per service: Python `trade_api.accounts`, `trade_api.assets`, `trade_api.market_data`, `trade_api.orders`, `trade_api.corporate_actions`, `trade_api.metrics`, `trade_api.auth_messages`; Node.js `@limeint/trade-api/accounts`, `/market-data`, `/orders`, and so on.
+
+## Data conventions
+
+- Symbols are `ticker@mic` using the segment MIC, for example `AAPL@XNGS`. `AAPL@XNAS` does not match a listing.
+- `google.type.Decimal` is a string: Python `Decimal(value="1")` from `google.type.decimal_pb2`; Node.js `{ value: "1" }`. Never pass a float.
+- Sides: `Side.SIDE_BUY`, `Side.SIDE_SELL` (`SIDE_UNSPECIFIED` is invalid for orders). Order types and time in force use the same prefixed style, for example `OrderType.ORDER_TYPE_LIMIT`, `TimeInForce.TIME_IN_FORCE_DAY`.
+- Node.js maps protobuf timestamps to `Date` and 64-bit integers to `bigint`.
+
+## Retries and errors
+
+- Unary RPCs, including `PlaceOrder` and `CancelOrder`, retry `UNAVAILABLE` by default: 4 total attempts, exponential backoff from 200 ms capped at 5 s. The SDK does not exempt order mutations, so a retried `PlaceOrder` can reach the server twice. Set a stable `client_order_id` / `clientOrderId`, or disable retries for that call (Node.js: `{ retry: false }` per call; Python: `RetryPolicy(max_attempts=1)`).
+- Python also retries `RESOURCE_EXHAUSTED` only when the server sends `grpc-retry-pushback-ms`. Node.js retries only `UNAVAILABLE`.
+- Streaming RPCs are never retried; reconnect yourself.
+- Python raises raw `grpc.RpcError`; `trade_api.from_rpc_error()` maps it to `TradeAPIError` subclasses (`AuthError`, `RateLimitError`, ...). Node.js uses `toTradeApiError()` and `TradeApiError`.
+
+## Safety rules for live orders
+
+- Strategy examples (`examples/strategies/`) are dry-run by default. `--check` is a bounded read-only signal check. Only `--execute` places real market orders, and `--check` with `--execute` is rejected.
+- Prefer `TRADE_API_SECRET` over the strategies' `--secret` flag: command-line secrets end up in shell history.
+- The limit-order SDK examples refuse to run unless `TRADE_API_EXECUTE=1` is set and a `TRADE_API_LIMIT_PRICE` is given, because they submit a real order.
+
+## Docs
+
+- [Python SDK README](sdk/python/README.md)
+- [Node.js SDK README](sdk/node/README.md)
+- [SDK examples](examples/sdk/)
+- [Strategy examples](examples/strategies/README.md)

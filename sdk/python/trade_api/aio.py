@@ -42,6 +42,9 @@ if TYPE_CHECKING:
     from .proto.grpc.tradeapi.v1.auth.auth_service_pb2_grpc import (
         AuthServiceAsyncStub,
     )
+    from .proto.grpc.tradeapi.v1.corporateactions.corporate_actions_service_pb2_grpc import (
+        CorporateActionsServiceAsyncStub,
+    )
     from .proto.grpc.tradeapi.v1.marketdata.marketdata_service_pb2_grpc import (
         MarketDataServiceAsyncStub,
     )
@@ -133,6 +136,9 @@ class AsyncTradeAPIClient:
             self.assets: AssetsServiceAsyncStub = stubs["assets"](self._channel)
             self.market_data: MarketDataServiceAsyncStub = stubs["market_data"](self._channel)
             self.orders: OrdersServiceAsyncStub = stubs["orders"](self._channel)
+            self.corporate_actions: CorporateActionsServiceAsyncStub = stubs["corporate_actions"](
+                self._channel
+            )
             self.metrics: UsageMetricsServiceAsyncStub = stubs["metrics"](self._channel)
             self._started = True
         except BaseException:

@@ -46,7 +46,14 @@ def parse_config(
         prog="python main.py",
         description="Run the RSI 14 threshold strategy",
     )
-    parser.add_argument("--secret", default=environ.get("TRADE_API_SECRET"))
+    parser.add_argument(
+        "--secret",
+        default=environ.get("TRADE_API_SECRET"),
+        help=(
+            "API secret. Prefer the TRADE_API_SECRET environment variable: "
+            "a value passed here is saved in shell history."
+        ),
+    )
     parser.add_argument("--symbol", default=environ.get("TRADE_API_SYMBOL"))
     parser.add_argument(
         "--timeframe",

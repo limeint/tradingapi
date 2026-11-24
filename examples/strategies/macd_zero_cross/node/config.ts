@@ -114,4 +114,6 @@ export const USAGE = `Usage:
   npm start -- --symbol AAPL@XNGS --check
   npm start -- --symbol AAPL@XNGS --execute
 
-TRADE_API_SECRET is required. Dry-run is the default.`;
+TRADE_API_SECRET is required. Dry-run is the default.
+Prefer the TRADE_API_SECRET environment variable over --secret:
+a secret passed on the command line is saved in shell history.`;

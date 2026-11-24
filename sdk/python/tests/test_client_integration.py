@@ -19,6 +19,7 @@ from trade_api import (
     TradeAPIClient,
     from_rpc_error,
 )
+from trade_api.corporate_actions import GetFutureSplitsRequest
 from trade_api.proto.grpc.tradeapi.v1.accounts.accounts_service_pb2 import (
     GetAccountRequest,
 )
@@ -36,6 +37,7 @@ from trade_api.proto.grpc.tradeapi.v1.orders.orders_service_pb2 import (
 from .fakes import (
     FakeAccountsService,
     FakeAuthService,
+    FakeCorporateActionsService,
     FakeMarketDataService,
     FakeOrdersService,
     fake_server,
@@ -60,6 +62,20 @@ def test_unary_call_succeeds_and_carries_authorization_header() -> None:
             assert resp.account_id == "A12345"
             md = dict(accounts.last_metadata)
             assert md.get("authorization") == "my-jwt"
+        auth.close_stream()
+
+
+def test_corporate_actions_call_reaches_service_with_authorization() -> None:
+    auth = FakeAuthService(initial_token="ca-jwt")
+    corporate_actions = FakeCorporateActionsService()
+    with fake_server(auth=auth, corporate_actions=corporate_actions) as (endpoint, _):
+        with TradeAPIClient.for_testing(secret="s", endpoint=endpoint) as client:
+            resp = client.corporate_actions.GetFutureSplits(
+                GetFutureSplitsRequest(symbol="AAPL@XNGS")
+            )
+            assert resp.symbol == "AAPL@XNGS"
+            assert len(resp.splits) == 1
+            assert dict(corporate_actions.last_metadata).get("authorization") == "ca-jwt"
         auth.close_stream()
 
 
@@ -256,6 +272,21 @@ async def test_async_unary_call_carries_authorization() -> None:
             assert resp.account_id == "A99"
             md = dict(accounts.last_metadata)
             assert md.get("authorization") == "async-jwt"
+        auth.close_stream()
+
+
+@pytest.mark.asyncio
+async def test_async_corporate_actions_call_carries_authorization() -> None:
+    auth = FakeAuthService(initial_token="async-ca-jwt")
+    corporate_actions = FakeCorporateActionsService()
+    with fake_server(auth=auth, corporate_actions=corporate_actions) as (endpoint, _):
+        async with AsyncTradeAPIClient.for_testing(secret="s", endpoint=endpoint) as client:
+            resp = await client.corporate_actions.GetFutureSplits(
+                GetFutureSplitsRequest(symbol="AAPL@XNGS")
+            )
+            assert resp.symbol == "AAPL@XNGS"
+            md = dict(corporate_actions.last_metadata)
+            assert md.get("authorization") == "async-ca-jwt"
         auth.close_stream()
 
 

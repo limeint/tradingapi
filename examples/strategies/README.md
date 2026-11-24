@@ -9,6 +9,7 @@ own applications.
 
 Choose either implementation. Both commands are bounded and read-only: they
 authenticate, fetch historical candles, calculate the latest signal, and exit.
+Run these from the repository root.
 
 ```sh
 # Python 3.10+ and uv
@@ -24,14 +25,21 @@ npm ci
 TRADE_API_SECRET=... npm start -- --symbol AAPL@XNGS --check
 ```
 
-Run these from the repository root. Contributors who would rather keep the
-secret in one place can copy `.env.example` to `.env` at the repository root and
-run any strategy through `just` instead, which loads that file:
+Provide the secret through the `TRADE_API_SECRET` environment variable. Every
+strategy also accepts `--secret`, but a secret passed on the command line is
+saved in your shell history and is visible to other local users in the process
+list, so prefer the environment variable.
+
+Contributors who would rather keep the secret in one place can copy
+`.env.example` to `.env` at the repository root and run any strategy through
+`just` instead, which loads that file:
 
 ```sh
 just run-strategy-python sma_crossover --check
 just run-strategy-node sma_crossover --check
-``` Continue with the
+```
+
+Continue with the
 [SMA strategy guide](sma_crossover/) before opening a live stream or enabling
 execution.
 

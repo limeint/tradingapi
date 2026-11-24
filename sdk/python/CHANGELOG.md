@@ -9,6 +9,14 @@ The PyPI distribution is `limeint-sdk`; the Python import name is
 
 ## [Unreleased]
 
+### Added
+
+- `client.corporate_actions` on `TradeAPIClient` and `AsyncTradeAPIClient`
+  exposes `CorporateActionsService` (`GetFutureSplits`, `GetPastSplits`,
+  `GetFutureDividends`, `GetPastDividends`), matching the Node.js SDK.
+- `trade_api.corporate_actions` re-exports the service's request, response,
+  and supporting message types.
+
 ## [2.24.0] — 2026-11-16
 
 Protobuf contracts are re-synced with the Trade API `2.24.0` release line.

@@ -30,3 +30,7 @@ sdk/node/src/generated/
 .coverage.*
 coverage.xml
 htmlcov/
+
+# Local Obsidian vault
+limeint/
+.obsidian/
