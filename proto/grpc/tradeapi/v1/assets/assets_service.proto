@@ -400,6 +400,16 @@ message GetAssetResponse {
   string quote_currency = 13;
   // Price step that depends on the order price. Set only when min_step = 0: use step if the order price is below threshold_price, and step_from_threshold if it is equal to or above
   PriceStep price_step = 17;
+  // Coefficient that converts a quote into the monetary value of one unit
+  // of the instrument (one contract for derivatives) in quote_currency.
+  // The monetary value of a price step equals the price step multiplied by price_cost.
+  // If min_step > 0, the price step equals min_step / 10^decimals.
+  // If min_step = 0 and price_step is set, the step is chosen by the order price:
+  // price_step.step if the price is below price_step.threshold_price;
+  // price_step.step_from_threshold if the price is equal to the threshold or above.
+  // Step values from price_step are used without scaling.
+  // If min_step = 0 and price_step is absent, there is not enough data to calculate the step.
+  double price_cost = 18;
 
   oneof asset_details {
     // Specific parameters for instrument type "Futures"
